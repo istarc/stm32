@@ -16,7 +16,7 @@ INCLUDES=-I. \
 -I../../../Utilities/STM32F4-Discovery \
 -I../../../Libraries/CMSIS/Include \
 -I../../../Libraries/STM32F4xx_StdPeriph_Driver/inc
-CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES)
+CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -g
 LDSCRIPT = TrueSTUDIO/IO_Toggle/stm32_flash.ld
 LDFLAGS=-T $(LDSCRIPT) --specs=nosys.specs $(MCFLAGS)
 

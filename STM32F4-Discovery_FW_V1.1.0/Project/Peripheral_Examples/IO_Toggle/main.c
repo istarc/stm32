@@ -21,6 +21,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4_discovery.h"
+#include "stm32f4xx_gpio.h"
+#include "stm32f4xx_rcc.h"
 
 /** @addtogroup STM32F4_Discovery_Peripheral_Examples
   * @{
