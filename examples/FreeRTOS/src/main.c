@@ -1,23 +1,3 @@
-/**
- * C/C++ Preprocessor Add Headers:
- * - FreeRTOS\Source\include
- * - FreeRTOS\Source\portable\IAR\ARM_CM4F
- * 
- * Assembler Preprocessor Add Headers:
- * - Copy to $PROJ_DIR$ a working FreeRTOSConfig.h and setup
- * - $PROJ_DIR$\.. (FreeRTOSConfig.h)
- *
- * Add source files:
- * - FreeRTOS\Source\*.c
- * - FreeRTOS\Source\portable\MemMang\heap_[1|2|3|4].c
- * - FreeRTOS\Source\portable\IAR\ARM_CM4F\*.c
- * - FreeRTOS\Source\portable\IAR\ARM_CM4F\*.s
- * 
- * Remove duplicate interrupt handlers definitions in stm32f4xx_it.c. Originals are in portasm.s
- *
- * Define tasks and start scheduler (below).
- */
-
 /* Board includes */
 #include "stm32f4_discovery.h"
 #include "stm32f4xx_gpio.h"
