@@ -24,8 +24,8 @@ INCLUDES=$(INC:%=-I%)
 OBJECTS=$(ASOURCES:%.s=%.o)
 OBJECTS+=$(CSOURCES:%.c=%.o)
 # Define output files ELF & IHEX
-BINELF=gpio.elf
-BINHEX=gpio.hex
+BINELF=outp.elf
+BINHEX=outp.hex
 
 ###
 # MCU FLAGS
@@ -70,4 +70,8 @@ clean:
 	rm -f $(OBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX)
 
 deploy:
-	/opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg -c "program bin/gpio.elf verify reset"
+ifeq ($(wildcard /opt/openocd/bin/openocd),)
+	/usr/bin/openocd -f /usr/share/openocd/scripts/board/stm32f4discovery.cfg -c "program bin/"$(BINELF)" verify reset"
+else
+	/opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg -c "program bin/"$(BINELF)" verify reset"
+endif
