@@ -8,9 +8,11 @@
 #include "timers.h"
 #include "semphr.h"
 
-void Task1(void*);
-void Task2(void*);
-void Task3(void*);
+#define BLOCK_
+
+void ToggleLED_Timer(void*);
+void DetectButtonPress(void*);
+void ToggleLED_IPC(void*);
 void initHW();
 
 xQueueHandle pbq;
@@ -28,18 +30,31 @@ int main(void)
   
   /* Create tasks */
   xTaskCreate(
-      Task1,                            /* Function pointer */
-      "Task1",                          /* Task name - for debugging only*/
-      configMINIMAL_STACK_SIZE,         /* Stack depth in words */
-      (void*) NULL,                     /* Pointer to tasks arguments (parameter) */
-      tskIDLE_PRIORITY + 2UL,           /* Task priority*/
-      NULL                              /* Task handle */
+		  ToggleLED_Timer,                 /* Function pointer */
+		  "Task1",                          /* Task name - for debugging only*/
+		  configMINIMAL_STACK_SIZE,         /* Stack depth in words */
+		  (void*) NULL,                     /* Pointer to tasks arguments (parameter) */
+		  tskIDLE_PRIORITY + 2UL,           /* Task priority*/
+		  NULL                              /* Task handle */
   );
   
-  xTaskCreate(Task2, "Task2", configMINIMAL_STACK_SIZE, (void*) NULL, tskIDLE_PRIORITY + 2UL, NULL);
-  xTaskCreate(Task3, "Task3", configMINIMAL_STACK_SIZE, (void*) NULL, tskIDLE_PRIORITY + 2UL, NULL);
+  xTaskCreate(
+		  DetectButtonPress,
+		  "Task2",
+		  configMINIMAL_STACK_SIZE,
+		  (void*) NULL,
+		  tskIDLE_PRIORITY + 2UL,
+		  NULL);
+
+  xTaskCreate(
+		  ToggleLED_IPC,
+		  "Task3",
+		  configMINIMAL_STACK_SIZE,
+		  (void*) NULL,
+		  tskIDLE_PRIORITY + 2UL,
+		  NULL);
   
-  /* Start the Scheduler */
+  /* Start the RTOS Scheduler */
   vTaskStartScheduler();
   
   /* HALT */
@@ -47,9 +62,9 @@ int main(void)
 }
 
 /**
- * TASK 1
+ * TASK 1: Toggle LED via RTOS Timer
  */
-void Task1(void *pvParameters){
+void ToggleLED_Timer(void *pvParameters){
   
   while (1) {
     GPIO_ToggleBits(GPIOD, GPIO_Pin_12);
@@ -65,36 +80,38 @@ void Task1(void *pvParameters){
 }
 
 /**
- * TASK 2 PushButton - Queue
+ * TASK 2: Detect Button Press
+ * 			And Signal Event via Inter-Process Communication (IPC)
  */
-void Task2(void *pvParameters){
+void DetectButtonPress(void *pvParameters){
   
   int sig = 1;
   
   while (1) {
+	/* Detect Button Press  */
     if(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0)>0) {
       while(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0)>0)
-        vTaskDelay(100 / portTICK_RATE_MS);
+        vTaskDelay(100 / portTICK_RATE_MS); /* Button Debounce Delay */
       while(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0)==0)
-        vTaskDelay(100 / portTICK_RATE_MS);
+        vTaskDelay(100 / portTICK_RATE_MS); /* Button Debounce Delay */
       
-      GPIO_ToggleBits(GPIOD,GPIO_Pin_13);
-      
-      xQueueSendToBack(pbq, &sig, 0);
+      xQueueSendToBack(pbq, &sig, 0); /* Send Message */
     }
   }
 }
 
 /**
- * TASK 3 LEDQ
+ * TASK 3: Toggle LED via Inter-Process Communication (IPC)
+ *
  */
-void Task3(void *pvParameters) {
+void ToggleLED_IPC(void *pvParameters) {
   
   int sig;
   portBASE_TYPE status;
   
   while (1) {
-    status = xQueueReceive(pbq, &sig, 0);
+    status = xQueueReceive(pbq, &sig, portMAX_DELAY); /* Receive Message */
+    												  /* portMAX_DELAY blocks task indefinitely if queue is empty */
     if(status == pdTRUE) {
       GPIO_ToggleBits(GPIOD,GPIO_Pin_14);
     }
