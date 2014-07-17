@@ -6,6 +6,7 @@ AR=arm-none-eabi-ar
 AS=arm-none-eabi-as
 CP=arm-none-eabi-objcopy
 OD=arm-none-eabi-objdump
+SIZE=arm-none-eabi-size
 
 ###
 # Directory Structure
@@ -57,6 +58,7 @@ $(BINDIR)/$(BINHEX): $(BINDIR)/$(BINELF)
 $(BINDIR)/$(BINELF): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 	@echo "Linking complete!\n"
+	$(SIZE) $(BINDIR)/$(BINELF)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@

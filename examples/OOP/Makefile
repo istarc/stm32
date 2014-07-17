@@ -1,6 +1,7 @@
 ###
 # GNU ARM Embedded Toolchain
 CC=arm-none-eabi-gcc
+CXX=arm-none-eabi-g++
 LD=arm-none-eabi-ld
 AR=arm-none-eabi-ar
 AS=arm-none-eabi-as
@@ -18,12 +19,15 @@ SRCDIR=src
 # Find source files
 ASOURCES=$(shell find -L $(SRCDIR) -name '*.s')
 CSOURCES+=$(shell find -L $(SRCDIR) -name '*.c')
+CXXSOURCES+=$(shell find -L $(SRCDIR) -name '*.cpp')
+$(info $(CXXSOURCES))
 # Find header directories
 INC=$(shell find -L . -name '*.h' -exec dirname {} \; | uniq)
 INCLUDES=$(INC:%=-I%)
 # Create object list
 OBJECTS=$(ASOURCES:%.s=%.o)
 OBJECTS+=$(CSOURCES:%.c=%.o)
+OBJECTS+=$(CXXSOURCES:%.cpp=%.o)
 # Define output files ELF & IHEX
 BINELF=outp.elf
 BINHEX=outp.hex
@@ -35,6 +39,7 @@ MCFLAGS=-mcpu=cortex-m4 -mthumb -mlittle-endian \
 # COMPILE FLAGS
 DEFS=-DUSE_STDPERIPH_DRIVER -DSTM32F4XX
 CFLAGS  =-c $(MCFLAGS) $(DEFS) $(INCLUDES)
+CXXFLAGS= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++11
 # LINKER FLAGS
 LDSCRIPT= stm32_flash.ld
 LDFLAGS =-T $(LDSCRIPT) --specs=nosys.specs $(MCFLAGS)
@@ -59,6 +64,10 @@ $(BINDIR)/$(BINELF): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 	@echo "Linking complete!\n"
 	$(SIZE) $(BINDIR)/$(BINELF)
+
+%.o: %.cpp
+	$(CC) $(CXXFLAGS) $< -o $@
+	@echo "Compiled "$<"!\n"
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
