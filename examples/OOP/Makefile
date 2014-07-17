@@ -20,7 +20,6 @@ SRCDIR=src
 ASOURCES=$(shell find -L $(SRCDIR) -name '*.s')
 CSOURCES+=$(shell find -L $(SRCDIR) -name '*.c')
 CXXSOURCES+=$(shell find -L $(SRCDIR) -name '*.cpp')
-$(info $(CXXSOURCES))
 # Find header directories
 INC=$(shell find -L . -name '*.h' -exec dirname {} \; | uniq)
 INCLUDES=$(INC:%=-I%)
