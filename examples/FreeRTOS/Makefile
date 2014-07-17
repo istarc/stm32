@@ -41,15 +41,19 @@ LDFLAGS =-T $(LDSCRIPT) --specs=nosys.specs $(MCFLAGS)
 
 ###
 # Build Rules
-.PHONY: release all debug clean deploy
+.PHONY: all release release-memopt debug clean
+
+all: release-memopt
 
 release: $(BINDIR)/$(BINHEX)
 
-all: $(BINDIR)/$(BINHEX)
+release-memopt: CFLAGS+=-Os
+release-memopt: LDFLAGS+=-Os
+release-memopt: release
 
-debug: CFLAGS+=-g # Add debug flag
+debug: CFLAGS+=-g
 debug: LDFLAGS+=-g
-debug: $(BINDIR)/$(BINHEX) 
+debug: release
 
 $(BINDIR)/$(BINHEX): $(BINDIR)/$(BINELF)
 	$(CP) -O ihex $< $@
