@@ -20,11 +20,20 @@
   */ 
 
 /* Includes ------------------------------------------------------------------*/
+/* #define CUSTOM_NEW // Implements new and delete using malloc and free to reduce memory footprint
+ * #define NO_EXCEPTIONS // C++ exceptions disabled to reduce memory footprint
+ */
+#ifdef CUSTOM_NEW
 #include <stdlib.h>
+#else
+#include <new>
+#include <cstddef>
+#endif
+
 #include "stm32f4_discovery.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
-#include "Counter.h"
+#include "TimeDelay.h"
 
 /** @addtogroup STM32F4_Discovery_Peripheral_Examples
   * @{
@@ -58,9 +67,18 @@ int main(void)
         system_stm32f4xx.c file
      */
 
-  /* Create a Counter Objects */
-  Counter c1 = Counter(0x3FFFFF);
-  Counter *c2 = new Counter(0xFFFFFF);
+  /* Create Counter Objects */
+  TimeDelay td1 = TimeDelay(); /* OOP: Automatic object instantiation (using stack) */
+#ifdef NO_EXCEPTIONS
+  TimeDelay *td2 = new TimeDelay(); /* OOP: Dynamic object instantiation (using heap) */
+#else
+  TimeDelay *td2 = NULL;
+  try { /* OOP: Exception handling */
+	  td2 = new TimeDelay();
+  } catch(int e) {
+	  while(true);
+  }
+#endif
 
   /* GPIOD Periph clock enable */
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
@@ -79,30 +97,30 @@ int main(void)
     GPIO_SetBits(GPIOD, GPIO_Pin_12);
     
     /* Insert delay */
-    Delay(c1.get());
+    Delay(td1.get());
     
     /* PD13 to be toggled */
     GPIO_SetBits(GPIOD, GPIO_Pin_13);
     
     /* Insert delay */
-    Delay(c1.get());
+    Delay(td1.get());
   
     /* PD14 to be toggled */
     GPIO_SetBits(GPIOD, GPIO_Pin_14);
     
     /* Insert delay */
-    Delay(c1.get());
+    Delay(td1.get());
     
     /* PD15 to be toggled */
     GPIO_SetBits(GPIOD, GPIO_Pin_15);
     
     /* Insert delay */
-    Delay(c1.get());
+    Delay(td1.get());
     
     GPIO_ResetBits(GPIOD, GPIO_Pin_12|GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15);
-    
+
     /* Insert delay */
-    Delay(c2->get());
+    Delay(td2->get());
   }
 }
 
@@ -140,8 +158,10 @@ void assert_failed(uint8_t* file, uint32_t line)
 #endif
 
 /*
- * Implement C++ new/delete operators
+ * Override C++ new/delete operators to reduce memory footprint
  */
+#ifdef CUSTOM_NEW
+
 void *operator new(size_t size) {
 	return malloc(size);
 }
@@ -158,6 +178,7 @@ void operator delete[](void *p) {
 	free(p);
 }
 
+#endif
 /**
   * @}
   */ 

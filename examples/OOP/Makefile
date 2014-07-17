@@ -37,35 +37,42 @@ MCFLAGS=-mcpu=cortex-m4 -mthumb -mlittle-endian \
 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork
 # COMPILE FLAGS
 DEFS=-DUSE_STDPERIPH_DRIVER -DSTM32F4XX
-CFLAGS  =-c $(MCFLAGS) $(DEFS) $(INCLUDES)
-CXXFLAGS= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++11
+CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES)
+CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11
 # LINKER FLAGS
 LDSCRIPT= stm32_flash.ld
 LDFLAGS =-T $(LDSCRIPT) --specs=nosys.specs $(MCFLAGS)
 
 ###
 # Build Rules
-.PHONY: release all debug clean
+.PHONY: all release release-memopt debug clean
+
+all: release-memopt
 
 release: $(BINDIR)/$(BINHEX)
 
-all: $(BINDIR)/$(BINHEX)
+release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS
+release-memopt: CFLAGS+=-Os
+release-memopt: CXXFLAGS+=-Os -fno-rtti -fno-exceptions
+release-memopt: LDFLAGS+=-Os
+release-memopt: release
 
-debug: CFLAGS+=-g # Add debug flag
+debug: CFLAGS+=-g
+debug: CXXFLAGS+=-g
 debug: LDFLAGS+=-g
-debug: $(BINDIR)/$(BINHEX) 
+debug: release
 
 $(BINDIR)/$(BINHEX): $(BINDIR)/$(BINELF)
 	$(CP) -O ihex $< $@
 	@echo "Objcopy from ELF to IHEX complete!\n"
 
 $(BINDIR)/$(BINELF): $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+	$(CXX) $(LDFLAGS) $(OBJECTS) -o $@
 	@echo "Linking complete!\n"
 	$(SIZE) $(BINDIR)/$(BINELF)
 
 %.o: %.cpp
-	$(CC) $(CXXFLAGS) $< -o $@
+	$(CXX) $(CXXFLAGS) $< -o $@
 	@echo "Compiled "$<"!\n"
 
 %.o: %.c
