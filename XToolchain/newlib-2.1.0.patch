@@ -1,0 +1,19 @@
+--- newlib-2.1.0/libgloss/arm/cpu-init/Makefile.in	2014-07-18 14:56:15.833128375 +0200
++++ newlib-2.1.0/libgloss/arm/cpu-init/Makefile.in	2014-07-18 14:57:09.265127174 +0200
+@@ -18,6 +18,7 @@
+ tooldir = $(exec_prefix)/$(target_alias)
+ 
+ objtype = @objtype@
++host_makefile_frag = $(srcdir)/../../config/default.mh
+ 
+ INSTALL = @INSTALL@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+@@ -80,7 +81,7 @@
+ install-info:
+ clean-info:
+ 
+-Makefile: Makefile.in ../config.status @host_makefile_frag_path@
++Makefile: Makefile.in ../config.status ${host_makefile_frag_path}
+ 	$(SHELL) ../config.status --file cpu-init/Makefile
+ 
+ ../config.status: ../configure
