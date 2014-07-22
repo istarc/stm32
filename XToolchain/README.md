@@ -11,7 +11,7 @@ Build:
 * bash build.sh
 
 Test:
-* export PATH=$PATH
+* export PATH=$PATH:~/arm/bin
 * cd ../examples/Assembly (or GPIO, FreeRTOS, OOP)
 * make clean && make release # OR
 * make clean && make release-memopt # OR
