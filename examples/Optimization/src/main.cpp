@@ -20,8 +20,15 @@
   */ 
 
 /* Includes ------------------------------------------------------------------*/
+/* #define CUSTOM_NEW // Implements new and delete using malloc and free to reduce memory footprint
+ * #define NO_EXCEPTIONS // C++ exceptions disabled to reduce memory footprint
+ */
+#ifdef CUSTOM_NEW
+#include <stdlib.h>
+#else
 #include <new>
 #include <cstddef>
+#endif
 
 #include "stm32f4_discovery.h"
 #include "stm32f4xx_gpio.h"
@@ -62,12 +69,16 @@ int main(void)
 
   /* Create Counter Objects */
   TimeDelay td1 = TimeDelay(); /* OOP: Automatic object instantiation (using stack) */
+#ifdef NO_EXCEPTIONS
+  TimeDelay *td2 = new TimeDelay(); /* OOP: Dynamic object instantiation (using heap) */
+#else
   TimeDelay *td2 = NULL;
   try { /* OOP: Exception handling */
 	  td2 = new TimeDelay();
   } catch(int e) {
 	  while(true);
   }
+#endif
 
   /* GPIOD Periph clock enable */
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
@@ -146,6 +157,28 @@ void assert_failed(uint8_t* file, uint32_t line)
 }
 #endif
 
+/*
+ * Override C++ new/delete operators to reduce memory footprint
+ */
+#ifdef CUSTOM_NEW
+
+void *operator new(size_t size) {
+	return malloc(size);
+}
+
+void *operator new[](size_t size) {
+	return malloc(size);
+}
+
+void operator delete(void *p) {
+	free(p);
+}
+
+void operator delete[](void *p) {
+	free(p);
+}
+
+#endif
 /**
   * @}
   */ 
