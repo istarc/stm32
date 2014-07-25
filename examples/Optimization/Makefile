@@ -73,18 +73,18 @@ LDFLAGS+=-Wl,-gc-sections # Remove isolated unused sections
 endif
 
 ifneq ($(filter O5,$(OPT)),)
-CFLAGS+=-fno-builtin
-CXXFLAGS+=-fno-builtin
+CFLAGS+=-fno-builtin # Disable C++ exception handling
+CXXFLAGS+=-fno-builtin # Disable C++ exception handling
 endif
 
 ifneq ($(filter O6,$(OPT)),)
-CFLAGS+=-flto
-CXXFLAGS+=-flto
-LDFLAGS+=-flto
+CFLAGS+=-flto # Enable link time optimization
+CXXFLAGS+=-flto # Enable link time optimization
+LDFLAGS+=-flto # Enable link time optimization
 endif
 
 ifneq ($(filter O7,$(OPT)),)
-CXXFLAGS+=-fno-rtti
+CXXFLAGS+=-fno-rtti # Disable type introspection
 endif
 
 ifneq ($(findstring O8,$(OPT)),)

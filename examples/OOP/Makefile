@@ -53,7 +53,7 @@ all: release-memopt
 release: $(BINDIR)/$(BINHEX)
 
 release-memopt: CFLAGS+=-Os 
-release-memopt: CXXFLAGS+=$(CFLAGS)
+release-memopt: CXXFLAGS+=-Os
 release-memopt: LDFLAGS+=-Os
 release-memopt: release
 
