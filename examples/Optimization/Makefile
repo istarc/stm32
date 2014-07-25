@@ -47,46 +47,72 @@ LDSCRIPT= stm32_flash.ld
 LDFLAGS =-T $(LDSCRIPT) $(MCFLAGS) --specs=nosys.specs
 
 ###
+# Optimizations
+OPT?='O1 O2 O3 O4 O5 O6 O7 O8'
+
+ifneq ($(findstring release-memopt,$(MAKECMDGOALS)),)
+ifneq ($(findstring O1,$(OPT)),)
+DEFS+=-DCUSTOM_NEW
+endif
+
+ifneq ($(filter O2,$(OPT)),)
+CXXFLAGS+=-fno-exceptions # Uncomment to disable exception handling
+DEFS+=-DNO_EXCEPTIONS # The source code has to comply with this rule
+endif
+
+ifneq ($(filter O3,$(OPT)),)
+CFLAGS+=-Os # Optimize for size https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
+CXXFLAGS+=-Os
+LDFLAGS+=-Os # Optimize for size https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
+endif
+
+ifneq ($(filter O4,$(OPT)),)
+CFLAGS+=-ffunction-sections -fdata-sections # Place each function or data item into its own section in the output file
+CXXFLAGS+=-ffunction-sections -fdata-sections # -||-
+LDFLAGS+=-Wl,-gc-sections # Remove isolated unused sections
+endif
+
+ifneq ($(filter O5,$(OPT)),)
+CFLAGS+=-fno-builtin
+CXXFLAGS+=-fno-builtin
+endif
+
+ifneq ($(filter O6,$(OPT)),)
+CFLAGS+=-flto
+CXXFLAGS+=-flto
+LDFLAGS+=-flto
+endif
+
+ifneq ($(filter O7,$(OPT)),)
+CXXFLAGS+=-fno-rtti
+endif
+
+ifneq ($(findstring O8,$(OPT)),)
+LDFLAGS+=--specs=nano.specs # Use size optimized newlib
+endif
+endif
+
+###
 # Build Rules
 .PHONY: all release release-memopt debug clean
 
-all: release-memopt
+all: release
 
 release: $(BINDIR)/$(BINHEX)
 
 ##
 # Optimizations
-release-memopt: CXXFLAGS+=$(CFLAGS) # DON'T TOUCH
-release-memopt: release # DON'T TOUCH
-# O1 (new and delete replacement with malloc and free)
-release-memopt: DEFS+=-DCUSTOM_NEW # Uncomment to use malloc instead of new, and free instead of delete
-# O2 (Disable C++ exception handling)
-release-memopt: CXXFLAGS+=-fno-exceptions # Uncomment to disable exception handling
-release-memopt: DEFS+=-DNO_EXCEPTIONS # The source code has to comply with this rule
-# O3 (Size optimization)
-release-memopt: CFLAGS+=-Os # Optimize for size https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
-release-memopt: LDFLAGS+=-Os # Optimize for size https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
-# O4 (Link time dead code elimination) -- WARNING -- May break things if linked to 3rd party static libraries that use magic sections (http://elinux.org/images/2/2d/ELC2010-gc-sections_Denys_Vlasenko.pdf)
-release-memopt: CFLAGS+=-ffunction-sections -fdata-sections # Place each function or data item into its own section in the output file
-release-memopt: LDFLAGS+=-Wl,-gc-sections # Remove isolated unused sections
-# O5 (Disable GCC built-in functions)
-release-memopt: CFLAGS+=-fno-builtin
-# O6 (Link time optimization)
-release-memopt: CFLAGS+=-flto # Enable link time optimization
-release-memopt: LDFLAGS+=-flto # Enable link time optimisation
-# O7 (Disable type introspection)
-release-memopt: CXXFLAGS+=-fno-rtti # Disable generation of information about every class with virtual functions
-# O8 (Size optimized newlib)
-release-memopt: LDFLAGS+=--specs=nano.specs # Use size optimized newlib
+release-memopt: release
 
 ##
-# The list of top 10 space consuming symbols from the object and
-# corresponging source files to blame.
-blame: CFLAGS+=-g
-blame: CXXFLAGS+=-g
-blame: LDFLAGS+=-g -Wl,-Map=$(BINDIR)/output.map
-blame: release-memopt
-blame:
+# Optimization with debug symbols to create:
+# - a list of top 10 space consuming symbols from the object;
+# - corresponging source files to blame.
+release-memopt-blame: CFLAGS+=-g
+release-memopt-blame: CXXFLAGS+=-g
+release-memopt-blame: LDFLAGS+=-g -Wl,-Map=$(BINDIR)/output.map
+release-memopt-blame: release-memopt
+release-memopt-blame:
 	@echo "Top 10 space consuming symbols from the object code ...\n"
 	$(NM) -A -l -C -td --reverse-sort --size-sort $(BINDIR)/$(BINELF) | head -n10 | cat -n # Output legend: man nm
 	@echo "\n... and corresponging source files to blame.\n"
