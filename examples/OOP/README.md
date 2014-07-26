@@ -19,4 +19,4 @@ Deploy:
 * make deploy
 
 More info:
-* [Object-oriented Programming (C++) with Embedded Systems](http://istarc.wordpress.com/2014/07/18/stm32f4-object-oriented-programming-c-with-embedded-systems/)
+* [Object-oriented Programming with Embedded Systems (C++ /w STL)](http://istarc.wordpress.com/2014/07/18/stm32f4-object-oriented-programming-c-with-embedded-systems/)
