@@ -24,6 +24,9 @@
 *.x86_64
 *.hex
 
+# Misc
+*.map
+
 # Eclipse CDT project files
 .cproject
 .project
