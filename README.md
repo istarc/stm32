@@ -2,10 +2,12 @@ This is an embedded code repository for ARM embedded devices. It contains the fo
 
 stm32 Projects:
 * examples
-   * Assembly: [Mixing C & Assembly for Fun and Profit]()
-   * FreeRTOS: [Deploy FreeRTOS Embedded OS under 10 seconds!](http://istarc.wordpress.com/2014/07/10/stm32f4-deploy-an-embedded-os-under-10-seconds/)
-   * GPIO: [Hello World!](http://istarc.wordpress.com/2014/07/01/stm32f4/) & [In-circuit Debugging](http://istarc.wordpress.com/2014/07/06/stm32f4-in-circuit-debugging/).
-   * OOP: [Object-oriented Programming (C++) with Embedded Systems](http://istarc.wordpress.com/2014/07/18/stm32f4-object-oriented-programming-c-with-embedded-systems/)
+	* Assembly: [Mixing C & Assembly for Fun and Profit]()
+	* FreeRTOS: [Deploy FreeRTOS Embedded OS under 10 seconds!](http://istarc.wordpress.com/2014/07/10/stm32f4-deploy-an-embedded-os-under-10-seconds/)
+	* Template: [Template Project with Generic Makefile](http://istarc.wordpress.com/2014/07/01/stm32f4/) & [In-circuit Debugging](http://istarc.wordpress.com/2014/07/06/stm32f4-in-circuit-debugging/).
+	* OOP: [Object-oriented Programming (C++) with Embedded Systems](http://istarc.wordpress.com/2014/07/18/stm32f4-object-oriented-programming-c-with-embedded-systems/)
+	* Optimization: [Optimizations](http://istarc.wordpress.com/2014/07/26/stm32f4-optimizations/)
+
 * XToolchain: [Build Your Own GNU ARM Cross-Toolchain From Scratch](http://istarc.wordpress.com/2014/07/21/stm32f4-build-your-toolchain-from-scratch/)
 
 stm32 Libraries:

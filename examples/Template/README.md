@@ -14,5 +14,5 @@ Deploy:
 * make deploy
 
 More info:
-* [Hello World!](http://istarc.wordpress.com/2014/07/01/stm32f4/)
+* [Template Project with Generic Makefile](http://istarc.wordpress.com/2014/07/01/stm32f4/)
 * [In-circuit Debugging](http://istarc.wordpress.com/2014/07/06/stm32f4-in-circuit-debugging/)
