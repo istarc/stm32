@@ -31,3 +31,6 @@
 .cproject
 .project
 .settings/
+
+# Include makefiles
+!Makefile

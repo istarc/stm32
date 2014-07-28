@@ -40,14 +40,15 @@ MCFLAGS=-mcpu=cortex-m4 -mthumb -mlittle-endian \
 # COMPILE FLAGS
 DEFS=-DSTM32F4XX
 CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c99
-CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) #-std=c++11
+CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11 
+CXXFLAGS+=-U__STRICT_ANSI__ # Undefine __STRICT_ANSI__ to compile Stream.cpp using c++11. This is a dirty hack!
 # LINKER FLAGS
 LDSCRIPT=STM32F407.ld
 LDFLAGS =-T $(LDSCRIPT) $(MCFLAGS) --specs=nosys.specs
 
 ###
 # Optimizations
-OPT?='O1 O2 O3 O4 O5 O6 O7'
+OPT?='O1 O2 O3 O4 O5 O7 O8' # O6 is by default disabled due to binary code increase
 
 ifneq ($(findstring release-memopt,$(MAKECMDGOALS)),)
 
