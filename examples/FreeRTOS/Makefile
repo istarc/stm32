@@ -40,6 +40,48 @@ LDSCRIPT= stm32_flash.ld
 LDFLAGS =-T $(LDSCRIPT) --specs=nosys.specs $(MCFLAGS)
 
 ###
+# Optimizations
+OPT?='O1 O2 O3 O4 O6 O7' # O5 disabled by default, because it breaks code
+
+ifneq ($(findstring release-memopt,$(MAKECMDGOALS)),)
+ifneq ($(filter O1,$(OPT)),)
+CXXFLAGS+=-fno-exceptions # Uncomment to disable exception handling
+DEFS+=-DNO_EXCEPTIONS # The source code has to comply with this rule
+endif
+
+ifneq ($(filter O2,$(OPT)),)
+CFLAGS+=-Os # Optimize for size https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
+CXXFLAGS+=-Os
+LDFLAGS+=-Os # Optimize for size https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
+endif
+
+ifneq ($(filter O3,$(OPT)),)
+CFLAGS+=-ffunction-sections -fdata-sections # Place each function or data item into its own section in the output file
+CXXFLAGS+=-ffunction-sections -fdata-sections # -||-
+LDFLAGS+=-Wl,-gc-sections # Remove isolated unused sections
+endif
+
+ifneq ($(filter O4,$(OPT)),)
+CFLAGS+=-fno-builtin # Disable C++ exception handling
+CXXFLAGS+=-fno-builtin # Disable C++ exception handling
+endif
+
+ifneq ($(filter O5,$(OPT)),)
+CFLAGS+=-flto # Enable link time optimization
+CXXFLAGS+=-flto # Enable link time optimization
+LDFLAGS+=-flto # Enable link time optimization
+endif
+
+ifneq ($(filter O6,$(OPT)),)
+CXXFLAGS+=-fno-rtti # Disable type introspection
+endif
+
+ifneq ($(findstring O7,$(OPT)),)
+LDFLAGS+=--specs=nano.specs # Use size optimized newlib
+endif
+endif
+
+###
 # Build Rules
 .PHONY: all release release-memopt debug clean
 
@@ -47,8 +89,6 @@ all: release-memopt
 
 release: $(BINDIR)/$(BINHEX)
 
-release-memopt: CFLAGS+=-Os
-release-memopt: LDFLAGS+=-Os
 release-memopt: release
 
 debug: CFLAGS+=-g
