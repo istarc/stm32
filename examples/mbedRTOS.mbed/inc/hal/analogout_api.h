@@ -1,0 +1,1 @@
+../../../../mbed/libraries/mbed/hal/analogout_api.h

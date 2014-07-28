@@ -1,0 +1,1 @@
+../../../../mbed/libraries/mbed/common/pinmap_common.c

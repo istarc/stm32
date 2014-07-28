@@ -1,0 +1,1 @@
+../../../../mbed/libraries/mbed/api/I2CSlave.h
