@@ -40,36 +40,28 @@ int main() {
   while (1)
   {
     /* PD12 to be toggled */
-    myled1 = 1;
+    myled1 = myled1 ^ 1;
 
     /* Insert delay */
-    wait(td1.get());
+    wait(td1.get()/0x8FFFFF+0.25);
 
     /* PD13 to be toggled */
-    myled2 = 1;
+    myled2 = myled2 ^ 1;
 
     /* Insert delay */
-    wait(td1.get());
+    wait(td1.get()/0x8FFFFF+0.25);
 
     /* PD14 to be toggled */
-    myled3 = 1;
+    myled3 = myled3 ^ 1;
 
     /* Insert delay */
-    wait(td1.get());
+    wait(td1.get()/0x8FFFFF+0.25);
 
     /* PD15 to be toggled */
-    myled4 = 1;
+    myled4 = myled4 ^ 1;
 
     /* Insert delay */
-    wait(td1.get());
-
-    myled1 = 0;
-    myled2 = 0;
-    myled3 = 0;
-    myled4 = 0;
-
-    /* Insert delay */
-    wait(td2->get());
+    wait(td2->get()/0x8FFFFF+0.25);
   }
 }
 

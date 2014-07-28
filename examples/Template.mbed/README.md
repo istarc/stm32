@@ -15,4 +15,4 @@ Deploy:
 * make deploy
 
 More info:
-* [Template Project with mbed SDK]()
+* [Template Project with mbed SDK](http://istarc.wordpress.com/2014/07/28/stm32f4-template-project-with-the-mbed-sdk/)
