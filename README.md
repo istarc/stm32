@@ -9,6 +9,7 @@ stm32 Projects:
 	* Template: [Template Project with Generic Makefile](http://istarc.wordpress.com/2014/07/01/stm32f4/) & [In-circuit Debugging](http://istarc.wordpress.com/2014/07/06/stm32f4-in-circuit-debugging/).
 	* Template.mbed: [Template Project with mbed SDK]()
 	* OOP: [Object-oriented Programming (C++) with Embedded Systems](http://istarc.wordpress.com/2014/07/18/stm32f4-object-oriented-programming-c-with-embedded-systems/)
+	* OOP.mbed: [Template Project with mbed SDK]()
 	* Optimization: [Optimizations](http://istarc.wordpress.com/2014/07/26/stm32f4-optimizations/)
 
 * XToolchain: [Build Your Own GNU ARM Cross-Toolchain From Scratch](http://istarc.wordpress.com/2014/07/21/stm32f4-build-your-toolchain-from-scratch/)
