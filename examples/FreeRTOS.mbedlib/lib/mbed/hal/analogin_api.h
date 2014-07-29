@@ -1,0 +1,1 @@
+../../../../../mbed/libraries/mbed/hal/analogin_api.h

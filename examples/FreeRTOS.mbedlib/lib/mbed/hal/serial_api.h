@@ -1,0 +1,1 @@
+../../../../../mbed/libraries/mbed/hal/serial_api.h
