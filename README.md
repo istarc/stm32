@@ -1,5 +1,8 @@
 This is an embedded code repository for ARM embedded devices. It contains the following projects and third-party libraries.
 
+New project generation utility:
+* createProject: [Project generation utility /w CMSIS, mbed, FreeRTOS, mbedRTOS] ()
+
 stm32 Projects:
 * examples
 	* Assembly: [Mixing C & Assembly for Fun and Profit]()

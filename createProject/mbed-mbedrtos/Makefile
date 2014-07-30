@@ -1,4 +1,7 @@
 ###
+# Purpose: to build mbedRTOS project with mbed SDK
+
+###
 # GNU ARM Embedded Toolchain
 CC=arm-none-eabi-gcc
 CXX=arm-none-eabi-g++
@@ -55,61 +58,10 @@ LDSCRIPT=stm32f407.ld
 LDFLAGS =-T $(LDSCRIPT) $(MCFLAGS) --specs=nosys.specs $(INCLUDES_LIBS) $(LINK_LIBS)
 
 ###
-# Optimizations
-OPT?='O1 O2 O3 O4 O5 O7 O8' # O6 is by default disabled due to binary code increase
-
-ifneq ($(findstring release-memopt,$(MAKECMDGOALS)),)
-
-ifneq ($(filter O1,$(OPT)),)
-DEFS+=-DCUSTOM_NEW
-endif
-
-ifneq ($(filter O2,$(OPT)),)
-CXXFLAGS+=-fno-exceptions # Uncomment to disable exception handling
-DEFS+=-DNO_EXCEPTIONS # The source code has to comply with this rule
-endif
-
-ifneq ($(filter O3,$(OPT)),)
-CFLAGS+=-Os # Optimize for size https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
-CXXFLAGS+=-Os
-LDFLAGS+=-Os # Optimize for size https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
-endif
-
-ifneq ($(filter O4,$(OPT)),)
-CFLAGS+=-ffunction-sections -fdata-sections # Place each function or data item into its own section in the output file
-CXXFLAGS+=-ffunction-sections -fdata-sections # -||-
-LDFLAGS+=-Wl,-gc-sections # Remove isolated unused sections
-endif
-
-ifneq ($(filter O5,$(OPT)),)
-CFLAGS+=-fno-builtin # Disable C++ exception handling
-CXXFLAGS+=-fno-builtin # Disable C++ exception handling
-endif
-
-ifneq ($(filter O6,$(OPT)),)
-CFLAGS+=-flto # Enable link time optimization
-CXXFLAGS+=-flto # Enable link time optimization
-LDFLAGS+=-flto # Enable link time optimization
-endif
-
-ifneq ($(filter O7,$(OPT)),)
-CXXFLAGS+=-fno-rtti # Disable type introspection
-endif
-
-ifneq ($(findstring O8,$(OPT)),)
-LDFLAGS+=--specs=nano.specs # Use size optimized newlib
-endif
-endif
-
-###
 # Build Rules
-.PHONY: all release release-memopt debug clean $(LIBDIRS)
+.PHONY: all release release-memopt debug clean
 
-all: release
-
-release: $(BINDIR)/$(BINHEX)
-
-release-memopt: release
+all: release-memopt
 
 release-memopt-blame: CFLAGS+=-g
 release-memopt-blame: CXXFLAGS+=-g
@@ -121,10 +73,18 @@ release-memopt-blame:
 	@echo "\n... and corresponging source files to blame.\n"
 	$(NM) --reverse-sort --size-sort -S -tx $(BINDIR)/$(BINELF) | head -10 | cut -d':' -f2 | cut -d' ' -f1 | $(A2L) -e $(BINDIR)/$(BINELF) | cat -n # Output legend: man addr2line
 
+release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS
+release-memopt: CFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin # -flto
+release-memopt: CXXFLAGS+=-Os -fno-exceptions -ffunction-sections -fdata-sections -fno-builtin -fno-rtti # -flto
+release-memopt: LDFLAGS+=-Os -Wl,-gc-sections --specs=nano.specs # -flto
+release-memopt: release
+
 debug: CFLAGS+=-g
 debug: CXXFLAGS+=-g
 debug: LDFLAGS+=-g
 debug: release
+
+release: $(BINDIR)/$(BINHEX)
 
 $(BINDIR)/$(BINHEX): $(BINDIR)/$(BINELF)
 	$(CP) -O ihex $< $@

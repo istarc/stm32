@@ -7,6 +7,13 @@ MBED=$BASEDIR/mbed/libraries/mbed
 MBEDRTOS=$BASEDIR/mbed/libraries/rtos
 FREERTOS=$BASEDIR/FreeRTOS/FreeRTOS
 
+# Check if project directory is emtpy
+STATUS=$(ls)
+if [[ "$STATUS" ]]; then
+	echo "Project directory is not empty!"
+	exit 1
+fi
+
 # Check dependancies
 TARGET=arm-none-eabi
 for c in "make" "${TARGET}-gcc" "${TARGET}-g++" "${TARGET}-ld" "${TARGET}-as" "symlinks"
@@ -14,12 +21,13 @@ do
 	STATUS=$(command -v $c >/dev/null 2>&1 || echo >&2 "$c not installed")
 	if [[ "$STATUS" ]]; then
 		echo "Install $c"
-		exit 1
+		exit 2
 	fi
 done
 
 do_create_dir()
 {
+echo "Project template created by ${0##*/}" > $(pwd)/README
 mkdir -p $(pwd)/bin
 mkdir -p $(pwd)/inc
 echo 'Your application header files (*.h).' > $(pwd)/inc/README
@@ -31,7 +39,7 @@ echo 'Your application source files (*.c, *.cpp, *.s).' > $(pwd)/src/README
 
 do_deploy_cmsis()
 {
-echo 1
+echo "Not implemented"
 }
 
 do_deploy_mbed()
@@ -75,14 +83,6 @@ symlinks -rc $(pwd) 1>/dev/null
 }
 
 case "$1" in
-  cmsis-none)
-	;;
-  cmsis-none-lib)
-	;;
-  cmsis-freertos)
-	;;
-  cmsis-freertos-lib)
-	;;
   mbed-none)
 	do_create_dir
 	do_deploy_mbed
@@ -129,7 +129,7 @@ case "$1" in
 	cp $SCRIPTDIR/mbed-mbedrtos/Makefile-lib $(pwd)/Makefile
 	;;
   *)
-	echo "Usage: $SCRIPTNAME {cmsis-none|cmsis-none-lib|cmsis-freertos|cmsis-freertos-lib|mbed-none|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib}" >&2
+	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib}" >&2
 	exit 3
 	;;
 esac
