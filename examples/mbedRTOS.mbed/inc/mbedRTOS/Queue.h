@@ -1,1 +1,0 @@
-../../../../mbed/libraries/rtos/rtos/Queue.h
