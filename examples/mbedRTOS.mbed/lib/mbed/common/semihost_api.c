@@ -1,0 +1,1 @@
+../../../../../mbed/libraries/mbed/common/semihost_api.c
