@@ -1,1 +1,0 @@
-../../../../../mbed/libraries/mbed/api/I2C.h

@@ -1,1 +1,0 @@
-../../../../../mbed/libraries/mbed/hal/spi_api.h

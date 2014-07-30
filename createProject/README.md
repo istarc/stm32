@@ -10,11 +10,10 @@ Install software dependencies:
 * `cd stm32 && git submodule update --init`
 
 Scripts:
-* gen-stm32f407-GCC-project.sh
-	* mbed-none\[-lib\] - Bare-metal project /w mbed SDK \[with library\].
-	* mbed-freertos\[-lib\] - FreeRTOS project /w mbed SDK \[with library\].
-	* mbed-mbedrtos\[-lib\] - mbedRTOS project /w mbed SDK \[with library\].
-
+* gen-stm32f407-GCC-project.sh provides:
+	* Bare-metal project with mbed SDK.
+	* FreeRTOS project with mbed SDK.
+	* mbedRTOS project with mbed SDKs.
 	* Use case 1:
 		* `mkdir -p stm32/examples/test`
 		* `cd stm32/examples/test`

@@ -1,1 +1,0 @@
-../../../../../../FreeRTOS/FreeRTOS/Source/portable/readme.txt

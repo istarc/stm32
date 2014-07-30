@@ -1,1 +1,0 @@
-../../../../../mbed/libraries/mbed/common/exit.c
