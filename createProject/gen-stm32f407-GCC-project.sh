@@ -1,18 +1,32 @@
 #!/bin/bash
 
-BASEDIR=~/stm32
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+BASEDIR=$SCRIPTDIR/..
 CMSIS=$BASEDIR/STM32F4-Discovery_FW_V1.0.0
 MBED=$BASEDIR/mbed/libraries/mbed
 MBEDRTOS=$BASEDIR/mbed/libraries/rtos
 FREERTOS=$BASEDIR/FreeRTOS/FreeRTOS
-SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Check dependancies
+TARGET=arm-none-eabi
+for c in "make" "${TARGET}-gcc" "${TARGET}-g++" "${TARGET}-ld" "${TARGET}-as" "symlinks"
+do
+	STATUS=$(command -v $c >/dev/null 2>&1 || echo >&2 "$c not installed")
+	if [[ "$STATUS" ]]; then
+		echo "Install $c"
+		exit 1
+	fi
+done
 
 do_create_dir()
 {
 mkdir -p $(pwd)/bin
 mkdir -p $(pwd)/inc
+echo 'Your application header files (*.h).' > $(pwd)/inc/README
 mkdir -p $(pwd)/lib
+echo 'Place third-party source code or libraries here.' > $(pwd)/lib/README
 mkdir -p $(pwd)/src
+echo 'Your application source files (*.c, *.cpp, *.s).' > $(pwd)/src/README
 }
 
 do_deploy_cmsis()

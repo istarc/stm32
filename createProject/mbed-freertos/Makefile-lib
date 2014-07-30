@@ -17,7 +17,7 @@ BINDIR=bin
 INCDIR=inc
 SRCDIR=src
 LIBDIR=lib
-LIBDIRS=$(shell find $(LIBDIR) -mindepth 1 -maxdepth 1)
+LIBDIRS=$(shell find $(LIBDIR) -mindepth 1 -maxdepth 1 -type d)
 
 ###
 # Find source files
