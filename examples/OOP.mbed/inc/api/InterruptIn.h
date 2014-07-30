@@ -1,1 +1,0 @@
-../../../../mbed/libraries/mbed/api/InterruptIn.h

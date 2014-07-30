@@ -68,21 +68,21 @@ debug: release
 release: $(LIBDIR)/$(LIB)
 
 $(LIBDIR)/$(LIB): $(OBJECTS)
-        $(AR) rcs $@ $(OBJECTS)
-        @echo "Library Created!\n"
+	$(AR) rcs $@ $(OBJECTS)
+	@echo "Library Created!\n"
 
 %.o: %.cpp
-        $(CXX) $(CXXFLAGS) $< -o $@
-        @echo "Compiled "$<"!\n"
+	$(CXX) $(CXXFLAGS) $< -o $@
+	@echo "Compiled "$<"!\n"
 
 %.o: %.c
-        $(CC) $(CFLAGS) $< -o $@
-        @echo "Compiled "$<"!\n"
+	$(CC) $(CFLAGS) $< -o $@
+	@echo "Compiled "$<"!\n"
 
 %.o: %.s
-        $(CC) $(CFLAGS) $< -o $@
-        @echo "Assambled "$<"!\n"
+	$(CC) $(CFLAGS) $< -o $@
+	@echo "Assambled "$<"!\n"
 
 clean:
-        rm -f $(OBJECTS) $(LIBDIR)/$(LIB)
+	rm -f $(OBJECTS) $(LIBDIR)/$(LIB)
 
