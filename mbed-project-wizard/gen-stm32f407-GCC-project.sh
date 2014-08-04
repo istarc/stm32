@@ -56,6 +56,7 @@ done
 do_create_dir()
 {
 mkdir -p $(pwd)/bin
+touch $(pwd)/bin/.gitkeep # A dummy file to keep directory structure in place
 mkdir -p $(pwd)/inc
 echo 'Your application header files (*.h).' > $(pwd)/inc/README
 mkdir -p $(pwd)/lib
