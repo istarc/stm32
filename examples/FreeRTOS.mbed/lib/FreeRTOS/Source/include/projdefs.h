@@ -1,1 +1,1 @@
-../../../../../../FreeRTOS/FreeRTOS/Source/include/projdefs.h
+../../../../../../freertos/FreeRTOS/Source/include/projdefs.h

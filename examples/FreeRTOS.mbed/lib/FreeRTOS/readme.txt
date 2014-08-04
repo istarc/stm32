@@ -1,1 +1,1 @@
-../../../../FreeRTOS/FreeRTOS/readme.txt
+../../../../freertos/FreeRTOS/readme.txt

@@ -29,7 +29,7 @@ BASEDIR=$SCRIPTDIR/..
 CMSIS=$BASEDIR/STM32F4-Discovery_FW_V1.0.0
 MBED=$BASEDIR/mbed/libraries/mbed
 MBEDRTOS=$BASEDIR/mbed/libraries/rtos
-FREERTOS=$BASEDIR/FreeRTOS/FreeRTOS
+FREERTOS=$BASEDIR/freertos/FreeRTOS
 
 ##
 # Check if project directory is emtpy

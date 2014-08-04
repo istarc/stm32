@@ -1,3 +1,6 @@
 [submodule "mbed"]
 	path = mbed
 	url = https://github.com/istarc/mbed
+[submodule "freertos"]
+	path = freertos
+	url = https://github.com/istarc/freertos.git
