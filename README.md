@@ -1,5 +1,10 @@
 This is an embedded code repository for ARM embedded devices. It contains the following projects and third-party libraries.
 
+* Setup repository:
+	* Clone: `git clone https://github.com/istarc/stm32.git`
+	* Init submodule: `git submodule update --init`
+	* Optional: cd freertos && git checkout tags/V8.0.1
+
 New project generation utility:
 * createProject: [Project generation utility /w CMSIS, mbed, FreeRTOS, mbedRTOS] ()
 
