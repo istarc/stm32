@@ -1,0 +1,32 @@
+Project template created by gen-stm32f407-GCC-project.sh mbed-freertos
+   mbed-freertos ... creates a FreeRTOS project with mbed SDK (/w libraries)
+
+
+1. Added 3rd party library to lib: FreeRTOS-Plus-Trace
+
+2. Based on http://percepio.com/docs/FreeRTOS/manual/Recorder.html#Recorder_Library_FreeRTOS_Integration I Changed FreeRTOSConfig.h:
+--- ../../mbed-project-wizard/freertos/FreeRTOSConfig.h	2014-08-04 12:48:52.799894089 +0200
++++ lib/FreeRTOS/config/FreeRTOSConfig.h	2014-08-05 15:09:01.449307214 +0200
+@@ -161,5 +161,8 @@
+ #define xPortPendSVHandler PendSV_Handler
+ #define xPortSysTickHandler SysTick_Handler
+ 
++#define configUSE_TRACE_FACILITY 1
++#include "trcKernelPort.h"
++
+ #endif /* FREERTOS_CONFIG_H */
+
+3. Changed Makefile:
+--- Makefile	2014-08-04 12:48:52.799894089 +0200
++++ Makefile	2014-08-05 15:13:49.341299359 +0200
+@@ -50,7 +50,7 @@
+ -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork
+ # COMPILE FLAGS
+ DEFS=
+-CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c99
++CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=gnu99
+ CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11
+ CXXFLAGS+=-U__STRICT_ANSI__ # Undefine __STRICT_ANSI__ to compile Stream.cpp using c++11. This is a dirty hack!
+ # LINKER FLAGS
+
+4. Download http://percepio.com/tracealyzer/downloads/
