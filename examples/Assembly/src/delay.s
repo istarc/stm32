@@ -3,7 +3,7 @@
   *
   * C equivalent
   *
-  * void delay(unsigned long ticks)
+  * void delay(int ticks)
   * {
   *   unsigned long us = 1*ticks;
   *
@@ -23,10 +23,10 @@
 	.type  delay, %function
 
 delay:
-	ldr r1,=1
-	muls r0, r1
+	ldr r1,=1	@ Load immediate and ...
+	muls r0, r1	@ ... multiply it with tick argument
 loop:
 	nop
-	subs r0, #1
-	bne loop
-	bx lr
+	subs r0, #1	@ In each loop decrement
+	bne loop	@ until r0 == 0
+	bx lr		@ return from subroutine

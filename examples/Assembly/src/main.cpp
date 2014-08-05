@@ -6,7 +6,7 @@
   */
 //#define DEFAULT_TOGGLE /* Use default mbed implementation main.c:38*/
 #define ASSEMBLY_TOGGLE /* Use pure assembly implementation toggle.s */
-//define INLINE_ASSEMBLY_TOGGLE /* Use inline assembly implementation main.c:45 */
+//#define INLINE_ASSEMBLY_TOGGLE /* Use inline assembly implementation main.c:45 */
 
 /**
   * CHOOSE ONE
@@ -34,33 +34,26 @@ int main() {
 	while(1) {
 
 	/* Assembly: Example 1: Toggle LED */
-#ifdef DEFAULT_TOGGLE
+#if defined DEFAULT_TOGGLE
 		myled = myled ^ 1;
-#endif
-#ifdef ASSEMBLY_TOGGLE
+#elif defined ASSEMBLY_TOGGLE
 		toggle(); /* Use pure assembly implementation toggle.s */
-#endif
-#ifdef INLINE_ASSEMBLY_TOGGLE
+#else // INLINE_ASSEMBLY_TOGGLE
 		__asm volatile( /* Use inline assembly */
-			"push {r0,r1}        \n" // Save r0, r1 onto stack
-			/* Thumb does not support 32 immediates "ldr r0,=0x40020C14". */
-			/* It has to be replaced by two following commands with two 16-bit immediates */
-			"movw r0,#0x0C14     \n" // Store lower half of GPIOD address to r0
-			"movt r0,#0x4002     \n" // Store upper half of GPIOD address to r0
-			"ldr r1,[r0]         \n" // Load GPIOD status at GPIOD address [ro] and store to r1
-			"eor r1,r1,#0xF000   \n" // XOR GPIOD status (only Pins 12,13,14,15) and store to r1
-			"str r1,[r0]         \n" // Store new status r1 to GPIOD address [ro]
+			"push {r0,r1}        \n"   // Save r0, r1 onto stack
+			"ldr r0,=0x40020C14  \n"   // Load GPIOD address
+			"ldr r1,[r0]         \n"   // Load GPIOD status at GPIOD address [ro] and store to r1
+			"eor r1,r1,#0xF000   \n"   // XOR GPIOD status (only Pins 12,13,14,15) and store to r1
+			"str r1,[r0]         \n"   // Store new status r1 to GPIOD address [ro]
 			"pop {r0,r1}         \n"); // Restore r0, r1 from stack
 #endif
 
 	/* Assembly: Example 2: Delay */
-#ifdef DEFAULT_DELAY
+#if defined DEFAULT_DELAY
 		wait(0.2);
-#endif
-#ifdef ASSEMBLY_DELAY
+#elif defined ASSEMBLY_DELAY
 		delay(0xFFFFFF);
-#endif
-#ifdef C_EQUIVALENT
+#else C_EQUIVALENT
 		delay(0xFFFFFF);
 #endif
 	}

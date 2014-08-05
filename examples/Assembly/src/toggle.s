@@ -24,10 +24,10 @@
 	.type  toggle, %function
 
 toggle:
-    push {r0,r1} 		// Save r0, r1 onto stack
-    ldr r0,=0x40020C14	// Load GPIOD address
-    ldr r1,[r0]			// Load GPIOD status at GPIOD address [ro] and store to r1
-    eor r1,r1,#0xF000	// XOR GPIOD status (only Pins 12,13,14,15) and store to r1
-    str r1,[r0]			// Store new status r1 to GPIOD address [ro]
-    pop {r0,r1}			// Restore r0, r1 from stack
-    bx lr				// Return from function call
+    push {r0,r1} 	@ Save r0, r1 onto stack
+    ldr r0,=0x40020C14	@ Load GPIOD address
+    ldr r1,[r0]		@ Load GPIOD status at GPIOD address [ro] and store to r1
+    eor r1,r1,#0xF000	@ XOR GPIOD status (only Pins 12,13,14,15) and store to r1
+    str r1,[r0]		@ Store new status r1 to GPIOD address [ro]
+    pop {r0,r1}		@ Restore r0, r1 from stack
+    bx lr		@ Return from function call
