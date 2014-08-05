@@ -236,6 +236,11 @@ case "$1" in
 	cp $SCRIPTDIR/mbed-mbedrtos/Makefile-lib $(pwd)/Makefile
 	;;
   none-safertos)
+	if [ ! -d "$SAFERTOS" ]; then
+		echo "Install SafeRTOS first at http://www.highintegritysystems.com/safertos"
+		echo "Or update SAFERTOS variable"
+		exit 1
+	fi
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
 	echo "   none-safertos ... creates a SafeRTOS project with mbed SDK (/w libraries)" >> $(pwd)/README
 	do_create_dir $2
@@ -251,6 +256,7 @@ case "$1" in
 	echo "   mbed-freertos-lib ... creates a FreeRTOS project with mbed SDK (/w libraries)"
 	echo "   mbed-mbedrtos ....... creates a mbedRTOS project with mbed SDK"
 	echo "   mbed-mbedrtos-lib ... creates a mbedRTOS project with mbed SDK (/w libraries)"
+	echo "   none-safertos ....... creates a SafeRTOS project"
 	echo " "
 	echo "   copy ................ copy files instead of symlinks (default)"
 	echo " "
