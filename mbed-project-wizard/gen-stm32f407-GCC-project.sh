@@ -13,14 +13,25 @@
 # cd stm32 && git submodule update --init
 
 ##
+# SafeRTOS
+#
+# To use SafeRTOS (proprietary) install the source first.
+# 1. Install wine
+#	sudo apt-get install wine
+# 2. Download STM32F4xx_atollic_SafeRTOS_Library_Demo.exe (SafeRTOS 4.7) from http://www.highintegritysystems.com/safertos/
+# 3. Install via wine (use default installation)
+#	wine STM32F4xx_atollic_SafeRTOS_Library_Demo.exe
+
+##
 # Depends on:
-# freertos/*, mbed/*, mbed-freertos/*, mbed-none/*, mbed-mbedrtos/*
+# freertos/*, mbed/*, mbed-freertos/*, mbed-none/*, mbed-mbedrtos/*, none-safertos/*
 
 ##
 # Options:
 # - mbed-none[-lib] - Bare-metal project /w mbed SDK [with library].
 # - mbed-freertos[-lib] - FreeRTOS project /w mbed SDK [with library].
 # - mbed-mbedrtos[-lib] - mbedRTOS project /w mbed SDK [with library].
+# - none-safertos - SafeRTOS project
 
 ##
 # Variables:
@@ -30,6 +41,7 @@ CMSIS=$BASEDIR/STM32F4-Discovery_FW_V1.0.0
 MBED=$BASEDIR/mbed/libraries/mbed
 MBEDRTOS=$BASEDIR/mbed/libraries/rtos
 FREERTOS=$BASEDIR/freertos/FreeRTOS
+SAFERTOS=~/.wine/drive_c/HighIntegritySystems/SafeRTOS_Atollic_STM32F4xx_Lib_Demo/SafeRTOS_Atollic_STM32F4xx_Lib_Demo
 
 ##
 # Check if project directory is emtpy
@@ -131,6 +143,40 @@ if [[ "$2" != "copy" ]]; then
 fi
 }
 
+##
+# Deploy FreeRTOS and tailor to fit STM32F4XX and GCC
+do_deploy_safertos()
+{
+if [[ "$1" != "copy" ]]; then
+	cp -sR $SAFERTOS $(pwd)/lib/SafeRTOS
+else
+	cp -LR $SAFERTOS $(pwd)/lib/SafeRTOS
+fi
+# Prune targets not(STM32F4XX or GCC)
+find $(pwd)/lib/SafeRTOS -mindepth 1 -maxdepth 1 -not -name 'src' -exec rm -rf {} \;
+find $(pwd)/lib/SafeRTOS/src -mindepth 1 -maxdepth 1 -name 'source' -exec rm -rf {} \;
+# Deploy demo application
+if [[ "$1" != "copy" ]]; then
+	cp -sR $SAFERTOS/src/source/* $(pwd)/src
+	ln -s $SAFERTOS/SafeRTOS_STM32F407VG_FLASH.ld stm32f407.ld
+	# Patch copy of main.c (Header files are case sensitive in Linux)
+	rm -f $(pwd)/src/main.c
+	cp -L $SAFERTOS/src/source/main.c $(pwd)/src/main.c
+	chmod a+wr $(pwd)/src/main.c
+	patch -p0 < $SCRIPTDIR/safertos/safertos.patch
+	# Remove test stub
+	rm $(pwd)/lib/SafeRTOS/src/common/comtest.c
+else
+	cp -LR $SAFERTOS/src/source/* $(pwd)/src
+	cp $SAFERTOS/SafeRTOS_STM32F407VG_FLASH.ld stm32f407.ld
+fi
+if [[ "$1" != "copy" ]]; then
+	# Abs to Rel Symlinks
+	symlinks -rc $(pwd) 1>/dev/null
+fi
+}
+
+
 case "$1" in
   mbed-none)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
@@ -189,8 +235,15 @@ case "$1" in
 	cp $SCRIPTDIR/mbed-mbedrtos/main.cpp $(pwd)/src/main.cpp
 	cp $SCRIPTDIR/mbed-mbedrtos/Makefile-lib $(pwd)/Makefile
 	;;
+  none-safertos)
+	echo "Project template created by ${0##*/} $1" > $(pwd)/README
+	echo "   none-safertos ... creates a SafeRTOS project with mbed SDK (/w libraries)" >> $(pwd)/README
+	do_create_dir $2
+	do_deploy_safertos $2
+	cp $SCRIPTDIR/none-safertos/Makefile $(pwd)/Makefile
+	;;
   --help)
-	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib} {|copy}"
+	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|copy}"
 	echo ""
 	echo "   mbed-none ........... creates a bare-metal project with mbed SDK"
 	echo "   mbed-none-lib ....... creates a bare-metal project with mbed SDK"
@@ -203,7 +256,7 @@ case "$1" in
 	echo " "
 	;;
   *)
-	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib} {|copy}"
+	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|copy}"
 	exit 3
 	;;
 esac
