@@ -1,25 +1,29 @@
-/* C prototype:
- *
- *  GPIO_ToggleBits(GPIOD,GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
- *  
- *  GPIOD = GPIOD_BASE + 0x14 (GPIO port output data register) = 0x40020C14
- *          GPIOD_BASE = AHB1PERIPH_BASE + 0x0C00
- *                       AHB1PERIPH_BASE = PERIPH_BASE + 0x00020000
- *                                         PERIPH_BASE = 0x40000000
- *
- * GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15 =
- * 0x1000      | 0x2000      | 0x4000      | 0x8000      = 0xF000
- *
- */
+/** 
+  *  Description: Toogle LED Assembly Routine
+  *  Target: STM32F4 Discovery Board
+  *
+  *  The GPIO device that drives LEDs is computed as follows:
+  *
+  *  PERIPH_BASE = 0x40000000
+  *  AHB1PERIPH_BASE = PERIPH_BASE + 0x00020000
+  *  GPIOD_BASE = AHB1PERIPH_BASE + 0x0C00
+  *  GPIOD = GPIOD_BASE + 0x14 (GPIO port output data register) = 0x40020C14
+  *
+  *  The GPIO values to toggle individual LEDs are the following:
+  *
+  *  LED1: Pin 12 | LED2: Pin 13 | LED3: Pin 14 | LED4: Pin 15 | All LEDs
+  *  0x1000       | 0x2000       | 0x4000       | 0x8000       | 0xF000
+  *
+  */
 	.syntax unified
 	.cpu cortex-m4
 	.thumb
 
-	.section  .text.Toggle
-  	.weak  Toggle
-	.type  Toggle, %function
+	.section  .text.toggle
+  	.weak  toggle
+	.type  toggle, %function
 
-Toggle:
+toggle:
     push {r0,r1} 		// Save r0, r1 onto stack
     ldr r0,=0x40020C14	// Load GPIOD address
     ldr r1,[r0]			// Load GPIOD status at GPIOD address [ro] and store to r1
