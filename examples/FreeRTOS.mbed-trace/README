@@ -30,3 +30,19 @@ Project template created by gen-stm32f407-GCC-project.sh mbed-freertos
  # LINKER FLAGS
 
 4. Download http://percepio.com/tracealyzer/downloads/
+
+5. Run program and dump the memory via openocd
+http://percepio.com/docs/FreeRTOS/manual/Recorder.html
+
+target remote localhost:3333
+monitor reset halt
+monitor flash protect 0 0 11 off
+monitor flash write_image erase *.elf
+monitor reset run
+monitor reset halt
+dump memory dump.bin 0x20000000 x20001FFF
+restore dump.bin binary 0x20000000
+
+Code Flash:     0x00000000 to 0x000FFFFF        1024 KB
+Data RAM:       0x20000000 to 0x2001FFFF        128 KB
+CCM RAM:        0x10000000 to 0x1000FFFF        64 KB
