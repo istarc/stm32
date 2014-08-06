@@ -244,7 +244,7 @@
  * If this is one (1), the TRACE_ASSERT macro will verify that a condition is 
  * true. If the condition is false, vTraceError() will be called.
  *****************************************************************************/
-#define USE_TRACE_ASSERT 1
+#define USE_TRACE_ASSERT 0
 
 /******************************************************************************
  * INCLUDE_FLOAT_SUPPORT
@@ -514,7 +514,7 @@
 * (some microseconds) since ALL configurable interrupts are disabled during 
 * the recorder's critical sections in this mode, using the PRIMASK register.
  ******************************************************************************/
-#define USE_PRIMASK_CS 0
+#define USE_PRIMASK_CS 1
 
 /******************************************************************************
 * HEAP_SIZE_BELOW_16M

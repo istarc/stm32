@@ -6,8 +6,6 @@
 #include "timers.h"
 #include "semphr.h"
 
-#define BLOCK_
-
 void ToggleLED_Timer(void*);
 void DetectButtonPress(void*);
 void ToggleLED_IPC(void*);
@@ -23,7 +21,8 @@ DigitalOut myled2(PD_14); // STM32F4Discovery Board Red Led
 int main(void)
 {
   vTraceInitTraceData ();
-  uiTraceStart();
+  if (!uiTraceStart())
+  	vTraceConsoleMessage("Could not start recorder!");
 
   /* Create IPC variables */
   pbq = xQueueCreate(10, sizeof(int));
@@ -70,6 +69,7 @@ int main(void)
 void ToggleLED_Timer(void *pvParameters){
   
   while (1) {
+    vTraceConsoleMessage("Toogle LED");
     myled1 = myled1 ^ 1;
     
     /*
@@ -98,6 +98,7 @@ void DetectButtonPress(void *pvParameters){
       while(pb == 0)
         vTaskDelay(100 / portTICK_RATE_MS); /* Button Debounce Delay */
       
+      vTraceConsoleMessage("PB Event Detected");
       xQueueSendToBack(pbq, &sig, 0); /* Send Message */
     }
   }
@@ -117,6 +118,7 @@ void ToggleLED_IPC(void *pvParameters) {
     												  /* portMAX_DELAY blocks task indefinitely if queue is empty */
     if(status == pdTRUE) {
       myled2 = myled2 ^ 1;
+      vTraceConsoleMessage("Toggle PB LED");
     }
   }
 }
