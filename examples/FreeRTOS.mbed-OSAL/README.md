@@ -30,5 +30,5 @@ More info:
 	* It is based on mbed SDK and FreeRTOS.
 	* An CMSIS-RTOS API implementation for FreeRTOS was imported from the STM32CubeF4 library (v1.3.0) to lib/OSAL folder. Thank you [STMicroelectronics](www.st.com)! :-)
 		* [CMSIS-RTOS API](http://www.arm.com/products/processors/cortex-m/cortex-microcontroller-software-interface-standard.php) is Operating System Abstraction Layer (OSAL) similar to POSIX, but is better suited for embedded devices. The standardization effort is driven by the [ARM](www.arm.com) company.
-	* FreeRTOS.mbed-OSAL is a dual project (to FreeRTOS.mbed+OSAL) without OSAL.
+	* The CMSIS-RTOS API is not used in this project, but in the dual project FreeRTOS.mbed+OSAL.
 * []()
