@@ -1,1 +1,1 @@
-../../../../FreeRTOS/FreeRTOS/Source/portable/MemMang/heap_1.c
+../../../../freertos/FreeRTOS/Source/portable/MemMang/heap_1.c

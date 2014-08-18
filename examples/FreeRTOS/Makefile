@@ -85,7 +85,7 @@ endif
 # Build Rules
 .PHONY: all release release-memopt debug clean
 
-all: release-memopt
+all: release
 
 release: $(BINDIR)/$(BINHEX)
 

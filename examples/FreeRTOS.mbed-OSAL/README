@@ -1,0 +1,11 @@
+Project template created by gen-stm32f407-GCC-project.sh mbed-freertos
+   mbed-freertos ... creates a FreeRTOS project with mbed SDK (/w libraries)
+
+   FreeRTOS ... created by gen-stm32f407-GCC-project.sh mbed-freertos
+   mbed ....... created by gen-stm32f407-GCC-project.sh mbed-freertos
+   OSAL ....... CMSIS-RTOS OS abstraction library
+                - FreeRTOS implementation of CMSIS-RTOS API obtained from STM32CubeF4 library
+                   1. Obtained from http://www.st.com/web/en/catalog/tools/PF259243
+                   2. I copied STM32Cube_FW_F4_V1.3.0/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.*
+
+		- CMSIS-RTOS API is actually not used in this example.
