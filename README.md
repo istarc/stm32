@@ -1,4 +1,4 @@
-This is an embedded code repository for ARM embedded devices. It contains the following projects and third-party libraries.
+This is an embedded code repository for ARM embedded devices. It contains the following projects and third-party libraries. The examples in the master branch are tested with Travis CI with the following status code: [![Build Status](https://travis-ci.org/istarc/stm32.svg?branch=master)](https://travis-ci.org/istarc/stm32)
 
 * Setup repository:
 	* Clone: `git clone https://github.com/istarc/stm32.git`
@@ -26,7 +26,6 @@ stm32 Projects
 	* Template: [Template Project with Generic Makefile](http://istarc.wordpress.com/2014/07/01/stm32f4/) & [In-circuit Debugging](http://istarc.wordpress.com/2014/07/06/stm32f4-in-circuit-debugging/).
 	* Template.mbed: [mbed Your Code: Zero Switching Costs When Changing ARM Platforms](http://istarc.wordpress.com/2014/07/28/stm32f4-mbed-your-code/)
 	* Template.mbedlib: [Behold the Project Wizard!](http://istarc.wordpress.com/2014/08/04/stm32f4-behold-the-project-wizard/)
-* examples build status [![Build Status](https://travis-ci.org/istarc/stm32.svg?branch=master)](https://travis-ci.org/istarc/stm32) via Travis CI
 
 * XToolchain: [Build Your Own GNU ARM Cross-Toolchain From Scratch](http://istarc.wordpress.com/2014/07/21/stm32f4-build-your-toolchain-from-scratch/)
 
