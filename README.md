@@ -9,8 +9,7 @@ New project generation utility:
 * mbed-project-wizard: [Behold the Project Wizard!] (http://istarc.wordpress.com/2014/08/04/stm32f4-behold-the-project-wizard/)
 
 stm32 Projects 
-[![Build Status](https://travis-ci.org/istarc/stm32.svg?branch=master)](https://travis-ci.org/istarc/stm32)
-* examples [![Build Status](https://travis-ci.org/istarc/stm32.svg?branch=master)](https://travis-ci.org/istarc/stm32)
+* examples
 	* Assembly: [Mixing C & Assembly for Fun and Profit](http://istarc.wordpress.com/2014/08/07/stay-tuned/)
 	* FreeRTOS: [Deploy FreeRTOS Embedded OS under 10 seconds!](http://istarc.wordpress.com/2014/08/07/stay-tuned/)
 	* FreeRTOS.mbed: [mbed Your Code: Zero Switching Costs When Changing ARM Platforms](http://istarc.wordpress.com/2014/07/28/stm32f4-mbed-your-code/)
@@ -27,6 +26,7 @@ stm32 Projects
 	* Template: [Template Project with Generic Makefile](http://istarc.wordpress.com/2014/07/01/stm32f4/) & [In-circuit Debugging](http://istarc.wordpress.com/2014/07/06/stm32f4-in-circuit-debugging/).
 	* Template.mbed: [mbed Your Code: Zero Switching Costs When Changing ARM Platforms](http://istarc.wordpress.com/2014/07/28/stm32f4-mbed-your-code/)
 	* Template.mbedlib: [Behold the Project Wizard!](http://istarc.wordpress.com/2014/08/04/stm32f4-behold-the-project-wizard/)
+* examples build status [![Build Status](https://travis-ci.org/istarc/stm32.svg?branch=master)](https://travis-ci.org/istarc/stm32) via Travis CI
 
 * XToolchain: [Build Your Own GNU ARM Cross-Toolchain From Scratch](http://istarc.wordpress.com/2014/07/21/stm32f4-build-your-toolchain-from-scratch/)
 
