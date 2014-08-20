@@ -13,7 +13,7 @@
 # - Cloned stm32 repository.
 #    - git clone https://github.com/istarc/stm32.git
 #
-# - It may depend on newlib-2.1.0.patch. Run from stm32/XToolchain directory.
+# - It may depend on newlib-2.1.0.patch. Run from stm32/build-ARM-toolchain directory.
 #
 # - Before running this script make sure that:
 #    - You install dependencies:
@@ -84,7 +84,7 @@ if [ ! -f $NEWLIB.tar.gz ]; then
 	tar xzf $PREFIX/orig/$NEWLIB.tar.gz
 	if [ $NEWLIB -eq "newlib-2.1.0" ]; then
 		cd $PREFIX/src/$NEWLIB
-		patch -p0 < $SCRIPTDIR/newlib-2.1.0.patch
+		patch -p0 < $SCRIPTDIR/newlib-2.1.0.patch/
 	fi
 fi
 
