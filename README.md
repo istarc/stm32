@@ -8,7 +8,8 @@ This is an embedded code repository for ARM embedded devices. It contains the fo
 New project generation utility:
 * mbed-project-wizard: [Behold the Project Wizard!] (http://istarc.wordpress.com/2014/08/04/stm32f4-behold-the-project-wizard/)
 
-stm32 Projects:
+stm32 Projects 
+[![Build Status](https://travis-ci.org/istarc/stm32.svg?branch=master)](https://travis-ci.org/istarc/stm32)
 * examples [![Build Status](https://travis-ci.org/istarc/stm32.svg?branch=master)](https://travis-ci.org/istarc/stm32)
 	* Assembly: [Mixing C & Assembly for Fun and Profit](http://istarc.wordpress.com/2014/08/07/stay-tuned/)
 	* FreeRTOS: [Deploy FreeRTOS Embedded OS under 10 seconds!](http://istarc.wordpress.com/2014/08/07/stay-tuned/)
