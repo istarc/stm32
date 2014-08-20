@@ -58,7 +58,7 @@ LDFLAGS =-T $(LDSCRIPT) $(MCFLAGS) --specs=nosys.specs $(INCLUDES_LIBS) $(LINK_L
 
 ###
 # Build Rules
-.PHONY: all release release-memopt debug clean $(LIBDIRS)
+.PHONY: all release release-memopt debug clean $(LIBDIRS) $(LIBCDIRS)
 
 all: libs
 all: release-memopt
@@ -109,6 +109,7 @@ $(BINDIR)/$(BINELF): $(OBJECTS)
 
 clean:
 	rm -f $(OBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
+	for d in $(LIBDIRS); do $(MAKE) -C $$d clean; done
 
 libs: $(LIBDIRS)
 

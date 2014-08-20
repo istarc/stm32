@@ -109,6 +109,7 @@ $(BINDIR)/$(BINELF): $(OBJECTS)
 
 clean:
 	rm -f $(OBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
+	for d in $(LIBDIRS); do $(MAKE) -C $$d clean; done
 
 libs: $(LIBDIRS)
 

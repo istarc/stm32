@@ -16,15 +16,16 @@ A2L=arm-none-eabi-addr2line
 
 ###
 # Directory Structure
-PROJECTS=$(shell find $(LIBDIR) -mindepth 1 -maxdepth 1 -type d)
+BDIRS=$(shell find . -mindepth 1 -maxdepth 1 -type d)
 
 ###
 # Build Rules
-.PHONY: all $(PROJECTS)
+.PHONY: all clean $(BDIRS)
 
-all: $(PROJECTS) 
+all: $(BDIRS) 
 
-$(PROJECTS):
-	$(MAKE) -C $@ clean
+$(BDIRS):
 	$(MAKE) -C $@
 
+clean:
+	for d in $(BDIRS); do $(MAKE) -C $$d clean; done
