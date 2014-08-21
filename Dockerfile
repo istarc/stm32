@@ -39,6 +39,10 @@
 #    # Password: admin
 #    # Click -> Waterfall (link) -> test-build (link) -> Force Build (button) -> Refresh (F5)
 # 6. sudo docker stop $CONTAINER_ID
+#  
+# Powerful one-liners (use them with care :-))
+# 7. docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q) # Stop and remove all containers
+# 8. sudo docker rmi $(sudo docker images | grep "^<none>" | awk '{print $3}') # Remove all untagged images
 
 ###
 # Docker script
