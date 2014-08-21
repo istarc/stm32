@@ -60,7 +60,7 @@ LDFLAGS =-T $(LDSCRIPT) $(MCFLAGS) --specs=nosys.specs $(INCLUDES_LIBS) $(LINK_L
 # Build Rules
 .PHONY: all release release-memopt debug clean $(LIBDIRS)
 
-all: libs
+#all: libs 
 all: release-memopt
 
 release-memopt-blame: CFLAGS+=-g
@@ -95,6 +95,8 @@ $(BINDIR)/$(BINELF): $(OBJECTS)
 	@echo "Linking complete!\n"
 	$(SIZE) $(BINDIR)/$(BINELF)
 
+$(OBJECTS): libs
+
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
 	@echo "Compiled "$<"!\n"
@@ -114,7 +116,6 @@ clean:
 libs: $(LIBDIRS)
 
 $(LIBDIRS):
-	$(MAKE) -C $@ clean
 	$(MAKE) -C $@
 
 deploy:
