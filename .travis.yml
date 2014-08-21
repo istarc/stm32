@@ -6,5 +6,5 @@ before_script:
 language: cpp
 
 script:
-  - make -C examples clean
-  - make -C examples
+  - make clean
+  - make
