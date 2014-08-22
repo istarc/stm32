@@ -86,6 +86,7 @@ run /bin/echo -e "[program:buildworker]\ncommand=twistd --nodaemon --no_save -y 
 
 # Setup privileges
 run chown -R admin:admin /home/admin
+run chmod o+rx /home
 
 # Expose container port 22 and 9989 to a random port in the host.
 expose 22 
