@@ -41,7 +41,7 @@
 # 6. sudo docker stop $CONTAINER_ID
 #  
 # Powerful one-liners (use them with care :-))
-# 7. docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q) # Stop and remove all containers
+# 7. sudo docker stop $(sudo docker ps -a -q) && sudo docker rm $(sudo docker ps -a -q) # Stop and remove all containers
 # 8. sudo docker rmi $(sudo docker images | grep "^<none>" | awk '{print $3}') # Remove all untagged images
 
 ###
