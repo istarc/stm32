@@ -65,7 +65,7 @@ if [ ! -d "$PREFIX/stm32" ]; then
 	cd $PREFIX/stm32
 	git submodule update --init
 else
-	cd $PREFIX
+	cd $PREFIX/stm32
 	git pull
 	git submodule update
 fi
