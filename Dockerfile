@@ -1,19 +1,24 @@
 ###
-# STM32F4-Discovery Build and Test Environment
+# STM32F4-Discovery Build and Test Environment Dockerfile
 #
 # VERSION         1.0
 # DOCKER_VERSION  1.1.2
-# AUTHOR          Iztok Starc <iz***.st***@gmail.com>
-# DESCRIPTION     Build and Test Environment based on Ubuntu 14.04 LTS for the STM32F4-Discovery board.
+# AUTHOR          Iztok Starc <i****.s****@gmail.com>
+# DESCRIPTION     This Dockerfile is used to build and test Environment for the STM32F4-Discovery board.
+#                 The Dockerfile is based on the ubuntu 14.04 LTS image from the official repository.
 #
-#
+#                 More info:
+#                   - http://istarc.wordpress.com/
+#                   - https://github.com/istarc/stm32
+#                   - https://registry.hub.docker.com/u/istarc/stm32/
 
 ###
 # Usage
 #
 #
 #
-# You may pull the image from the repository (1) or build it yourself (2).
+# I provide already built image based on this Dockerfile and you may pull it from the repository (1).
+# Alternatively, you may use this Dockerfile to build the image yourself (2).
 #
 #
 #
@@ -23,6 +28,7 @@
 #
 #    docker --version
 #    Docker version 1.1.0 # Issues with version < 1.1.0
+#    # Install Docker by following instructions at https://docs.docker.com/
 #
 # 1.2 Basic Usage:
 #
@@ -54,17 +60,16 @@
 #    make -j4
 #    sudo make deploy
 #
-# 1.5 Create New STM32F4-Discovery Projects:
-#
-#  - http://istarc.wordpress.com
-#  - https://github.com/istarc/stm32
-#
-# 1.6 Test Build Existing Projects via Buildbot:
+# 1.5 Test Build Existing Projects via Buildbot:
 #
 #    firefox http://localhost:$(sudo docker port $CONTAINER_ID 8010 | cut -d ':' -f2)
 #    Login U: admin P: admin (Upper right corner)
 #    Click: Waterfall -> test-build -> [Use default options] -> Force Build
 #    Check: Waterfall -> F5 to Refresh
+#
+# 1.6 More info:
+#  - http://istarc.wordpress.com
+#  - https://github.com/istarc/stm32
 #
 #
 #
@@ -76,10 +81,12 @@
 #
 #    docker --version
 #    Docker version 1.1.0 # Issues with version < 1.1.0
+#    # Install Docker by following instructions at https://docs.docker.com/
 #
 # 2.2 Install software dependencies
 #
 #    cd ~
+#    sudo docker pull ubuntu
 #    wget https://github.com/istarc/stm32/blob/master/Dockerfile
 #
 # 2.3 Build the image
@@ -87,6 +94,8 @@
 #    sudo docker build -t istarc/stm32 - < Dockerfile
 #    
 # 2.4 Usage: see 1.2 - 1.6
+
+
 
 ###
 # Docker script
