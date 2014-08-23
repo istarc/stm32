@@ -1,6 +1,6 @@
 Build and Test Environment based on Ubuntu 14.04 LTS for the STM32F4-Discovery board.
 
-# 1. Build and Test Environment Structure
+# 1. File Organization
 
 - [examples](https://github.com/istarc/stm32/tree/master/examples) [![Build Status](https://travis-ci.org/istarc/stm32.svg?branch=master)](https://travis-ci.org/istarc/stm32)
 - [build-ARM-toolchain](http://istarc.wordpress.com/2014/07/21/stm32f4-build-your-toolchain-from-scratch/)
