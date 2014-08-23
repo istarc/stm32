@@ -3,7 +3,7 @@ Build and Test Environment based on Ubuntu 14.04 LTS for the STM32F4-Discovery b
 # 1. Build and Test Environment Structure
 
 - [examples](https://github.com/istarc/stm32/tree/master/examples) [![Build Status](https://travis-ci.org/istarc/stm32.svg?branch=master)](https://travis-ci.org/istarc/stm32)
-- [build-ARM-toolchain]((http://istarc.wordpress.com/2014/07/21/stm32f4-build-your-toolchain-from-scratch/)
+- [build-ARM-toolchain](http://istarc.wordpress.com/2014/07/21/stm32f4-build-your-toolchain-from-scratch/)
 - [freertos](https://github.com/istarc/freertos) library
 - [mbed](http://mbed.org/) library
 - [mbed-project-wizard](http://istarc.wordpress.com/2014/08/04/stm32f4-behold-the-project-wizard/)
