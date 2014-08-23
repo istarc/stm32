@@ -54,7 +54,10 @@ You may use these projects as a template or create a new project using a [projec
     cd ~/stm32/examples/test
     # Create a new project template via project wizard
     ../../mbed-project-wizard/gen-stm32f407-GCC-project.sh 
-    # Usage:  {mbed-none|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|copy}
+    # Usage:  {mbed-none|mbed-none-lib|
+    #          mbed-freertos|mbed-freertos-lib|
+    #          mbed-mbedrtos|mbed-mbedrtos-lib|
+    #          none-safertos} {|copy}
     ../../mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none
     # Edit source files
     vim src/main.cpp
