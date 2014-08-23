@@ -39,8 +39,6 @@ Linux, Windows or Mac users should install the environment indirectly via Docker
 # 3. Usage
 ## 3.1 Run the Docker Image
 
-Applies Only for Other OS
-
     CONTAINER_ID=$(sudo docker run -P -d --privileged=true istarc/stm32)
     # Other run options:
     # CONTAINER_ID=$(sudo docker run -P -d istarc/stm32) # /wo deploy capability
