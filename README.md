@@ -2,7 +2,7 @@ Build and Test Environment based on Ubuntu 14.04 LTS for the STM32F4-Discovery b
 
 # 1. File Organization
 
-- [examples](https://github.com/istarc/stm32/tree/master/examples) [![Build Status](https://travis-ci.org/istarc/stm32.svg?branch=master)](https://travis-ci.org/istarc/stm32)
+- [examples](https://github.com/istarc/stm32/tree/master/examples) have the following status: [![Build Status](https://travis-ci.org/istarc/stm32.svg?branch=master)](https://travis-ci.org/istarc/stm32)
 - [build-ARM-toolchain](http://istarc.wordpress.com/2014/07/21/stm32f4-build-your-toolchain-from-scratch/)
 - [freertos](https://github.com/istarc/freertos) library
 - [mbed](http://mbed.org/) library
@@ -20,7 +20,7 @@ Ubuntu 14.04 LTS users install the environment directly on host OS. :-)
     git clone https://github.com/istarc/stm32.git
     cd ~/stm32
     git submodule update --init
-    setup-env.sh
+    ./setup-env.sh
 
 ## 2.2 Other
 
