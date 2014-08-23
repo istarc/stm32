@@ -45,7 +45,8 @@ Linux, Windows or Mac users should install the environment indirectly via Docker
     # sudo docker run -P -i -t istarc/stm32 /bin/bash # Interactive mode
     sudo docker stop $CONTAINER_ID
     # Stop and remove all containers:
-    # sudo docker stop $(sudo docker ps -a -q) && sudo docker rm $(sudo docker ps -a -q)
+    # sudo docker stop $(sudo docker ps -a -q)
+    # sudo docker rm $(sudo docker ps -a -q)
     # Remove all untagged images:
     # sudo docker rmi $(sudo docker images | grep "^<none>" | awk '{print $3}')
     ssh -p $(sudo docker port $CONTAINER_ID 22 | cut -d ':' -f2) admin@localhost
