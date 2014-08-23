@@ -66,7 +66,7 @@ Applies Only for Other OS
     make -j4
     sudo make deploy
 
-## 3.4 Test Build Existing Projects via Buildbot:
+## 3.4 Test Existing Projects using Buildbot:
 
     firefox http://localhost:$(sudo docker port $CONTAINER_ID 8010 | cut -d ':' -f2)
     Login U: admin P: admin (Upper right corner)
