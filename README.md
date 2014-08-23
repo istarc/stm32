@@ -22,7 +22,7 @@ Ubuntu 14.04 LTS users install the environment directly on host OS. :-)
     git submodule update --init
     ./setup-env.sh
 
-## 2.2 Other
+## 2.2 Others
 
 Linux, Windows or Mac users should install the environment indirectly via Docker virtualization.
 
