@@ -20,7 +20,9 @@ Build and Test Environment based on Ubuntu 14.04 LTS for the STM32F4-Discovery b
 
 ## 2.2 Deploy the Vagrant Image
 
-    TODO
+    cd ~
+    vagrant add box istarc/stm32 # After that you may directly use VirtualBox UI
+    vagrant init istarc/stm32
 
 An alternative is to build the image from scratch (see the Vagrantfile for details).
 

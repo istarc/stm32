@@ -2,11 +2,33 @@
 # vi: set ft=ruby :
 
 ###
+# STM32F4-Discovery Build and Test Environment Dockerfile
+#
+# VERSION         1.1.0
+# VAGRANT_VERSION 1.1.2
+# AUTHOR          Iztok Starc <i****.s****@gmail.com>
+# DESCRIPTION     This Vagrantfile is used to build and test Environment for the STM32F4-Discovery board.
+#                 The Vagrantfile is based on the ubuntu 14.04 LTS image from the official repository.
+#
+#                 More info:
+#                   - http://istarc.wordpress.com/
+#                   - https://github.com/istarc/stm32
+#                   - https://vagrantcloud.com/istarc/stm32
+
 # Usage
 #
 #
 #
-# 1. Build the image 
+# I provide already built image based on this Vagrantfile and you may pull it from the repository (1).
+# Alternatively, you may use this Vagrantfile to build the image yourself (2).
+#
+# I recommend to use the Docker image, even it comes without preinstalled GUI, unlike the Vagrant image.
+# The Docker image is automatically updated after each commit in the repository. Thereby, you can have
+# always a fresh and updated image.
+#
+#
+#
+# 1. Pull the image from the repository
 #
 # This is alternative to "1. Pull the image from the repository"
 #
@@ -18,22 +40,19 @@
 #
 # 1.2 Install software dependencies
 #
-#    cd ~
-#    # Install VirtualBox
+#    # Install VirtualBox (https://www.virtualbox.org/)
 #    sudo apt-get install build-essential virtualbox virtualbox-dkms virtualbox-guest-dkms \
 #                         virtualbox-guest-utils virtualbox-guest-x11 virtualbox-qt
-#    # Download and install the extension pack https://www.virtualbox.org/wiki/Downloads
+#    # Download VirtualBox extension pack (https://www.virtualbox.org/wiki/Downloads)
 #    wget http://download.virtualbox.org/virtualbox/4.3.14/Oracle_VM_VirtualBox_Extension_Pack-4.3.14-95030.vbox-extpack
+#    # Install the extension pack
 #    VBoxManage extpack install Oracle_VM_VirtualBox_Extension_Pack-4.3.14-95030.vbox-extpack
-#    # Clone the STM32 repository
-#    sudo apt-get install git
-#    git clone https://github.com/istarc/stm32.git
 #
-# 1.3 Deploy the image and provision the STM32F4-Discovery test and build environment
+# 1.3 Basic usage
 #
-#    cd ~/stm32
+#    cd ~
+#    vagrant init istarc/stm32
 #    vagrant up
-#    vagrant provision
 #    # Manually enable ST-Link: Devices -> USB Devices -> STMicroelectronics STM32 STLink
 #
 # 1.4 Build Existing Projects:
@@ -54,6 +73,7 @@
 #
 # 1.6 Test Build Existing Projects via Buildbot:
 #
+#    # Switch to VirtualBox Container
 #    firefox http://localhost:8010
 #    Login U: admin P: admin (Upper right corner)
 #    Click: Waterfall -> test-build -> [Use default options] -> Force Build
@@ -62,6 +82,32 @@
 # 1.7 More info:
 #  - http://istarc.wordpress.com
 #  - https://github.com/istarc/stm32
+#  - https://vagrantcloud.com/istarc/stm32
+#
+# 
+#
+# 2. Build the image 
+#
+# This is alternative to "1. Pull the image from the repository".
+#
+# 2.1 Prerequisites:
+#
+# See 1.1.
+#
+# 2.2 Install software dependencies
+#
+# See 1.2
+#
+# 2.3 Build the image
+#
+#    cd ~
+#    # Get the Vagrantfile to build the image
+#    wget https://raw.githubusercontent.com/istarc/stm32/master/Vagrantfile
+#    # Build the image
+#    vagrant --provision up
+#    # Manually enable ST-Link: Devices -> USB Devices -> STMicroelectronics STM32 STLink
+#    
+# 2.4 Usage: see 1.3 - 1.7
 
 
 
