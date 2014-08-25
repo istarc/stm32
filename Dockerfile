@@ -88,7 +88,7 @@
 #
 #    cd ~
 #    sudo docker pull ubuntu
-#    wget https://github.com/istarc/stm32/blob/master/Dockerfile
+#    wget https://raw.githubusercontent.com/istarc/stm32/master/Dockerfile
 #
 # 2.3 Build the image
 #
