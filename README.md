@@ -23,8 +23,9 @@ Ubuntu 14.04 LTS users install the environment directly on host OS. :-)
     ./setup-env.sh
 
 Linux, Windows or Mac users should install the environment indirectly:
-- via Docker using LXC virtualization;
-- via Vagrant using Virtualbox virtualization.
+
+- via [Docker using LXC virtualization](https://github.com/istarc/stm32/blob/master/README-Docker.md);
+- via [Vagrant using Virtualbox virtualization](https://github.com/istarc/stm32/blob/master/README-Vagrant.md).
 
 # 3. Usage
 ## 3.1 Build Existing Projects
