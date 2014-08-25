@@ -53,8 +53,10 @@ Linux, Windows or Mac users should install the environment indirectly:
  - [http://istarc.wordpress.com/][1]
  - [https://github.com/istarc/stm32][2]
  - [https://registry.hub.docker.com/u/istarc/stm32/][3]
+ - [https://vagrantcloud.com/istarc/stm32][4]
 
   [1]: http://istarc.wordpress.com/
   [2]: https://github.com/istarc/stm32
   [3]: https://registry.hub.docker.com/u/istarc/stm32/
+  [4]: https://vagrantcloud.com/istarc/stm32
 
