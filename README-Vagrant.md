@@ -10,16 +10,15 @@ Build and Test Environment based on Ubuntu 14.04 LTS for the STM32F4-Discovery b
 - [STM32F4-Discovery_FW_V1.1.0 library](http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/PF252419) library
 - [test]()
 
-# 2. How to Setup the Environment
-## 2.1 Via Vagrant
+# 2. How to Setup the Environment Via Vagrant
 
-### Prerequisites
+## 2.1 Prerequisites
 
     vagrant --version
     Vagrant 1.6.3 # Issues with version < 1.5.0
     # Install Vagrant by following instructions at https://www.vagrantup.com
 
-### Deploy the Vagrant Image
+## 2.2 Deploy the Vagrant Image
 
     TODO
 
