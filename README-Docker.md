@@ -25,12 +25,20 @@ Build and Test Environment based on Ubuntu 14.04 LTS for the STM32F4-Discovery b
 An alternative is to build the image from scratch (see the Dockerfile for details).
 
 # 3. Usage
-## 3.1 Run the VirtualBox Image
+## 3.1 Run the Docker Image
 
-    cd ~
-    vagrant up
-    vagrant provision
-    # Manually enable ST-Link: Devices -> USB Devices -> STMicroelectronics STM32 STLink
+    CONTAINER_ID=$(sudo docker run -P -d --privileged=true istarc/stm32)
+    # Other run options:
+    # CONTAINER_ID=$(sudo docker run -P -d istarc/stm32) # /wo deploy capability
+    # sudo docker run -P -i -t istarc/stm32 /bin/bash # Interactive mode
+    sudo docker stop $CONTAINER_ID
+    # Stop and remove all containers:
+    # sudo docker stop $(sudo docker ps -a -q)
+    # sudo docker rm $(sudo docker ps -a -q)
+    # Remove all untagged images:
+    # sudo docker rmi $(sudo docker images | grep "^<none>" | awk '{print $3}')
+    ssh -p $(sudo docker port $CONTAINER_ID 22 | cut -d ':' -f2) admin@localhost
+    # Enter password: admin
 
 ## 3.2 Build Existing Projects
 
@@ -54,8 +62,8 @@ An alternative is to build the image from scratch (see the Dockerfile for detail
 
 # 4. Other Options
 
-- Ubuntu 14.04 LTS users
-- Via Vagrant using Virtualbox virtualization
+- [Ubuntu 14.04 LTS users](https://github.com/istarc/stm32/blob/master/README.md);
+- via [Vagrant using Virtualbox virtualization](https://github.com/istarc/stm32/blob/master/README-Vagrant.md).
 
 # 5. More Info
 
