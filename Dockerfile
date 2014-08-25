@@ -1,7 +1,7 @@
 ###
 # STM32F4-Discovery Build and Test Environment Dockerfile
 #
-# VERSION         1.0
+# VERSION         1.1.0
 # DOCKER_VERSION  1.1.2
 # AUTHOR          Iztok Starc <i****.s****@gmail.com>
 # DESCRIPTION     This Dockerfile is used to build and test Environment for the STM32F4-Discovery board.
@@ -76,7 +76,7 @@
 #
 # 2. Build the image 
 #
-# This is alternative to "1. Pull the image from the repository"
+# This is alternative to "1. Pull the image from the repository".
 #
 # 2.1 Prerequisites:
 #
