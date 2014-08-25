@@ -10,44 +10,54 @@ Build and Test Environment based on Ubuntu 14.04 LTS for the STM32F4-Discovery b
 - [STM32F4-Discovery_FW_V1.1.0 library](http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/PF252419) library
 - [test]()
 
-# 2. How to Setup the Environment
-## 2.1 Ubuntu 14.04 LTS Users
+# 2. How to Setup the Environment Via Docker
 
-Ubuntu 14.04 LTS users install the environment directly on host OS. :-)
+## 2.1 Prerequisites
 
-    cd ~
-    sudo apt-get install git
-    git clone https://github.com/istarc/stm32.git
-    cd ~/stm32
-    git submodule update --init
-    ./setup-env.sh
+    docker --version
+    Docker version 1.1.0 # Issues with version < 1.1.0
+    # Install Docker by following instructions at https://docs.docker.com
 
-Linux, Windows or Mac users should install the environment indirectly:
-- via Docker using LXC virtualization;
-- via Vagrant using Virtualbox virtualization.
+## 2.2 Deploy the Docker Image
+
+    sudo docker pull istarc/stm32
+
+An alternative is to build the image from scratch (see the Dockerfile for details).
 
 # 3. Usage
-## 3.1 Build Existing Projects
+## 3.1 Run the VirtualBox Image
+
+    cd ~
+    vagrant up
+    vagrant provision
+    # Manually enable ST-Link: Devices -> USB Devices -> STMicroelectronics STM32 STLink
+
+## 3.2 Build Existing Projects
 
     cd ~/stm32/
     make clean
     make -j4
 
-## 3.2 Deploy an Existing Project
+## 3.3 Deploy an Existing Project
 
     cd ~/stm32/examples/Template.mbed
     make clean
     make -j4
     sudo make deploy
 
-## 3.3 Test Existing Projects using Buildbot:
+## 3.4 Test Existing Projects using Buildbot:
 
-    firefox http://localhost:8010
+    firefox http://localhost:$(sudo docker port $CONTAINER_ID 8010 | cut -d ':' -f2)
     Login U: admin P: admin (Upper right corner)
     Click: Waterfall -> test-build -> [Use default options] -> Force Build
     Check: Waterfall -> F5 to Refresh
 
-# 4. More Info
+# 4. Other Options
+
+- Ubuntu 14.04 LTS users
+- Via Vagrant using Virtualbox virtualization
+
+# 5. More Info
 
  - [http://istarc.wordpress.com/][1]
  - [https://github.com/istarc/stm32][2]

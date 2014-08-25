@@ -187,6 +187,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #
   #   chef.validation_client_name = "ORGNAME-validator"
   #
-  config.vm.provision "shell", path: "setup-env.sh", privileged: false
+  
+  # Setup environment
+  config.vm.provision "shell", inline: "apt-get update -q && apt-get install openssl wget"
+  config.vm.provision "shell", inline: "useradd -s /bin/bash -m -d /home/krusty -p $(openssl passwd -1 krusty) krusty"
+  config.vm.provision "shell", inline: "sed -Ei 's/adm:x:4:/krusty:x:4:krusty/' /etc/group"
+  config.vm.provision "shell", inline: "sed -Ei 's/(\%krusty ALL=\(ALL\) )ALL/\1 NOPASSWD:ALL/' /etc/sudoers"
+
+  # Install GCC ARM Toolchain
+  config.vm.provision "shell", inline: "su - krusty -c 'wget https://github.com/istarc/stm32/blob/master/setup-env.sh'"
+  config.vm.provision "shell", inline: "su - krusty -c 'setup-env.sh'"
+
+  # Install the GUI
+  config.vm.provision "shell", inline: "export DEBIAN_FRONTEND=noninteractive && apt-get update -q && apt-get -y install xubuntu-desktop gksu leafpad synaptic build-essential git eclipse-cdt && apt-get -y remove nautilus gnome-power-manager gnome-screensaver gnome-termina* gnome-pane* gnome-applet* gnome-bluetooth gnome-desktop* gnome-sessio* gnome-user* gnome-shell-common compiz compiz* unity unity* hud zeitgeist zeitgeist* python-zeitgeist libzeitgeist* activity-log-manager-common gnome-control-center gnome-screenshot overlay-scrollba* && apt-get -y install xubuntu-community-wallpapers && apt-get autoremove"
 
 end

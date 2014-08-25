@@ -39,7 +39,8 @@
 #    # sudo docker run -P -i -t istarc/stm32 /bin/bash # Interactive mode
 #    sudo docker stop $CONTAINER_ID
 #    # Stop and remove all containers
-#    # sudo docker stop $(sudo docker ps -a -q) && sudo docker rm $(sudo docker ps -a -q)
+#    # sudo docker stop $(sudo docker ps -a -q) 
+#    # sudo docker rm $(sudo docker ps -a -q)
 #    # Remove all untagged images
 #    # sudo docker rmi $(sudo docker images | grep "^<none>" | awk '{print $3}')
 #
@@ -107,7 +108,7 @@ from ubuntu:14.04
 # 2.1 Install platform dependancies
 run export DEBIAN_FRONTEND=noninteractive
 run sudo apt-get update -q
-run sudo apt-get install -y supervisor sudo ssh openssh-server software-properties-common vim
+run sudo apt-get install -y supervisor sudo ssh openssh-server software-properties-common vim wget openssl
 # 2.2 Install project dependancies
 run sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
 run sudo apt-get update -q
@@ -124,7 +125,7 @@ run cd /home/admin; git clone https://github.com/istarc/stm32.git
 run cd /home/admin/stm32; git submodule update --init
 
 # 3. Add user admin with password "admin"
-run useradd -s /bin/bash -m -d /home/admin -p sa1aY64JOY94w admin
+run useradd -s /bin/bash -m -d /home/admin -p $(openssl passwd -1 admin)  admin
 run sed -Ei 's/adm:x:4:/admin:x:4:admin/' /etc/group
 run sed -Ei 's/(\%admin ALL=\(ALL\) )ALL/\1 NOPASSWD:ALL/' /etc/sudoers
 

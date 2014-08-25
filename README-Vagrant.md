@@ -11,43 +11,63 @@ Build and Test Environment based on Ubuntu 14.04 LTS for the STM32F4-Discovery b
 - [test]()
 
 # 2. How to Setup the Environment
-## 2.1 Ubuntu 14.04 LTS Users
+## 2.1 Via Docker
 
-Ubuntu 14.04 LTS users install the environment directly on host OS. :-)
+### Prerequisites
 
-    cd ~
-    sudo apt-get install git
-    git clone https://github.com/istarc/stm32.git
-    cd ~/stm32
-    git submodule update --init
-    ./setup-env.sh
+    docker --version
+    Docker version 1.1.0 # Issues with version < 1.1.0
+    # Install Docker by following instructions at https://docs.docker.com
 
-Linux, Windows or Mac users should install the environment indirectly:
-- via Docker using LXC virtualization;
-- via Vagrant using Virtualbox virtualization.
+### Deploy the docker image
+
+    sudo docker pull istarc/stm32
 
 # 3. Usage
-## 3.1 Build Existing Projects
+## 3.1 Run the Docker Image
 
+    CONTAINER_ID=$(sudo docker run -P -d --privileged=true istarc/stm32)
+    # Other run options:
+    # CONTAINER_ID=$(sudo docker run -P -d istarc/stm32) # /wo deploy capability
+    # sudo docker run -P -i -t istarc/stm32 /bin/bash # Interactive mode
+    sudo docker stop $CONTAINER_ID
+    # Stop and remove all containers:
+    # sudo docker stop $(sudo docker ps -a -q)
+    # sudo docker rm $(sudo docker ps -a -q)
+    # Remove all untagged images:
+    # sudo docker rmi $(sudo docker images | grep "^<none>" | awk '{print $3}')
+    ssh -p $(sudo docker port $CONTAINER_ID 22 | cut -d ':' -f2) admin@localhost
+    # Enter password: admin
+
+## 3.2 Build Existing Projects
+
+    # Switch to Virtualbox container
     cd ~/stm32/
     make clean
     make -j4
 
-## 3.2 Deploy an Existing Project
+## 3.3 Deploy an Existing Project
 
+    # Switch to Virtualbox container
     cd ~/stm32/examples/Template.mbed
     make clean
     make -j4
     sudo make deploy
 
-## 3.3 Test Existing Projects using Buildbot:
+## 3.4 Test Existing Projects using Buildbot:
 
+    # Switch to Virtualbox container
     firefox http://localhost:8010
     Login U: admin P: admin (Upper right corner)
     Click: Waterfall -> test-build -> [Use default options] -> Force Build
     Check: Waterfall -> F5 to Refresh
 
-# 4. More Info
+# 4. Other Options
+
+- Ubuntu 14.04 LTS users
+- Via Docker using LXC virtualization
+
+# 5. More Info
 
  - [http://istarc.wordpress.com/][1]
  - [https://github.com/istarc/stm32][2]
