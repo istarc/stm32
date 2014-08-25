@@ -16,58 +16,54 @@ Build and Test Environment based on Ubuntu 14.04 LTS for the STM32F4-Discovery b
 
     vagrant --version
     Vagrant 1.6.3 # Issues with version < 1.5.0
-    # Install Vagrant by following instructions at https://www.vagrantup.com
+    # Install Vagrant by following instructions at https://www.vagrantup.com/downloads.html
 
-## 2.2 Deploy the Vagrant Image
+## 2.2 Install software dependencies
 
-    cd ~
-    vagrant add box istarc/stm32 # After that you may directly use VirtualBox UI
-    vagrant init istarc/stm32
+    # Install VirtualBox (https://www.virtualbox.org/)
+    sudo apt-get install build-essential virtualbox virtualbox-dkms virtualbox-guest-dkms \
+                         virtualbox-guest-utils virtualbox-guest-x11 virtualbox-qt
+    # Download VirtualBox extension pack (https://www.virtualbox.org/wiki/Downloads)
+    wget http://download.virtualbox.org/virtualbox/4.3.14/Oracle_VM_VirtualBox_Extension_Pack-4.3.14-95030.vbox-extpack
+    # Install the extension pack
+    VBoxManage extpack install Oracle_VM_VirtualBox_Extension_Pack-4.3.14-95030.vbox-extpack
 
-An alternative is to build the image from scratch (see the Vagrantfile for details).
+An alternative is to build the image from scratch. See the [Vagrantfile](https://github.com/istarc/stm32/blob/master/Vagrantfile) for details.
 
-# 3. Usage
+# 3. Basic usage
 ## 3.1 Run the VirtualBox Image
 
     cd ~
+    vagrant init istarc/stm32
     vagrant up
     # Manually enable ST-Link: Devices -> USB Devices -> STMicroelectronics STM32 STLink
 
-## 3.2 Build Existing Projects
+## 3.2 Build Existing Projects:
 
-    # Switch to Virtualbox container
+    # Switch to VirtualBox Container
     cd ~/stm32/
     make clean
     make -j4
 
-## 3.3 Deploy an Existing Project
+## 3.3 Deploy Existing Project:
 
-    # Switch to Virtualbox container
+    # Switch to VirtualBox Container
     cd ~/stm32/examples/Template.mbed
     make clean
     make -j4
+    # Manually enable ST-Link: Devices -> USB Devices -> STMicroelectronics STM32 STLink
     sudo make deploy
 
-## 3.4 Test Existing Projects using Buildbot:
+## 3.4 Test Build Existing Projects via Buildbot:
 
-    # Switch to Virtualbox container
+    # Switch to VirtualBox Container
     firefox http://localhost:8010
     Login U: admin P: admin (Upper right corner)
     Click: Waterfall -> test-build -> [Use default options] -> Force Build
     Check: Waterfall -> F5 to Refresh
 
-# 4. Other Options
-
-- [Ubuntu 14.04 LTS users](https://github.com/istarc/stm32/blob/master/README.md);
-- via [Docker using LXC virtualization](https://github.com/istarc/stm32/blob/master/README-Docker.md).
-
-# 5. More Info
-
- - [http://istarc.wordpress.com/][1]
- - [https://github.com/istarc/stm32][2]
- - [https://registry.hub.docker.com/u/istarc/stm32/][3]
-
-  [1]: http://istarc.wordpress.com/
-  [2]: https://github.com/istarc/stm32
-  [3]: https://registry.hub.docker.com/u/istarc/stm32/
+## 3.5 More info:
+  - http://istarc.wordpress.com
+  - https://github.com/istarc/stm32
+  - https://vagrantcloud.com/istarc/stm32
 

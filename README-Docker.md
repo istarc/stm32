@@ -22,7 +22,7 @@ Build and Test Environment based on Ubuntu 14.04 LTS for the STM32F4-Discovery b
 
     sudo docker pull istarc/stm32
 
-An alternative is to build the image from scratch (see the Dockerfile for details).
+An alternative is to build the image from scratch. See the [Dockerfile](https://github.com/istarc/stm32/blob/master/Dockerfile) for details.
 
 # 3. Usage
 ## 3.1 Run the Docker Image
