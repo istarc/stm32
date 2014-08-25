@@ -70,7 +70,8 @@ fi
 # 1.2.5 Clone OpenOCD
 if [ ! -d "$PREFIX/openocd" ]; then
 	cd $PREFIX
-	git clone git://openocd.git.sourceforge.net/gitroot/openocd/openocd
+	#git clone git://openocd.git.sourceforge.net/gitroot/openocd/openocd # Unreliable
+	git clone https://github.com/ntfreak/openocd.git
 fi
 
 # 2. Build and Install OpenOCD
