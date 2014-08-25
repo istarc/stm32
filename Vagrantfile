@@ -30,8 +30,6 @@
 #
 # 1. Pull the image from the repository
 #
-# This is alternative to "1. Pull the image from the repository"
-#
 # 1.1 Prerequisites:
 #
 #    vagrant --version
