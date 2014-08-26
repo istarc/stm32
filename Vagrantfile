@@ -247,7 +247,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell", inline: "apt-get update -q"
 
   # Install GCC ARM Toolchain
-  config.vm.provision "shell", inline: "cd /home/admin && wget https://raw.githubusercontent.com/istarc/stm32/master/setup-env.sh && bash setup-env.sh"
+  config.vm.provision "shell", inline: "cd /home/admin && wget https://raw.githubusercontent.com/istarc/stm32/master/setup-env.sh && export HOME=/home/admin && bash setup-env.sh"
   config.vm.provision "shell", inline: "chown -R admin:admin /home/admin"
 
   # Install GUI
