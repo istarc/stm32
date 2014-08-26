@@ -57,7 +57,10 @@ An alternative is to build the image from scratch. See the [Dockerfile](https://
 
     firefox http://localhost:$(sudo docker port $CONTAINER_ID 8010 | cut -d ':' -f2)
     Login U: admin P: admin (Upper right corner)
-    Click: Waterfall -> test-build -> [Use default options] -> Force Build
+    Click: Waterfall -> test-build-local -> [Use default options] -> Force Build
+    # Test builds examples in /home/admin/stm32/examples
+    Click: Waterfall -> test-build-repo -> [Use default options] -> Force Build
+    # Test builds examples from the https://github.com/istarc/stm32.git repository
     Check: Waterfall -> F5 to Refresh
 
 # 4. Other Options

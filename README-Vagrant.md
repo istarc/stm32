@@ -57,9 +57,15 @@ An alternative is to build the image from scratch. See the [Vagrantfile](https:/
 ## 3.4 Test Build Existing Projects via Buildbot:
 
     # Switch to VirtualBox Container
+    cd ~/stm32bb
+    buildbot start master
+    buildslave start slave
     firefox http://localhost:8010
-    Login U: admin P: admin (Upper right corner)
-    Click: Waterfall -> test-build -> [Use default options] -> Force Build
+    # Login U: admin P: admin (Upper right corner)
+    Click: Waterfall -> test-build-local -> [Use default options] -> Force Build
+    # Test builds examples in /home/admin/stm32/examples
+    Click: Waterfall -> test-build-repo -> [Use default options] -> Force Build
+    # Test builds examples from the https://github.com/istarc/stm32.git repository
     Check: Waterfall -> F5 to Refresh
 
 ## 3.5 More info:

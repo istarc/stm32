@@ -51,6 +51,7 @@
 #    cd ~
 #    vagrant init istarc/stm32
 #    vagrant up
+#    # Login as U: admin P: admin
 #    # Manually enable ST-Link: Devices -> USB Devices -> STMicroelectronics STM32 STLink
 #
 # 1.4 Build Existing Projects:
@@ -72,9 +73,15 @@
 # 1.6 Test Build Existing Projects via Buildbot:
 #
 #    # Switch to VirtualBox Container
+#    cd ~/stm32bb
+#    buildbot start master
+#    buildslave start slave
 #    firefox http://localhost:8010
-#    Login U: admin P: admin (Upper right corner)
-#    Click: Waterfall -> test-build -> [Use default options] -> Force Build
+#    # Login U: admin P: admin (Upper right corner)
+#    Click: Waterfall -> test-build-local -> [Use default options] -> Force Build
+#    # Test builds examples in /home/admin/stm32/examples
+#    Click: Waterfall -> test-build-repo -> [Use default options] -> Force Build
+#    # Test builds examples from the https://github.com/istarc/stm32.git repository
 #    Check: Waterfall -> F5 to Refresh
 #
 # 1.7 More info:
@@ -103,7 +110,11 @@
 #    wget https://raw.githubusercontent.com/istarc/stm32/master/Vagrantfile
 #    # Build the image
 #    vagrant --provision up
-#    # Manually enable ST-Link: Devices -> USB Devices -> STMicroelectronics STM32 STLink
+#    # Wait util provisioning is fully completed
+#    # Switch to VirtualBox Container, Login with U: admin P: admin
+#    sudo reboot
+#    # Enter password: admin
+#    # Login to GUI as U: admin P: admin
 #    
 # 2.4 Usage: see 1.3 - 1.7
 
