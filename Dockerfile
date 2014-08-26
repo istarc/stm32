@@ -125,7 +125,7 @@ run sudo apt-get install -y build-essential git openocd gcc-arm-none-eabi=4-8-20
 run sudo apt-get install -y buildbot buildbot-slave
 # 2.2.3 OpenOCD build dependancies
 run sudo apt-get install -y libtool libftdi-dev libusb-1.0-0-dev automake pkg-config texinfo
-.# 22.4 Clone and init stm32 repository
+# 22.4 Clone and init stm32 repository
 run mkdir -p /home/admin
 run cd /home/admin; git clone --depth 1 https://github.com/istarc/stm32.git
 run cd /home/admin/stm32; git submodule update --init --depth 1
