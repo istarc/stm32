@@ -112,9 +112,11 @@ run sudo echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricte
 run sudo echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-updates main restricted universe multiverse' >> /etc/apt/sources.list
 run sudo echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-backports main restricted universe multiverse' >> /etc/apt/sources.list
 run sudo echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main restricted universe multiverse' >> /etc/apt/sources.list
-run sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
 run sudo apt-get update -q
 run sudo apt-get install -y supervisor sudo ssh openssh-server software-properties-common vim wget openssl
+# The above is required to execute add-apt-repository
+run sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
+run sudo apt-get update -q
 # 2.2 Install project dependancies
 # 2.2.1 GCC ARM
 run sudo apt-cache policy gcc-arm-none-eabi
