@@ -107,22 +107,28 @@ from ubuntu:14.04
 # 2. Install dependancies
 # 2.1 Install platform dependancies
 run export DEBIAN_FRONTEND=noninteractive
+run 
 run sudo apt-get update -q
 run sudo apt-get install -y supervisor sudo ssh openssh-server software-properties-common vim wget openssl
 # 2.2 Install project dependancies
+run sudo mv /etc/apt/sources.list /etc/apt/sources.list.old
+run sudo echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricted universe multiverse' >> /etc/apt/sources.list
+run sudo echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-updates main restricted universe multiverse' >> /etc/apt/sources.list
+run sudo echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-backports main restricted universe multiverse' >> /etc/apt/sources.list
+run sudo echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main restricted universe multiverse' >> /etc/apt/sources.list
 run sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
 run sudo apt-get update -q
-run sudo apt-cache policy gcc-arm-none-eabi
 # 2.2.1 GCC ARM
+run sudo apt-cache policy gcc-arm-none-eabi
 run sudo apt-get install -y build-essential git openocd gcc-arm-none-eabi=4-8-2014q2-0trusty10
 # 2.2.2 Buildbot
 run sudo apt-get install -y buildbot buildbot-slave
 # 2.2.3 OpenOCD build dependancies
 run sudo apt-get install -y libtool libftdi-dev libusb-1.0-0-dev automake pkg-config texinfo
-# 2.2.4 Clone and init stm32 repository
+.# 22.4 Clone and init stm32 repository
 run mkdir -p /home/admin
-run cd /home/admin; git clone https://github.com/istarc/stm32.git
-run cd /home/admin/stm32; git submodule update --init
+run cd /home/admin; git clone --depth 1 https://github.com/istarc/stm32.git
+run cd /home/admin/stm32; git submodule update --init --depth 1
 
 # 3. Add user admin with password "admin"
 run useradd -s /bin/bash -m -d /home/admin -p $(openssl passwd -1 admin)  admin
@@ -144,7 +150,8 @@ run /bin/echo -e "[program:buildworker]\ncommand=twistd --nodaemon --no_save -y 
 expose 8010
 
 # 6. Build & Install OpenOCD from repository
-run cd /home/admin; git clone git://openocd.git.sourceforge.net/gitroot/openocd/openocd
+# run cd /home/admin; git clone git://openocd.git.sourceforge.net/gitroot/openocd/openocd # Not Reliable
+run cd /home/admin; git clone --depth 1 https://github.com/ntfreak/openocd.git
 run cd /home/admin/openocd; ./bootstrap; ./configure --enable-maintainer-mode --disable-option-checking --disable-werror --prefix=/opt/openocd --enable-dummy --enable-usb_blaster_libftdi --enable-ep93xx --enable-at91rm9200 --enable-presto_libftdi --enable-usbprog --enable-jlink --enable-vsllink --enable-rlink --enable-stlink --enable-arm-jtag-ew; make; make install
 
 # 7. Post-install

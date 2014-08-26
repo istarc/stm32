@@ -59,9 +59,9 @@ sudo apt-get install -y libtool libftdi-dev libusb-1.0-0-dev automake pkg-config
 # 1.2.4 Clone and init stm32 repository
 if [ ! -d "$PREFIX/stm32" ]; then
 	cd $PREFIX
-	git clone https://github.com/istarc/stm32.git
+	git clone --depth 1 https://github.com/istarc/stm32.git
 	cd $PREFIX/stm32
-	git submodule update --init
+	git submodule update --init --depth 1
 else
 	cd $PREFIX/stm32
 	git pull
@@ -71,7 +71,7 @@ fi
 if [ ! -d "$PREFIX/openocd" ]; then
 	cd $PREFIX
 	#git clone git://openocd.git.sourceforge.net/gitroot/openocd/openocd # Unreliable
-	git clone https://github.com/ntfreak/openocd.git
+	git clone --depth 1 https://github.com/ntfreak/openocd.git
 fi
 
 # 2. Build and Install OpenOCD

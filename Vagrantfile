@@ -238,11 +238,23 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell", inline: "sed -Ei 's/adm:x:4:/admin:x:4:admin/' /etc/group"
   config.vm.provision "shell", inline: "sed -Ei 's/(\%admin ALL=\(ALL\) )ALL/\1 NOPASSWD:ALL/' /etc/sudoers"
 
+  # Setup repository (Automatically selects the best mirror)
+  config.vm.provision "shell", inline: "mv /etc/apt/sources.list /etc/apt/sources.list.old"
+  config.vm.provision "shell", inline: "echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricted universe multiverse' >> /etc/apt/sources.list"
+  config.vm.provision "shell", inline: "echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-updates main restricted universe multiverse' >> /etc/apt/sources.list"
+  config.vm.provision "shell", inline: "echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-backports main restricted universe multiverse' >> /etc/apt/sources.list"
+  config.vm.provision "shell", inline: "echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main restricted universe multiverse' >> /etc/apt/sources.list"
+  config.vm.provision "shell", inline: "apt-get update -q"
+
   # Install GCC ARM Toolchain
   config.vm.provision "shell", inline: "cd /home/admin && wget https://raw.githubusercontent.com/istarc/stm32/master/setup-env.sh && bash setup-env.sh"
   config.vm.provision "shell", inline: "chown -R admin:admin /home/admin"
 
-  # Install the GUI
-  config.vm.provision "shell", inline: "export DEBIAN_FRONTEND=noninteractive && apt-get update -q && apt-get -y install xubuntu-desktop gksu leafpad synaptic build-essential git eclipse-cdt && apt-get -y remove nautilus gnome-power-manager gnome-screensaver gnome-termina* gnome-pane* gnome-applet* gnome-bluetooth gnome-desktop* gnome-sessio* gnome-user* gnome-shell-common compiz compiz* unity unity* hud zeitgeist zeitgeist* python-zeitgeist libzeitgeist* activity-log-manager-common gnome-control-center gnome-screenshot overlay-scrollba* && apt-get -y install xubuntu-community-wallpapers && apt-get autoremove"
+  # Install GUI
+  config.vm.provision "shell", inline: "export DEBIAN_FRONTEND=noninteractive && apt-get -y install xubuntu-desktop xubuntu-community-wallpapers gksu leafpad synaptic eclipse-cdt"
+
+ # Remove
+ # config.vm.provision "shell", inline: "apt-get -y remove nautilus gnome-power-manager gnome-screensaver gnome-termina* gnome-pane* gnome-applet* gnome-bluetooth gnome-desktop* gnome-sessio* gnome-user* gnome-shell-common compiz compiz* unity unity* hud zeitgeist zeitgeist* python-zeitgeist libzeitgeist* activity-log-manager-common gnome-control-center gnome-screenshot overlay-scrollba*"
+ config.vm.provision "shell", inline: "apt-get -y autoremove"
 
 end
