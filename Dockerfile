@@ -107,10 +107,6 @@ from ubuntu:14.04
 # 2. Install dependancies
 # 2.1 Install platform dependancies
 run export DEBIAN_FRONTEND=noninteractive
-run 
-run sudo apt-get update -q
-run sudo apt-get install -y supervisor sudo ssh openssh-server software-properties-common vim wget openssl
-# 2.2 Install project dependancies
 run sudo mv /etc/apt/sources.list /etc/apt/sources.list.old
 run sudo echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricted universe multiverse' >> /etc/apt/sources.list
 run sudo echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-updates main restricted universe multiverse' >> /etc/apt/sources.list
@@ -118,6 +114,8 @@ run sudo echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-backports main
 run sudo echo 'deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main restricted universe multiverse' >> /etc/apt/sources.list
 run sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
 run sudo apt-get update -q
+run sudo apt-get install -y supervisor sudo ssh openssh-server software-properties-common vim wget openssl
+# 2.2 Install project dependancies
 # 2.2.1 GCC ARM
 run sudo apt-cache policy gcc-arm-none-eabi
 run sudo apt-get install -y build-essential git openocd gcc-arm-none-eabi=4-8-2014q2-0trusty10
@@ -125,7 +123,7 @@ run sudo apt-get install -y build-essential git openocd gcc-arm-none-eabi=4-8-20
 run sudo apt-get install -y buildbot buildbot-slave
 # 2.2.3 OpenOCD build dependancies
 run sudo apt-get install -y libtool libftdi-dev libusb-1.0-0-dev automake pkg-config texinfo
-# 22.4 Clone and init stm32 repository
+# 2.2.4 Clone and init stm32 repository
 run mkdir -p /home/admin
 run cd /home/admin; git clone --depth 1 https://github.com/istarc/stm32.git
 run cd /home/admin/stm32; git submodule update --init --depth 1
