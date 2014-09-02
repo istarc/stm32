@@ -2,11 +2,35 @@
 
 # Setups STM32F4-Discovery Build and Test Environment
 
-set -e # Exit immediately if a command exits with a non-zero status
+###
+# Setups STM32F4-Discovery Build and Test Environment
+# 
+# Host:   Ubuntu 14.04 LTS x86_64
+# Target: ARM cortex-m4f
+#
+# Features:
+# - GCC ARM Embedded Toolchain (Ubuntu 14.04 LTS PPA Repository)
+# - OpenOCD (On-chip Debugger)
+# - Buildbot (Automated Build and Test Environment)
+# - Optional: GCC ARM Embedded Toolchain (Built from scratch)
 
-#PREFIX=~/stm32f4-env
+###
+# Prerequisites:
+# - Ubuntu 14.04 GNU/Linux.
+
+###
+# Check My Blog
+#  http://istarc.wordpress.com
+
+###
+# 0. Define Variables
+# 0.1 Stop on first error
+set -e 
+# 0.2 Be verbose
+set -x
+# 0.3 Build directory
 PREFIX=~
-
+# 0.4 Check if Ubuntu 14.04 LTS
 if [ -z "$(cat /etc/os-release | grep "Ubuntu 14.04")" ]; then
 	echo "This script should be only used with Ubuntu 14.04,"
 	echo "but your system is"
@@ -18,7 +42,7 @@ if [ -z "$(cat /etc/os-release | grep "Ubuntu 14.04")" ]; then
 	echo ""
 	exit 
 fi
-
+# 0.5 Check if clean
 if [ -d "$PREFIX/stm32" ] || [ -d "$PREFIX/stm32bb" ] || [ -d "$PREFIX/openocd" ] || [ -d "/opt/openocd" ]; then
 	echo ""
 	echo "The following directories may be overwritten."
@@ -39,7 +63,9 @@ fi
 
 # 1. Install dependancies
 # 1.1 Install platform dependancies
-mkdir -p $PREFIX
+if [ ! -d $PREFIX ]; then
+	mkdir -p $PREFIX
+fi
 cd $PREFIX
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update -q
@@ -72,6 +98,10 @@ if [ ! -d "$PREFIX/openocd" ]; then
 	cd $PREFIX
 	#git clone git://openocd.git.sourceforge.net/gitroot/openocd/openocd # Unreliable
 	git clone --depth 1 https://github.com/ntfreak/openocd.git
+else
+	cd $PREFIX/openocd
+	git pull
+	git submodule update
 fi
 
 # 2. Build and Install OpenOCD
@@ -100,5 +130,31 @@ buildslave restart slave
 cd $PREFIX/stm32/examples/Template.mbed
 make clean
 make -j4
-sudo make deploy
+# sudo make deploy
 
+# 5 Install 
+echo ""
+echo "Build GCC ARM Embedded Toolchain from the scratch?"
+echo ""
+read -r -p "Are you sure? [y/N] " response
+case $response in
+	[yY][eE][sS]|[yY])
+	cd $PREFIX/stm32/build-ARM-toolchain
+# 5.1 Install the toolchain
+	bash build.sh
+# 5.2 Test the toolchain
+	export PATH=~/arm/bin:$PATH
+	cd $PREFIX/stm32/examples/Template.mbed
+	make clean
+	make -j4
+	arm-none-eabi-g++ --version
+	# sudo make deploy
+	;;
+	*)
+	exit
+	;;
+esac
+
+echo ""
+echo "### END ###"
+echo ""
