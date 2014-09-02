@@ -51,6 +51,12 @@
 #  http://istarc.wordpress.com
 
 ###
+# 0. Install dependencies
+export DEBIAN_FRONTEND=noninteractive
+sudo apt-get update -q
+sudo apt-get install build-essential git libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev
+
+###
 # 1. Define Variables
 # 1.1 GNU Toolchain
 export BINUTILS=binutils-2.24
