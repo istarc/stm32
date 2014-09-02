@@ -54,7 +54,7 @@
 # 0. Install dependencies
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update -q
-sudo apt-get install build-essential git libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev
+sudo apt-get install -y build-essential git libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev libtool
 
 ###
 # 1. Define Variables
