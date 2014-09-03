@@ -53,8 +53,8 @@
 ###
 # 0. Install dependencies
 export DEBIAN_FRONTEND=noninteractive
-sudo apt-get update -q
-sudo apt-get install -y build-essential git libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev libtool
+#sudo apt-get update -q
+#sudo apt-get install -y symlinks build-essential git libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev libtool 
 
 ###
 # 1. Define Variables
@@ -69,7 +69,6 @@ export BOOTSTR_GNAT_SRC='http://mirrors.cdn.adacore.com/art/7427735035ecc98968eb
 export TARGET=arm-none-eabi
 # 1.3 Build directory
 export PREFIX=~/arm
-OLDPATH=$PATH
 export PATH=$PREFIX/bin:$PATH
 export SCRIPTDIR=$(pwd)
 # 1.4 Stop on first error
@@ -154,6 +153,13 @@ if [ ! -d $PREFIX/src/$GDB ]; then
 	cd $PREFIX/src
 	tar xzf $PREFIX/orig/$GDB.tar.gz
 fi
+# 2.3 Create build directories
+cd $PREFIX/build
+for x in $(ls $PREFIX/src); do
+	if [ ! -d $x ]; then
+		mkdir $x
+	fi
+done
 # 2.2.8 Download boostrap GNAT
 cd $PREFIX/orig
 if [ ! -f $BOOTSTR_GNAT.tar.gz ]; then
@@ -164,25 +170,22 @@ if [ ! -d $PREFIX/tmp/$BOOTSTR_GNAT ]; then
         cd $PREFIX/tmp
         tar xzf $PREFIX/orig/$BOOTSTR_GNAT.tar.gz
 fi
-# 2.2.10 Setup PATH
-export PATH=$PREFIX/bin:$PREFIX/tmp/$BOOTSTR_GNAT/bin:$OLDPATH
+# 2.2.10 Setup Links to gnat
+cd $PREFIX/bin
+rm -f $PREFIX/bin/gnat* # Remove symlinks
+rm -f $PREFIX/bin/gcc
+cp -s $PREFIX/tmp/$BOOTSTR_GNAT/bin/gnat* $PREFIX/bin # Copy by symlinking files
+cp -s $PREFIX/tmp/$BOOTSTR_GNAT/bin/gcc $PREFIX/bin
+symlinks -rc $PREFIX/bin # Make symlinks relative
 # 2.2.11 Check gcc version
-echo $(gcc --version)
-echo $(g++ --version)
-read -r -p "Press a key to continue? [y/N] " response
-# 2.3 Create build directories
-cd $PREFIX/build
-for x in $(ls $PREFIX/src); do
-	if [ ! -d $x ]; then
-		mkdir $x
-	fi
-done
+#echo $(gnat --version) 
+#read -r -p "Press a key to continue? [y/N] " response
 
 ### 
 # 3. Build & install GNU ARM cross-toolchain
 # 3.1 Build Binutils
 cd $PREFIX/build/$BINUTILS
-$PREFIX/src/$BINUTILS/configure --target=$TARGET --prefix=$PREFIX --with-cpu=cortex-m4 --with-fpu=fpv4-sp-d16 --with-float=hard --with-mode=thumb --enable-interwork --enable-multilib --with-gnu-as --with-gnu-ld --disable-nls
+$PREFIX/src/$BINUTILS/configure --target=$TARGET --prefix=$PREFIX --with-cpu=cortex-m4 --with-fpu=fpv4-sp-d16 --with-float=hard --with-mode=thumb --enable-interwork --disable-multilib --with-gnu-as --with-gnu-ld --disable-nls
 # The meaning of flags:
 # --with-cpu=cortex-m4 ..... cortex-m4 CPU
 # --with-fpu=fpv4-sp-d16 ... this CPU has fpv4-sp-d16 FPU
@@ -193,13 +196,13 @@ $PREFIX/src/$BINUTILS/configure --target=$TARGET --prefix=$PREFIX --with-cpu=cor
 # --with-gnu-as ............ use only GNU Assembler
 # --with-gnu-ld ............ use only GNU Linker
 # --disable-nls ............ output only in English
-# make clean
+make clean
 make -j4 all
 make install
 
 # 3.2 Build & install bootstrap GCC (C cross-compiler only)
 cd $PREFIX/build/$GCC
-$PREFIX/src/$GCC/configure --target=$TARGET --prefix=$PREFIX --with-cpu=cortex-m4 --with-fpu=fpv4-sp-d16 --with-float=hard --with-mode=thumb --enable-interwork --enable-multilib --with-system-zlib --with-newlib --without-headers --disable-shared --disable-nls --with-gnu-as --with-gnu-ld --enable-languages="c,ada"
+$PREFIX/src/$GCC/configure --target=$TARGET --prefix=$PREFIX --with-cpu=cortex-m4 --with-fpu=fpv4-sp-d16 --with-float=hard --with-mode=thumb --enable-interwork --disable-multilib --with-system-zlib --with-newlib --without-headers --disable-shared --disable-nls --with-gnu-as --with-gnu-ld --enable-languages="c"
 # The meaning of flags (see https://gcc.gnu.org/install/configure.html):
 # --with-system-zlib ...... use the system's zlib library
 
@@ -207,9 +210,9 @@ $PREFIX/src/$GCC/configure --target=$TARGET --prefix=$PREFIX --with-cpu=cortex-m
 # --with-newlib ........... newlib is going to be used as the target C library
 # --without-headers ....... do not use target headers from libc (newlib) when building, because newlib is not build yet.
 # --disable-shared ........ only static libraries, because shared are not supported on the target platform
-# make clean
-make -j4 all-gcc all-gnattools #all-target-libada all-gnattools
-make install-gcc install-gnattools #install-target-libada install-gnattools
+make clean
+make -j4 all-gcc
+make install-gcc
 
 # 3.3 Build & install newlib library
 cd $PREFIX/build/$NEWLIB
@@ -217,23 +220,23 @@ $PREFIX/src/$NEWLIB/configure --target=$TARGET --prefix=$PREFIX --with-cpu=corte
 # The meaning of flags:
 # --disable-newlib-supplied-syscalls ... disable syscalls, because we are building for bare-metal target.
 # --enable-newlib-nano-malloc ... enable nano implementation of malloc suitable for devices with limited memory resources
-# make clean
+make clean
 make -j4 all
 make install
 
 # 3.4 Build & install GCC C, C++, libstdc++ with newlib library
 cd $PREFIX/build/$GCC
-$PREFIX/src/$GCC/configure --target=$TARGET --prefix=$PREFIX --with-cpu=cortex-m4 --with-fpu=fpv4-sp-d16 --with-float=hard --with-mode=thumb --enable-interwork --enable-interwork --enable-multilib --with-system-zlib --with-newlib --disable-shared --disable-nls --with-gnu-as --with-gnu-ld --enable-languages="c,c++,ada"
-# make clean
-make -j4 all
-make install
+$PREFIX/src/$GCC/configure --target=$TARGET --prefix=$PREFIX --with-cpu=cortex-m4 --with-fpu=fpv4-sp-d16 --with-float=hard --with-mode=thumb --enable-interwork --enable-clocale=gnu --with-system-zlib --with-newlib --disable-multilib --disable-shared --disable-nls --disable-threads --disable-lto --disable-libssp --disable-werror --with-gnu-as --with-gnu-ld --enable-languages="c,c++,ada" --enable-cross-gnattools --disable-libquadmath-support --disable-libstdcxx --disable-libgomp
+make clean
+make -j4 all all-gnattools
+make install install-gnattools
 
 # 3.5 Build & install GDB debugger
 cd $PREFIX/build/$GDB
 $PREFIX/src/$GDB/configure --target=$TARGET --prefix=$PREFIX
-# make clean
-make -j4
-make install
+#make clean
+#make -j4
+#make install
 
 echo ""
 echo "### END ###"
