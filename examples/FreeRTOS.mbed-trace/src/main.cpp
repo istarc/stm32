@@ -91,14 +91,16 @@ void DetectButtonPress(void *pvParameters){
   int sig = 1;
   
   while (1) {
+
     /* Detect Button Press  */
 
-    if(pb > 0) {
-      while(pb > 0)
-        vTaskDelay(100 / portTICK_RATE_MS); /* Button Debounce Delay 100 ms */
-      while(pb == 0)
-        vTaskDelay(100 / portTICK_RATE_MS); /* Button Debounce Delay 100 ms */
-      
+    if(pb == 1) {
+      vTaskDelay(10 / portTICK_RATE_MS); /* Debounce delay 10 ms */
+      while(pb == 1)
+        vTaskDelay(10 / portTICK_RATE_MS); /* Wait release, probe every 10 ms */
+      vTaskDelay(10 / portTICK_RATE_MS); /* Debounce Delay 10 ms */
+
+      /* Notify Task 3 */
       vTraceConsoleMessage("PB Event Detected");
       xQueueSendToBack(pbq, &sig, 0); /* Send Message */
     }

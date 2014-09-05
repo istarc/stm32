@@ -86,15 +86,18 @@ void ToggleLED_Timer(void *pvParameters){
 void DetectButtonPress(void *pvParameters){
   
   int sig = 1;
-  
+
   while (1) {
-	/* Detect Button Press  */
-    if(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0)>0) {
-      while(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0)>0)
-        vTaskDelay(100 / portTICK_RATE_MS); /* Button Debounce Delay */
-      while(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0)==0)
-        vTaskDelay(100 / portTICK_RATE_MS); /* Button Debounce Delay */
-      
+
+    /* Detect Button Press  */
+    vTaskDelay(10 / portTICK_RATE_MS); /* Wait press, probe every 10 ms */
+    if(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0) == 1) {
+      vTaskDelay(10 / portTICK_RATE_MS); /* Debounce delay 10 ms */
+      while(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0) == 1)
+        vTaskDelay(10 / portTICK_RATE_MS); /* Wait release, probe every 10 ms */
+      vTaskDelay(10 / portTICK_RATE_MS); /* Debounce Delay 10 ms */
+
+      /* Notify Task 3 */
       xQueueSendToBack(pbq, &sig, 0); /* Send Message */
     }
   }
