@@ -1,0 +1,108 @@
+0. Prerequisites
+cd ~
+sudo apt-get purge binutils-arm-none-eabi gcc-arm-none-eabi gdb-arm-none-eabi libnewlib-arm-none-eabi
+sudo add-apt-repository ppa:terry.guo/gcc-arm-embedded
+sudo apt-get update
+sudo apt-get policy gcc-arm-none-eabi # Check the PPA version
+sudo apt-get install build-essential git openocd symlinks gcc-arm-none-eabi=4-8-2014q2-0trusty10
+git clone https://github.com/istarc/stm32.git
+cd ~/stm32
+git submodule update --init # Initialize mbed submodule
+
+1. Project template created by gen-stm32f407-GCC-project.sh mbed-freertos
+     mbed-freertos ... creates a FreeRTOS project with mbed SDK (/w libraries)
+mkdir -p ~/stm32/examples/FreeRTOS.mbed-trace
+cd ~/stm32/examples/FreeRTOS.mbed-trace
+../../mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-freertos
+
+2. Add 3rd party library to lib: FreeRTOS-Plus-Trace
+cp ~/stm32/freertos/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace lib/
+
+3. Update the FreeRTOSConfig.h
+   According to http://percepio.com/docs/FreeRTOS/manual/Recorder.html#Recorder_Library_FreeRTOS_Integration
+
+--- ../../mbed-project-wizard/freertos/FreeRTOSConfig.h	2014-08-04 12:48:52.799894089 +0200
++++ lib/FreeRTOS/config/FreeRTOSConfig.h	2014-08-05 15:09:01.449307214 +0200
+@@ -161,5 +161,8 @@
+ #define xPortPendSVHandler PendSV_Handler
+ #define xPortSysTickHandler SysTick_Handler
+ 
++#define configUSE_TRACE_FACILITY 1
++#include "trcKernelPort.h"
++
+ #endif /* FREERTOS_CONFIG_H */
+
+4. Update the main.cpp
+   According to http://percepio.com/docs/FreeRTOS/manual/Recorder.html#Recorder_Library_FreeRTOS_Integration
+--- src/main.cpp	2014-08-06 22:56:11.351115948 +0200
++++ /home/iztok/stm32/mbed-project-wizard/mbed-freertos/main.cpp	2014-08-04 21:41:10.959735545 +0200
+@@ -20,10 +22,6 @@
+ 
+ int main(void)
+ {
+-  vTraceInitTraceData ();
+-  if (!uiTraceStart())
+-  	vTraceConsoleMessage("Could not start recorder!");
+-
+   /* Create IPC variables */
+   pbq = xQueueCreate(10, sizeof(int));
+   if (pbq == 0) {
+
+5. Compile-time error. Apply Hotfix (c99 -> gnu99):
+--- Makefile	2014-08-04 12:48:52.799894089 +0200
++++ Makefile	2014-08-05 15:13:49.341299359 +0200
+@@ -50,7 +50,7 @@
+ -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork
+ # COMPILE FLAGS
+ DEFS=
+-CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c99
++CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=gnu99
+ CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11
+ CXXFLAGS+=-U__STRICT_ANSI__ # Undefine __STRICT_ANSI__ to compile Stream.cpp using c++11. This is a dirty hack!
+ # LINKER FLAGS
+
+6. Run-time errors (probably due to USE_PRIMASK_CS 1 default value)! :-( Apply Hotfix
+--- lib/FreeRTOS-Plus-Trace/ConfigurationTemplate/trcConfig.h	2014-08-06 22:34:52.733413430 +0200
++++ /home/iztok/stm32/freertos/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/ConfigurationTemplate/trcConfig.h	2014-08-04 21:42:30.343738098 +0200
+@@ -244,7 +244,7 @@
+  * If this is one (1), the TRACE_ASSERT macro will verify that a condition is 
+  * true. If the condition is false, vTraceError() will be called.
+  *****************************************************************************/
+-#define USE_TRACE_ASSERT 0
++#define USE_TRACE_ASSERT 1
+ 
+ /******************************************************************************
+  * INCLUDE_FLOAT_SUPPORT
+@@ -514,7 +514,7 @@
+ * (some microseconds) since ALL configurable interrupts are disabled during 
+ * the recorder's critical sections in this mode, using the PRIMASK register.
+  ******************************************************************************/
+-#define USE_PRIMASK_CS 1
++#define USE_PRIMASK_CS 0
+ 
+ /******************************************************************************
+ * HEAP_SIZE_BELOW_16M
+
+7. Build the FreeRTOS.mbed-trace
+make clean && make -j8
+
+8. Deploy the program, run the program and dump the memory via openocd
+sudo /opt/openocd/bin/openocd -f /opt/openocd/share/openocscripts/board/stm32f4discovery.cfg &
+arm-none-eabi-gdb
+(gdb) target remote localhost:3333
+(gdb) monitor reset halt
+(gdb) monitor flash protect 0 0 11 off
+(gdb) monitor flash write_image erase /path/to/outp.elf
+(gdb) monitor reset run
+(gdb) monitor reset halt
+(gdb) monitor dump_image /path/to/stm32/examples/FreeRTOS.mbed-trace/dump.bin 0x20000000 0x1FFFF
+(gdb) quit
+
+STM32F4XX Memory Map:
+Code Flash:     0x00000000 to 0x000FFFFF        1024 KB
+Data RAM:       0x20000000 to 0x2001FFFF        128 KB
+CCM RAM:        0x10000000 to 0x1000FFFF        64 KB
+
+9. Install FreeRTOS+Trace (http://percepio.com) (Windows)
+
+10. Open dump.bin with FreeRTOS+Trace :-)
