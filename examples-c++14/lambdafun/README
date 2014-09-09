@@ -1,0 +1,5 @@
+Project template created by gen-stm32f407-GCC-project.sh mbed-none
+   mbed-none ... creates a bare-metal project with mbed SDK
+
+1. build-ARM-toolchain (requires GCC 4.9.1)
+2. https://solarianprogrammer.com/2014/08/28/cpp-14-lambda-tutorial/
