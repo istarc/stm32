@@ -1,0 +1,82 @@
+This is a simple example of Ada on an ARM board.
+
+I have used an STM32F4DISCOVERY board and the stlink from github.
+
+Get the very latest texane stlink, compile and install the udev rules
+as per the instructions.
+
+1) mkdir obj inside the blink dir.
+
+2) Compile blink with make, make sure you have PATH and  LD_LIBRARY_PATH set
+for the compilers and tools you just installed.
+
+3) Connect the board to the USB cable. 
+
+4) Start the st-util.
+
+5) Load the blink file:
+
+$ arm-none-eabi-gdb
+(gdb) target remote :4242
+Remote debugging using :4242
+0x08000188 in ?? ()
+(gdb) load blink
+Loading section .isr_vector, size 0x188 lma 0x8000000
+Loading section .text, size 0x2f8 lma 0x8000188
+Loading section .data, size 0x4 lma 0x8000480
+Start address 0x8000189, load size 1156
+Transfer rate: 456 bytes/sec, 385 bytes/write.
+(gdb) file blink
+A program is being debugged already.
+Are you sure you want to change the file? (y or n) y
+Reading symbols from /home/laguest/src/mine/tamp/blink/blink...done.
+(gdb) b Reset_Handler
+Breakpoint 1 at 0x800018a
+(gdb) c
+Continuing.
+Note: automatically using hardware breakpoints for read-only addresses.
+
+Breakpoint 1, 0x0800018a in Reset_Handler ()
+(gdb) list
+1	with STM32F4xx;
+2	pragma Unreferenced (STM32F4xx);
+3	
+4	procedure Blink is
+5	begin
+6	   null;
+7	end Blink;
+(gdb) b Blink
+Breakpoint 2 at 0x800046c: file /home/laguest/src/mine/tamp/blink/src/blink.adb, line 6.
+(gdb) b adainit
+Breakpoint 3 at 0x80001dc: file /home/laguest/src/mine/tamp/blink/obj/b~blink.adb, line 11.
+(gdb) c
+Continuing.
+
+Breakpoint 3, adainit () at /home/laguest/src/mine/tamp/blink/obj/b~blink.adb:11
+11	      null;
+(gdb) list
+6	   pragma Warnings (Off);
+7	   procedure adainit is
+8	      E3 : Boolean; pragma Import (Ada, E3, "stm32f4xx_E");
+9	
+10	   begin
+11	      null;
+12	
+13	      Stm32f4xx'Elab_Spec;
+14	      E3 := True;
+15	   end adainit;
+(gdb) c
+Continuing.
+
+Breakpoint 2, blink () at /home/laguest/src/mine/tamp/blink/src/blink.adb:6
+6	   null;
+(gdb) list
+1	with STM32F4xx;
+2	pragma Unreferenced (STM32F4xx);
+3	
+4	procedure Blink is
+5	begin
+6	   null;
+7	end Blink;
+
+And there you have it, Ada on ARM!

@@ -1,0 +1,619 @@
+diff -r -N orig/gcc-4.9.1/gcc/ada/adaint.c src/gcc-4.9.1/gcc/ada/adaint.c
+509c509,510
+<     || defined(__vxworks) || defined (__nucleus__)
+---
+>     || defined(__vxworks) || defined (__nucleus__) \
+>     || (defined(__arm__) && defined(__ELF__))
+525c526,527
+<     || defined(__vxworks) || defined (__nucleus__)
+---
+>     || defined(__vxworks) || defined (__nucleus__) \
+>     || (defined(__arm__) && defined(__ELF__))
+535c537,538
+<   || defined (_WIN32) || defined (VMS)
+---
+>   || defined (_WIN32) || defined (VMS) \
+>   || (defined(__arm__) && defined(__ELF__))
+674a678,679
+> #elif defined(__arm__) && defined(__ELF__)
+>    /* Do nothing, we have no getcwd! */
+1347a1353,1357
+> #if !(defined(__arm__) && defined(__ELF__))
+> /* For arm-elf or arm-eabi-elf, do not include these functions as we
+>  * can't use them.
+>  */
+> 
+1352c1362,1363
+< #if defined (RTX)
+---
+> #if defined (RTX) \
+>     || (defined(__arm__) && defined(__ELF__))
+1367a1379,1380
+> #endif /* !(defined(__arm__) && defined(__ELF__)) */
+> 
+1370a1384,1386
+> #if (defined(__arm__) && defined(__ELF__))
+> /* Exclude */
+> #else
+1415a1432
+> #endif /* (defined(__arm__) && defined(__ELF__)) */
+1418a1436,1438
+> #if (defined(__arm__) && defined(__ELF__))
+> /* Exclude */
+> #else
+1432a1453
+> #endif /* (defined(__arm__) && defined(__ELF__)) */
+2471c2492,2493
+< #if defined (__vxworks) || defined(__nucleus__) || defined(RTX)
+---
+> #if defined (__vxworks) || defined(__nucleus__) || defined(RTX) \
+>  || (defined(__arm__) && defined(__ELF__))
+2528c2550,2551
+< #if defined (__vxworks) && !defined (__RTP__)
+---
+> #if defined (__vxworks) && !defined (__RTP__) \
+>     || (defined(__arm__) && defined(__ELF__))
+2543c2566,2567
+< #if defined (__vxworks) && !defined (__RTP__)
+---
+> #if defined (__vxworks) && !defined (__RTP__) \
+>     || (defined(__arm__) && defined(__ELF__))
+2802c2826,2827
+< #if defined (__vxworks) || defined (__nucleus__) || defined (RTX)
+---
+> #if defined (__vxworks) || defined (__nucleus__) || defined (RTX) \
+>     || (defined(__arm__) && defined(__ELF__))
+2845c2870,2871
+< #if defined (__vxworks) || defined (__nucleus__) || defined (RTX)
+---
+> #if defined (__vxworks) || defined (__nucleus__) || defined (RTX) \
+>     || (defined(__arm__) && defined(__ELF__))
+3681c3707,3708
+<   defined (__nucleus__)
+---
+>   defined (__nucleus__) \
+>     || (defined(__arm__) && defined(__ELF__))
+diff -r -N orig/gcc-4.9.1/gcc/ada/adaint.h src/gcc-4.9.1/gcc/ada/adaint.h
+42a43,44
+> #if !(defined(__arm__) && defined(__ELF__))
+> /* For arm-elf or arm-eabi-elf, do not include this as we can't use it. */
+43a46
+> #endif
+149a153,157
+> 
+> #if !(defined(__arm__) && defined(__ELF__))
+> /* For arm-elf or arm-eabi-elf, do not include these functions as we
+>  * can't use them.
+>  */
+152a161,162
+> #endif
+> 
+diff -r -N orig/gcc-4.9.1/gcc/ada/cal.c src/gcc-4.9.1/gcc/ada/cal.c
+38c38,39
+< #if defined(VMS) || defined(__nucleus__)
+---
+> #if defined(VMS) || defined(__nucleus__) \
+>     || (defined(__arm__) && defined(__ELF__))
+diff -r -N orig/gcc-4.9.1/gcc/ada/gcc-interface/Makefile.in src/gcc-4.9.1/gcc/ada/gcc-interface/Makefile.in
+1074a1075,1092
+> # arm-none-eabi-elf
+> ifeq ($(strip $(filter-out arm% none eabi,$(targ))),)
+>   # Disable sockets on arm-eabi-elf
+>   LIBGNAT_TARGET_PAIRS += $(DUMMY_SOCKETS_TARGET_PAIRS)
+>   GNATRTL_SOCKETS_OBJS =
+> 
+>   ifeq ($(strip $(filter-out arm%b,$(arch))),)
+>     LIBGNAT_TARGET_PAIRS += \
+>     system.ads<system-bare-armeb.ads
+>   else
+>     LIBGNAT_TARGET_PAIRS += \
+>     system.ads<system-bare-armel.ads
+>   endif
+> 
+>   # See gnattools/configure for setting the TOOLS_TARGET_PAIRS variable, it
+>   # no longer set in this file, so I don't know why it's even mentioned in here.
+> endif
+> 
+diff -r -N orig/gcc-4.9.1/gcc/ada/gsocket.h src/gcc-4.9.1/gcc/ada/gsocket.h
+32c32,33
+< #if defined(__nucleus__) || defined(VTHREADS) || defined(__ANDROID__)
+---
+> #if defined(__nucleus__) || defined(VTHREADS) || defined(__ANDROID__) \
+>     || (defined(__arm__) && defined(__ELF__))
+diff -r -N orig/gcc-4.9.1/gcc/ada/Makefile.rtl src/gcc-4.9.1/gcc/ada/Makefile.rtl
+71d70
+<   s-tadeca$(objext) \
+168d166
+<   a-direct$(objext) \
+411,412d408
+<   g-expect$(objext) \
+<   g-exptty$(objext) \
+537,538d532
+<   s-filatt$(objext) \
+<   s-fileio$(objext) \
+diff -r -N orig/gcc-4.9.1/gcc/ada/mlib-tgt-specific-bare.adb src/gcc-4.9.1/gcc/ada/mlib-tgt-specific-bare.adb
+0a1,47
+> ------------------------------------------------------------------------------
+> --                                                                          --
+> --                         GNAT COMPILER COMPONENTS                         --
+> --                                                                          --
+> --                    M L I B . T G T . S P E C I F I C                     --
+> --                          (Bare machine version)                          --
+> --                                                                          --
+> --                                 B o d y                                  --
+> --                                                                          --
+> --                     Copyright (C) 2007, AdaCore                          --
+> --                                                                          --
+> -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+> -- terms of the  GNU General Public License as published  by the Free Soft- --
+> -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+> -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+> -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+> -- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
+> -- for  more details.  You should have  received  a copy of the GNU General --
+> -- Public License  distributed with GNAT; see file COPYING3.  If not, go to --
+> -- http://www.gnu.org/licenses for a complete copy of the license.          --
+> --                                                                          --
+> -- GNAT was originally developed  by the GNAT team at  New York University. --
+> -- Extensive contributions were provided by Ada Core Technologies Inc.      --
+> --                                                                          --
+> ------------------------------------------------------------------------------
+> 
+> --  Default version
+> 
+> package body MLib.Tgt.Specific is
+> 
+>    --  By default, libraries are not supported at all
+> 
+>    function Support_For_Libraries return Library_Support;
+>    --  Function indicating if libraries are supported
+> 
+>    ---------------------------
+>    -- Support_For_Libraries --
+>    ---------------------------
+> 
+>    function Support_For_Libraries return Library_Support is
+>    begin
+>       return Static_Only;
+>    end Support_For_Libraries;
+> 
+> begin
+>    Support_For_Libraries_Ptr := Support_For_Libraries'Access;
+> end MLib.Tgt.Specific;
+diff -r -N orig/gcc-4.9.1/gcc/ada/s-oscons-tmplt.c src/gcc-4.9.1/gcc/ada/s-oscons-tmplt.c
+107,109c107,108
+< #if ! (defined (__vxworks) || defined (__VMS) || defined (__MINGW32__) || \
+<        defined (__nucleus__))
+< # define HAVE_TERMIOS
+---
+> #if ! (defined (__vxworks) || defined (__VMS) || defined (__MINGW32__) || defined (__nucleus__) || (defined(__arm__) && defined(__ELF__)))
+> #define HAVE_TERMIOS
+271d269
+< 
+276a275,276
+>    Target_OS               : constant OS_Type := Other_OS;
+>    Target_Name             : constant String  := "arm-none-eabi";
+304d303
+< 
+308d306
+< 
+327d324
+< 
+331d327
+< 
+350d345
+< 
+354d348
+< 
+368d361
+< 
+372d364
+< 
+381d372
+< 
+385d375
+< 
+411d400
+< 
+417d405
+< 
+664d651
+< 
+668d654
+< 
+895d880
+< 
+899d883
+< 
+995d978
+< 
+999d981
+< 
+1016d997
+< 
+1020d1000
+< 
+1044d1023
+< 
+1048d1026
+< 
+1062d1039
+< 
+1066d1042
+< 
+1090d1065
+< 
+1094d1068
+< 
+1113d1086
+< 
+1117d1089
+< 
+1141d1112
+< 
+1145d1115
+< 
+1190d1159
+< 
+1194d1162
+< 
+1283d1250
+< 
+1287d1253
+< 
+1363d1328
+< 
+1367d1331
+< 
+1394d1357
+< 
+1400d1362
+< 
+1490d1451
+< 
+1494d1454
+< 
+1530d1489
+< 
+1546d1504
+< 
+1571d1528
+< 
+diff -r -N orig/gcc-4.9.1/gcc/ada/system-bare-armeb.ads src/gcc-4.9.1/gcc/ada/system-bare-armeb.ads
+0a1,152
+> ------------------------------------------------------------------------------
+> --                                                                          --
+> --                        GNAT RUN-TIME COMPONENTS                          --
+> --                                                                          --
+> --                               S Y S T E M                                --
+> --                                                                          --
+> --                                 S p e c                                  --
+> --                        (ARMEL Bare Board Version)                         --
+> --                                                                          --
+> --          Copyright (C) 1992-2010, Free Software Foundation, Inc.         --
+> --                                                                          --
+> -- This specification is derived from the Ada Reference Manual for use with --
+> -- GNAT. The copyright notice above, and the license provisions that follow --
+> -- apply solely to the  contents of the part following the private keyword. --
+> --                                                                          --
+> -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+> -- terms of the  GNU General Public License as published  by the Free Soft- --
+> -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+> -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+> -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+> -- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
+> --                                                                          --
+> -- As a special exception under Section 7 of GPL version 3, you are granted --
+> -- additional permissions described in the GCC Runtime Library Exception,   --
+> -- version 3.1, as published by the Free Software Foundation.               --
+> --                                                                          --
+> -- You should have received a copy of the GNU General Public License and    --
+> -- a copy of the GCC Runtime Library Exception along with this program;     --
+> -- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+> -- <http://www.gnu.org/licenses/>.                                          --
+> --                                                                          --
+> -- GNAT was originally developed  by the GNAT team at  New York University. --
+> -- Extensive contributions were provided by Ada Core Technologies Inc.      --
+> --                                                                          --
+> ------------------------------------------------------------------------------
+> 
+> package System is
+>    pragma Pure;
+>    --  Note that we take advantage of the implementation permission to make
+>    --  this unit Pure instead of Preelaborable; see RM 13.7.1(15). In Ada
+>    --  2005, this is Pure in any case (AI-362).
+> 
+>    System_Name : constant String := "STM32F4-Discovery Bare Bones";
+> 
+>    --  System-Dependent Named Numbers
+> 
+>    Min_Int               : constant := Long_Long_Integer'First;
+>    Max_Int               : constant := Long_Long_Integer'Last;
+> 
+>    Max_Binary_Modulus    : constant := 2 ** Long_Long_Integer'Size;
+>    Max_Nonbinary_Modulus : constant := 2 ** Integer'Size - 1;
+> 
+>    Max_Base_Digits       : constant := Long_Long_Float'Digits;
+>    Max_Digits            : constant := Long_Long_Float'Digits;
+> 
+>    Max_Mantissa          : constant := 63;
+>    Fine_Delta            : constant := 2.0 ** (-Max_Mantissa);
+> 
+>    Tick                  : constant := 0.000_001;
+> 
+>    --  Storage-related Declarations
+> 
+>    type Address is private;
+>    pragma Preelaborable_Initialization (Address);
+>    Null_Address : constant Address;
+> 
+>    Storage_Unit : constant := 8;
+>    Word_Size    : constant := 32;
+>    Memory_Size  : constant := 2 ** 32;
+> 
+>    --  Address comparison
+> 
+>    function "<"  (Left, Right : Address) return Boolean;
+>    function "<=" (Left, Right : Address) return Boolean;
+>    function ">"  (Left, Right : Address) return Boolean;
+>    function ">=" (Left, Right : Address) return Boolean;
+>    function "="  (Left, Right : Address) return Boolean;
+> 
+>    pragma Import (Intrinsic, "<");
+>    pragma Import (Intrinsic, "<=");
+>    pragma Import (Intrinsic, ">");
+>    pragma Import (Intrinsic, ">=");
+>    pragma Import (Intrinsic, "=");
+> 
+>    --  Other System-Dependent Declarations
+> 
+>    type Bit_Order is (High_Order_First, Low_Order_First);
+>    Default_Bit_Order : constant Bit_Order := Low_Order_First;
+>    pragma Warnings (Off, Default_Bit_Order); -- kill constant condition warning
+> 
+>    --  Priority-related Declarations (RM D.1)
+> 
+>    --  0 .. 98 corresponds to the system priority range 1 .. 99.
+>    --
+>    --  If the scheduling policy is SCHED_FIFO or SCHED_RR the runtime makes use
+>    --  of the entire range provided by the system.
+>    --
+>    --  If the scheduling policy is SCHED_OTHER the only valid system priority
+>    --  is 1 and other values are simply ignored.
+> 
+>    Max_Priority           : constant Positive := 97;
+>    Max_Interrupt_Priority : constant Positive := 98;
+> 
+>    subtype Any_Priority       is Integer      range  0 .. 98;
+>    subtype Priority           is Any_Priority range  0 .. 97;
+>    subtype Interrupt_Priority is Any_Priority range 98 .. 98;
+> 
+>    Default_Priority : constant Priority := 48;
+> 
+> private
+> 
+>    type Address is mod Memory_Size;
+>    Null_Address : constant Address := 0;
+> 
+>    --------------------------------------
+>    -- System Implementation Parameters --
+>    --------------------------------------
+> 
+>    --  These parameters provide information about the target that is used
+>    --  by the compiler. They are in the private part of System, where they
+>    --  can be accessed using the special circuitry in the Targparm unit
+>    --  whose source should be consulted for more detailed descriptions
+>    --  of the individual switch values.
+> 
+>    Backend_Divide_Checks     : constant Boolean := False;
+>    Backend_Overflow_Checks   : constant Boolean := False;
+>    Command_Line_Args         : constant Boolean := False;
+>    Configurable_Run_Time     : constant Boolean := True;
+>    Denorm                    : constant Boolean := True;
+>    Duration_32_Bits          : constant Boolean := False;
+>    Exit_Status_Supported     : constant Boolean := False;
+>    Fractional_Fixed_Ops      : constant Boolean := False;
+>    Frontend_Layout           : constant Boolean := False;
+>    Machine_Overflows         : constant Boolean := False;
+>    Machine_Rounds            : constant Boolean := True;
+>    Preallocated_Stacks       : constant Boolean := False;
+>    Signed_Zeros              : constant Boolean := True;
+>    Stack_Check_Default       : constant Boolean := False;
+>    Stack_Check_Probes        : constant Boolean := True;
+>    Stack_Check_Limits        : constant Boolean := False;
+>    Support_64_Bit_Divides    : constant Boolean := True;
+>    Support_Aggregates        : constant Boolean := True;
+>    Support_Composite_Assign  : constant Boolean := True;
+>    Support_Composite_Compare : constant Boolean := True;
+>    Support_Long_Shifts       : constant Boolean := True;
+>    Always_Compatible_Rep     : constant Boolean := False;
+>    Suppress_Standard_Library : constant Boolean := True;
+>    Use_Ada_Main_Program_Name : constant Boolean := False;
+>    ZCX_By_Default            : constant Boolean := False;
+>    GCC_ZCX_Support           : constant Boolean := False;
+> 
+> end System;
+diff -r -N orig/gcc-4.9.1/gcc/ada/system-bare-armel.ads src/gcc-4.9.1/gcc/ada/system-bare-armel.ads
+0a1,154
+> ------------------------------------------------------------------------------
+> --                                                                          --
+> --                        GNAT RUN-TIME COMPONENTS                          --
+> --                                                                          --
+> --                               S Y S T E M                                --
+> --                                                                          --
+> --                                 S p e c                                  --
+> --                        (ARMEL Bare Board Version)                         --
+> --                                                                          --
+> --          Copyright (C) 1992-2010, Free Software Foundation, Inc.         --
+> --                                                                          --
+> -- This specification is derived from the Ada Reference Manual for use with --
+> -- GNAT. The copyright notice above, and the license provisions that follow --
+> -- apply solely to the  contents of the part following the private keyword. --
+> --                                                                          --
+> -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+> -- terms of the  GNU General Public License as published  by the Free Soft- --
+> -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+> -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+> -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+> -- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
+> --                                                                          --
+> -- As a special exception under Section 7 of GPL version 3, you are granted --
+> -- additional permissions described in the GCC Runtime Library Exception,   --
+> -- version 3.1, as published by the Free Software Foundation.               --
+> --                                                                          --
+> -- You should have received a copy of the GNU General Public License and    --
+> -- a copy of the GCC Runtime Library Exception along with this program;     --
+> -- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+> -- <http://www.gnu.org/licenses/>.                                          --
+> --                                                                          --
+> -- GNAT was originally developed  by the GNAT team at  New York University. --
+> -- Extensive contributions were provided by Ada Core Technologies Inc.      --
+> --                                                                          --
+> ------------------------------------------------------------------------------
+> 
+> package System is
+>    pragma Pure;
+>    --  Note that we take advantage of the implementation permission to make
+>    --  this unit Pure instead of Preelaborable; see RM 13.7.1(15). In Ada
+>    --  2005, this is Pure in any case (AI-362).
+> 
+>    -- type Name is (SYSTEM_NAME_GNAT);
+>    -- System_Name : constant Name := SYSTEM_NAME_GNAT;
+>    System_Name : constant String := "STM32F4-Discovery Bare Bones";
+> 
+>    --  System-Dependent Named Numbers
+> 
+>    Min_Int               : constant := Long_Long_Integer'First;
+>    Max_Int               : constant := Long_Long_Integer'Last;
+> 
+>    Max_Binary_Modulus    : constant := 2 ** Long_Long_Integer'Size;
+>    Max_Nonbinary_Modulus : constant := 2 ** Integer'Size - 1;
+> 
+>    Max_Base_Digits       : constant := Long_Long_Float'Digits;
+>    Max_Digits            : constant := Long_Long_Float'Digits;
+> 
+>    Max_Mantissa          : constant := 63;
+>    Fine_Delta            : constant := 2.0 ** (-Max_Mantissa);
+> 
+>    Tick                  : constant := 0.000_001;
+> 
+>    --  Storage-related Declarations
+> 
+>    type Address is private;
+>    pragma Preelaborable_Initialization (Address);
+>    Null_Address : constant Address;
+> 
+>    Storage_Unit : constant := 8;
+>    Word_Size    : constant := 32;
+>    Memory_Size  : constant := 2 ** 32;
+> 
+>    --  Address comparison
+> 
+>    function "<"  (Left, Right : Address) return Boolean;
+>    function "<=" (Left, Right : Address) return Boolean;
+>    function ">"  (Left, Right : Address) return Boolean;
+>    function ">=" (Left, Right : Address) return Boolean;
+>    function "="  (Left, Right : Address) return Boolean;
+> 
+>    pragma Import (Intrinsic, "<");
+>    pragma Import (Intrinsic, "<=");
+>    pragma Import (Intrinsic, ">");
+>    pragma Import (Intrinsic, ">=");
+>    pragma Import (Intrinsic, "=");
+> 
+>    --  Other System-Dependent Declarations
+> 
+>    type Bit_Order is (High_Order_First, Low_Order_First);
+>    Default_Bit_Order : constant Bit_Order := Low_Order_First;
+>    pragma Warnings (Off, Default_Bit_Order); -- kill constant condition warning
+> 
+>    --  Priority-related Declarations (RM D.1)
+> 
+>    --  0 .. 98 corresponds to the system priority range 1 .. 99.
+>    --
+>    --  If the scheduling policy is SCHED_FIFO or SCHED_RR the runtime makes use
+>    --  of the entire range provided by the system.
+>    --
+>    --  If the scheduling policy is SCHED_OTHER the only valid system priority
+>    --  is 1 and other values are simply ignored.
+> 
+>    Max_Priority           : constant Positive := 97;
+>    Max_Interrupt_Priority : constant Positive := 98;
+> 
+>    subtype Any_Priority       is Integer      range  0 .. 98;
+>    subtype Priority           is Any_Priority range  0 .. 97;
+>    subtype Interrupt_Priority is Any_Priority range 98 .. 98;
+> 
+>    Default_Priority : constant Priority := 48;
+> 
+> private
+> 
+>    type Address is mod Memory_Size;
+>    Null_Address : constant Address := 0;
+> 
+>    --------------------------------------
+>    -- System Implementation Parameters --
+>    --------------------------------------
+> 
+>    --  These parameters provide information about the target that is used
+>    --  by the compiler. They are in the private part of System, where they
+>    --  can be accessed using the special circuitry in the Targparm unit
+>    --  whose source should be consulted for more detailed descriptions
+>    --  of the individual switch values.
+> 
+>    Backend_Divide_Checks     : constant Boolean := False;
+>    Backend_Overflow_Checks   : constant Boolean := False;
+>    Command_Line_Args         : constant Boolean := False;
+>    Configurable_Run_Time     : constant Boolean := True;
+>    Denorm                    : constant Boolean := True;
+>    Duration_32_Bits          : constant Boolean := False;
+>    Exit_Status_Supported     : constant Boolean := False;
+>    Fractional_Fixed_Ops      : constant Boolean := False;
+>    Frontend_Layout           : constant Boolean := False;
+>    Machine_Overflows         : constant Boolean := False;
+>    Machine_Rounds            : constant Boolean := True;
+>    Preallocated_Stacks       : constant Boolean := False;
+>    Signed_Zeros              : constant Boolean := True;
+>    Stack_Check_Default       : constant Boolean := False;
+>    Stack_Check_Probes        : constant Boolean := True;
+>    Stack_Check_Limits        : constant Boolean := False;
+>    Support_64_Bit_Divides    : constant Boolean := True;
+>    Support_Aggregates        : constant Boolean := True;
+>    Support_Composite_Assign  : constant Boolean := True;
+>    Support_Composite_Compare : constant Boolean := True;
+>    Support_Long_Shifts       : constant Boolean := True;
+>    Always_Compatible_Rep     : constant Boolean := False;
+>    Suppress_Standard_Library : constant Boolean := True;
+>    Use_Ada_Main_Program_Name : constant Boolean := False;
+>    ZCX_By_Default            : constant Boolean := False;
+>    GCC_ZCX_Support           : constant Boolean := False;
+> 
+> end System;
+diff -r -N orig/gcc-4.9.1/gcc/ada/terminals.c src/gcc-4.9.1/gcc/ada/terminals.c
+35c35,36
+<     defined (__ANDROID__)
+---
+>     defined (__ANDROID__) \
+>     || (defined(__arm__) && defined(__ELF__))
+diff -r -N orig/gcc-4.9.1/gnattools/configure src/gcc-4.9.1/gnattools/configure
+2087a2088,2096
+>   # Any bare machine stuff can go here, i.e. mips-elf, arm-elf,
+>   # arm-none-eabi-elf, etc.
+>   #
+>   # This file just enables the ability to build static libs with gnatmake and
+>   # project files.
+>   arm-*-elf* | arm*-*-eabi*)
+>     TOOLS_TARGET_PAIRS="\
+>     mlib-tgt-specific.adb<mlib-tgt-specific-bare.adb"
+>     ;;
+diff -r -N orig/gcc-4.9.1/gnattools/configure.ac src/gcc-4.9.1/gnattools/configure.ac
+127a128,136
+>   # Any bare machine stuff can go here, i.e. mips-elf, arm-elf,
+>   # arm-none-eabi-elf, etc.
+>   #
+>   # This file just enables the ability to build static libs with gnatmake and
+>   # project files.
+>   arm-*-elf* | arm*-*-eabi*)
+>     TOOLS_TARGET_PAIRS="\
+>     mlib-tgt-specific.adb<mlib-tgt-specific-bare.adb"
+>     ;;
