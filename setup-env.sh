@@ -104,6 +104,16 @@ else
 	git submodule update
 fi
 
+# 2. Build and Install CppUTest
+if [ ! -d "$PREFIX/stm32/lib/cpputest" ]; then
+	cd $PREFIX/stm32/cpputest
+	autoreconf -i
+	./configure --prefix=$PREFIX/stm32/lib/cpputest --host=arm-none-eabi LDFLAGS=--specs=nosys.specs
+        make
+        make install
+	git reset --hard
+fi
+
 # 2. Build and Install OpenOCD
 if [ ! -d "/opt/openocd" ]; then
 	cd $PREFIX/openocd

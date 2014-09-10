@@ -40,3 +40,6 @@
 # Include makefiles
 !Makefile
 *~
+
+# Libraries
+lib/
