@@ -8,11 +8,7 @@
     tar xzf gnat-gpl-2014-arm-elf-linux-bin.tar.gz
     mv gnat-gpl-2014-arm-elf-linux-bin ~/gnat
     cd ~/gnat
-    sudo ./doinstall
-    # Enter
-    # Enter (choose default install directory)
-    # Y (confirm)
-    # Y (confirm)
+    sudo ./doinstall #Enter, Enter, Y (confirm), Y (confirm)
     
 # 2. Create a New Project
 
