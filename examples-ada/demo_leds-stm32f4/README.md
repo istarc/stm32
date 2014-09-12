@@ -41,6 +41,8 @@
 
 # 3.3 Deploy the Project
 
+    /opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg -c "program obj/demo" verify reset"
+
 # 3.4 Clean the Project
 
    gprclean --target=arm-eabi -P demo_leds.gpr
