@@ -1,7 +1,10 @@
 # 1. Deploy GNAT for ARM
+# 1.1 Download
 
 - [Read this](http://www.adacore.com/press/gnat-gpl-for-bare-board-arm/)
 - [Download GNAT GPL Ada gpl-2014](http://libre.adacore.com/download/configurations), select ARM ELF platform (2014 edition).
+
+# 1.2 Install
 
     unzip AdaCore-Download-2014-09-12_1029.zip
     cd arm-elf-linux/adagpl-2014/gnatgpl
