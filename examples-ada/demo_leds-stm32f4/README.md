@@ -9,10 +9,10 @@
     mv gnat-gpl-2014-arm-elf-linux-bin ~/gnat
     cd ~/gnat
     sudo ./doinstall
-    # [Enter]
-    # [Enter] (choose default install directory)
-    # [Y] (confirm)
-    # [Y] (confirm)
+    # Enter
+    # Enter (choose default install directory)
+    # Y (confirm)
+    # Y (confirm)
     
 # 2. Create a New Project
 
@@ -41,7 +41,8 @@
 
 # 3.3 Deploy the Project
 
-    /opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg -c "program obj/demo" verify reset"
+    /opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg \
+                             -c "program obj/demo" verify reset"
 
 # 3.4 Clean the Project
 
