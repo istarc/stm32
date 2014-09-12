@@ -45,4 +45,4 @@
 
 # 3.4 Clean the Project
 
-   gprclean --target=arm-eabi -P demo_leds.gpr
+    gprclean --target=arm-eabi -P demo_leds.gpr
