@@ -87,7 +87,7 @@ cp ~/stm32/freertos/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace lib/
 make clean && make -j8
 
 8. Deploy the program, run the program and dump the memory via openocd
-sudo /opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg
+sudo /opt/openocd/bin/openocd -f /opt/openocd/share/openocscripts/board/stm32f4discovery.cfg &
 arm-none-eabi-gdb
 (gdb) target remote localhost:3333
 (gdb) monitor reset halt
