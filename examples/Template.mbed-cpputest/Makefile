@@ -32,10 +32,11 @@ CXXSOURCES+=$(shell find -L $(LIBDIR) -name '*.cpp')
 # Find header directories
 INC=$(shell find -L $(INCDIR) -name '*.h' -exec dirname {} \; | uniq)
 INC+=$(shell find -L $(LIBDIR) -name '*.h' -exec dirname {} \; | uniq)
+INC+=../../lib/cpputest/include
 INCLUDES=$(INC:%=-I%)
 # Find libraries
-INCLUDES_LIBS=
-LINK_LIBS=
+INCLUDES_LIBS=-L../../lib/cpputest/lib
+LINK_LIBS=-lCppUTest -lCppUTestExt
 # Create object list
 AOBJECTS=$(ASOURCES:%.s=%.o)
 COBJECTS+=$(CSOURCES:%.c=%.o)

@@ -1,0 +1,1 @@
+../../../../../../../../../mbed/libraries/mbed/targets/hal/TARGET_STM/TARGET_STM32F407VG/TARGET_DISCO_F407VG/PinNames.h
