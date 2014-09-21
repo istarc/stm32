@@ -88,17 +88,18 @@ else
 fi
 # Prune targets not(STM32F4XX or GCC)
 find $(pwd)/lib/mbed/targets/cmsis -mindepth 1 -maxdepth 1 -type d -not -name 'TARGET_STM' -exec rm -rf {} \;
-find $(pwd)/lib/mbed/targets/cmsis/TARGET_STM -mindepth 1 -maxdepth 1 -type d -not -name 'TARGET_STM32F4XX' -exec rm -rf {} \;
-find $(pwd)/lib/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F4XX -mindepth 1 -maxdepth 1 -type d -not -name 'TOOLCHAIN_GCC_ARM' -exec rm -rf {} \;
+find $(pwd)/lib/mbed/targets/cmsis/TARGET_STM -mindepth 1 -maxdepth 1 -type d -not -name 'TARGET_STM32F407VG' -exec rm -rf {} \;
+find $(pwd)/lib/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F407VG -mindepth 1 -maxdepth 1 -type d -not -name 'TOOLCHAIN_GCC_ARM' -exec rm -rf {} \;
 find $(pwd)/lib/mbed/targets/hal -mindepth 1 -maxdepth 1 -type d -not -name 'TARGET_STM' -exec rm -rf {} \;
-find $(pwd)/lib/mbed/targets/hal/TARGET_STM -mindepth 1 -maxdepth 1 -type d -not -name 'TARGET_STM32F4XX' -exec rm -rf {} \;
+find $(pwd)/lib/mbed/targets/hal/TARGET_STM -mindepth 1 -maxdepth 1 -type d -not -name 'TARGET_STM32F407VG' -exec rm -rf {} \;
+find $(pwd)/lib/mbed/targets/hal/TARGET_STM/TARGET_STM32F407VG -mindepth 1 -maxdepth 1 -type d -not -name 'TARGET_DISCO_F407VG' -exec rm -rf {} \;
 if [[ "$1" != "copy" ]]; then
 	# Linker script
-	ln -s lib/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F4XX/TOOLCHAIN_GCC_ARM/STM32F407.ld stm32f407.ld
+	ln -s lib/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F407VG/TOOLCHAIN_GCC_ARM/STM32F407.ld stm32f407.ld
 	# Abs to Rel Symlinks
 	symlinks -rc $(pwd) 1>/dev/null
 else
-	cp lib/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F4XX/TOOLCHAIN_GCC_ARM/STM32F407.ld stm32f407.ld
+	cp lib/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F407VG/TOOLCHAIN_GCC_ARM/STM32F407.ld stm32f407.ld
 fi
 }
 
