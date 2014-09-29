@@ -81,24 +81,25 @@ echo 'Your application source files (*.c, *.cpp, *.s).' > $(pwd)/src/README
 # Deploy mbed SDK and tailor to fit STM32F4XX and GCC
 do_deploy_mbed()
 {
-if [[ "$1" != "copy" ]]; then
+if [[ "$1" == "link" ]]; then
 	cp -sR $MBED $(pwd)/lib/mbed
 else
 	cp -LR $MBED $(pwd)/lib/mbed
 fi
 # Prune targets not(STM32F4XX or GCC)
 find $(pwd)/lib/mbed/targets/cmsis -mindepth 1 -maxdepth 1 -type d -not -name 'TARGET_STM' -exec rm -rf {} \;
-find $(pwd)/lib/mbed/targets/cmsis/TARGET_STM -mindepth 1 -maxdepth 1 -type d -not -name 'TARGET_STM32F4XX' -exec rm -rf {} \;
-find $(pwd)/lib/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F4XX -mindepth 1 -maxdepth 1 -type d -not -name 'TOOLCHAIN_GCC_ARM' -exec rm -rf {} \;
+find $(pwd)/lib/mbed/targets/cmsis/TARGET_STM -mindepth 1 -maxdepth 1 -type d -not -name 'TARGET_STM32F407VG' -exec rm -rf {} \;
+find $(pwd)/lib/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F407VG -mindepth 1 -maxdepth 1 -type d -not -name 'TOOLCHAIN_GCC_ARM' -exec rm -rf {} \;
 find $(pwd)/lib/mbed/targets/hal -mindepth 1 -maxdepth 1 -type d -not -name 'TARGET_STM' -exec rm -rf {} \;
-find $(pwd)/lib/mbed/targets/hal/TARGET_STM -mindepth 1 -maxdepth 1 -type d -not -name 'TARGET_STM32F4XX' -exec rm -rf {} \;
-if [[ "$1" != "copy" ]]; then
+find $(pwd)/lib/mbed/targets/hal/TARGET_STM -mindepth 1 -maxdepth 1 -type d -not -name 'TARGET_STM32F407VG' -exec rm -rf {} \;
+find $(pwd)/lib/mbed/targets/hal/TARGET_STM/TARGET_STM32F407VG -mindepth 1 -maxdepth 1 -type d -not -name 'TARGET_DISCO_F407VG' -exec rm -rf {} \;
+if [[ "$1" == "link" ]]; then
 	# Linker script
-	ln -s lib/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F4XX/TOOLCHAIN_GCC_ARM/STM32F407.ld stm32f407.ld
+	ln -s lib/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F407VG/TOOLCHAIN_GCC_ARM/STM32F407.ld stm32f407.ld
 	# Abs to Rel Symlinks
 	symlinks -rc $(pwd) 1>/dev/null
 else
-	cp lib/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F4XX/TOOLCHAIN_GCC_ARM/STM32F407.ld stm32f407.ld
+	cp lib/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F407VG/TOOLCHAIN_GCC_ARM/STM32F407.ld stm32f407.ld
 fi
 }
 
@@ -106,7 +107,7 @@ fi
 # Deploy FreeRTOS and tailor to fit STM32F4XX and GCC
 do_deploy_freertos()
 {
-if [[ "$1" != "copy" ]]; then
+if [[ "$1" == "link" ]]; then
 	cp -sR $FREERTOS $(pwd)/lib/FreeRTOS
 else
 	cp -LR $FREERTOS $(pwd)/lib/FreeRTOS
@@ -119,7 +120,7 @@ find $(pwd)/lib/FreeRTOS/Source/portable/GCC -mindepth 1 -maxdepth 1 -type d -no
 # Copy FreeRTOSConfig.h
 mkdir $(pwd)/lib/FreeRTOS/config/
 cp $SCRIPTDIR/freertos/FreeRTOSConfig.h $(pwd)/lib/FreeRTOS/config/FreeRTOSConfig.h
-if [[ "$1" != "copy" ]]; then
+if [[ "$1" == "link" ]]; then
 	# Abs to Rel Symlinks
 	symlinks -rc $(pwd) 1>/dev/null
 fi
@@ -129,7 +130,7 @@ fi
 # Deploy mbedRTOS and tailor to fit STM32F4XX and GCC
 do_deploy_mbedrots()
 {
-if [[ "$1" != "copy" ]]; then
+if [[ "$1" == "link" ]]; then
 	cp -sR $MBEDRTOS $(pwd)/lib/mbedrtos
 else
 	cp -LR $MBEDRTOS $(pwd)/lib/mbedrtos
@@ -137,7 +138,7 @@ fi
 # Prune targets not(STM32F4XX or GCC)
 find $(pwd)/lib/mbedrtos/rtx -mindepth 1 -maxdepth 1 -type d -not -name 'TARGET_M4' -exec rm -rf {} \;
 find $(pwd)/lib/mbedrtos/rtx/TARGET_M4 -mindepth 1 -maxdepth 1 -type d -not -name 'TOOLCHAIN_GCC' -exec rm -rf {} \;
-if [[ "$2" != "copy" ]]; then
+if [[ "$2" == "link" ]]; then
 	# Abs to Rel Symlinks
 	symlinks -rc $(pwd) 1>/dev/null
 fi
@@ -147,7 +148,7 @@ fi
 # Deploy FreeRTOS and tailor to fit STM32F4XX and GCC
 do_deploy_safertos()
 {
-if [[ "$1" != "copy" ]]; then
+if [[ "$1" == "link" ]]; then
 	cp -sR $SAFERTOS $(pwd)/lib/SafeRTOS
 else
 	cp -LR $SAFERTOS $(pwd)/lib/SafeRTOS
@@ -156,7 +157,7 @@ fi
 find $(pwd)/lib/SafeRTOS -mindepth 1 -maxdepth 1 -not -name 'src' -exec rm -rf {} \;
 find $(pwd)/lib/SafeRTOS/src -mindepth 1 -maxdepth 1 -name 'source' -exec rm -rf {} \;
 # Deploy demo application
-if [[ "$1" != "copy" ]]; then
+if [[ "$1" == "link" ]]; then
 	cp -sR $SAFERTOS/src/source/* $(pwd)/src
 	ln -s $SAFERTOS/SafeRTOS_STM32F407VG_FLASH.ld stm32f407.ld
 	# Patch copy of main.c (Header files are case sensitive in Linux)
@@ -170,7 +171,7 @@ else
 	cp -LR $SAFERTOS/src/source/* $(pwd)/src
 	cp $SAFERTOS/SafeRTOS_STM32F407VG_FLASH.ld stm32f407.ld
 fi
-if [[ "$1" != "copy" ]]; then
+if [[ "$1" == "link" ]]; then
 	# Abs to Rel Symlinks
 	symlinks -rc $(pwd) 1>/dev/null
 fi
@@ -248,7 +249,7 @@ case "$1" in
 	cp $SCRIPTDIR/none-safertos/Makefile $(pwd)/Makefile
 	;;
   --help)
-	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|copy}"
+	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
 	echo ""
 	echo "   mbed-none ........... creates a bare-metal project with mbed SDK"
 	echo "   mbed-none-lib ....... creates a bare-metal project with mbed SDK"
@@ -258,11 +259,11 @@ case "$1" in
 	echo "   mbed-mbedrtos-lib ... creates a mbedRTOS project with mbed SDK (/w libraries)"
 	echo "   none-safertos ....... creates a SafeRTOS project"
 	echo " "
-	echo "   copy ................ copy files instead of symlinks (default)"
+	echo "   link ................ symlink files instead of copy"
 	echo " "
 	;;
   *)
-	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|copy}"
+	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
 	exit 3
 	;;
 esac
