@@ -1,9 +1,8 @@
 Project template created by gen-stm32f407-GCC-project.sh mbed-none
    mbed-none ... creates a bare-metal project with mbed SDK
 
-./configure --host=arm-none-eabi --prefix=/home/iztok/stm32/lib/cpputest LDFLAGS='--specs=nosys.specs -mcpu=cortex-m4 -mthumb -mlittle-endian -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork' CFLAGS='-mcpu=cortex-m4 -mthumb -mlittle-endian -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork -std=c99' CXXFLAGS='-mcpu=cortex-m4 -mthumb -mlittle-endian -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork -std=c++11'
+./configure --host=arm-none-eabi --with-gnu-ld --prefix=/home/iztok/stm32/lib/cpputest LDFLAGS='--specs=nosys.specs -mcpu=cortex-m4 -mthumb -mlittle-endian -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork -Os -Wl,-gc-sections --specs=nano.specs' CFLAGS='-mcpu=cortex-m4 -mthumb -mlittle-endian -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork -std=c99 -Os -ffunction-sections -fdata-sections -fno-builtin' CXXFLAGS='-mcpu=cortex-m4 -mthumb -mlittle-endian -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork -Os -ffunction-sections -fdata-sections -fno-builtin -fno-rtti'
 # Remove C+11 flag
-# Remove C99 flag
 
 make
 make install
