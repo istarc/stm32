@@ -1,3 +1,7 @@
+branches:
+  only:
+    - master
+
 before_script:
   - sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
   - sudo apt-get update -q
