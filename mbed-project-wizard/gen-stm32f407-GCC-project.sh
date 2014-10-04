@@ -187,6 +187,15 @@ case "$1" in
 	cp $SCRIPTDIR/mbed-none/main.cpp $(pwd)/src/main.cpp
 	cp $SCRIPTDIR/mbed-none/Makefile $(pwd)/Makefile
 	;;
+  mbed-none-sim)
+        echo "Project template created by ${0##*/} $1" > $(pwd)/README
+        echo "   mbed-none-sim ... creates a bare-metal project with mbed SDK suitable for QEMU simulation" >> $(pwd)/README
+        do_create_dir $2
+        do_deploy_mbed $2
+        cp $SCRIPTDIR/mbed-none-sim/main.cpp $(pwd)/src/main.cpp
+        cp $SCRIPTDIR/mbed-none-sim/Makefile $(pwd)/Makefile
+	rm *.ld # Delete the linker script
+        ;;
   mbed-none-lib)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
 	echo "   mbed-none-lib ... creates a bare-metal project with mbed SDK" >> $(pwd)/README
@@ -249,9 +258,10 @@ case "$1" in
 	cp $SCRIPTDIR/none-safertos/Makefile $(pwd)/Makefile
 	;;
   --help)
-	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
+	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-sim|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
 	echo ""
 	echo "   mbed-none ........... creates a bare-metal project with mbed SDK"
+	echo "   mbed-none-sim ....... creates a bare-metal project with mbed SDK suitable for QEMU simulation"
 	echo "   mbed-none-lib ....... creates a bare-metal project with mbed SDK"
 	echo "   mbed-freertos ....... creates a FreeRTOS project with mbed SDK (/w libraries)"
 	echo "   mbed-freertos-lib ... creates a FreeRTOS project with mbed SDK (/w libraries)"
@@ -263,7 +273,7 @@ case "$1" in
 	echo " "
 	;;
   *)
-	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
+	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-sim|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
 	exit 3
 	;;
 esac
