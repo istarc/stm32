@@ -171,7 +171,7 @@ else
 	cp -LR $SAFERTOS/src/source/* $(pwd)/src
 	cp $SAFERTOS/SafeRTOS_STM32F407VG_FLASH.ld stm32f407.ld
 fi
-if [[ "$1" == "link" ]]; then
+if [[ "$1" != "copy" ]]; then
 	# Abs to Rel Symlinks
 	symlinks -rc $(pwd) 1>/dev/null
 fi
@@ -249,9 +249,10 @@ case "$1" in
 	cp $SCRIPTDIR/none-safertos/Makefile $(pwd)/Makefile
 	;;
   --help)
-	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
+	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-sim|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
 	echo ""
 	echo "   mbed-none ........... creates a bare-metal project with mbed SDK"
+	echo "   mbed-none-sim ....... creates a bare-metal project with mbed SDK suitable for QEMU simulation"
 	echo "   mbed-none-lib ....... creates a bare-metal project with mbed SDK"
 	echo "   mbed-freertos ....... creates a FreeRTOS project with mbed SDK (/w libraries)"
 	echo "   mbed-freertos-lib ... creates a FreeRTOS project with mbed SDK (/w libraries)"
@@ -263,7 +264,7 @@ case "$1" in
 	echo " "
 	;;
   *)
-	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
+	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-sim|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
 	exit 3
 	;;
 esac

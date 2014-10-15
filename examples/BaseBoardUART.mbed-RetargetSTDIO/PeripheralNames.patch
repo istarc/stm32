@@ -1,0 +1,20 @@
+--- BaseBoardUART.mbed-Serial/lib/mbed/targets/hal/TARGET_STM/TARGET_STM32F407VG/PeripheralNames.h	2014-10-08 08:14:02.490663681 +0200
++++ BaseBoardUART.mbed-RetargetSTDIO/lib/mbed/targets/hal/TARGET_STM/TARGET_STM32F407VG/PeripheralNames.h	2014-10-08 09:25:18.510547009 +0200
+@@ -51,9 +51,17 @@
+     UART_6 = (int)USART6_BASE
+ } UARTName;
+ 
++#ifndef STDIO_UART_TX
+ #define STDIO_UART_TX  PA_2
++#endif
++
++#ifndef STDIO_UART_RX
+ #define STDIO_UART_RX  PA_3
++#endif
++
++#ifndef STDIO_UART
+ #define STDIO_UART     UART_2
++#endif
+ 
+ typedef enum {
+     SPI_1 = (int)SPI1_BASE,

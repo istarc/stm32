@@ -77,7 +77,7 @@ sudo apt-cache policy gcc-arm-none-eabi
 # Remove the offical packages
 sudo apt-get purge -y binutils-arm-none-eabi gcc-arm-none-eabi gdb-arm-none-eabi libnewlib-arm-none-eabi
 # Install the packages from the PPA repository (these come with C++ libraries and newlib.nano)
-sudo apt-get install -y build-essential git openocd gcc-arm-none-eabi=4-8-2014q2-0trusty10
+sudo apt-get install -y build-essential git openocd gcc-arm-none-eabi=4.8.4.2014q3-0trusty11
 # 1.2.2 Buildbot
 sudo apt-get install -y buildbot buildbot-slave
 # 1.2.3 OpenOCD build dependancies

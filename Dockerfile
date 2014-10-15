@@ -123,7 +123,7 @@ run sudo apt-get update -q
 # 2.2 Install project dependancies
 # 2.2.1 GCC ARM
 run sudo apt-cache policy gcc-arm-none-eabi
-run sudo apt-get install -y build-essential git openocd gcc-arm-none-eabi=4-8-2014q2-0trusty10
+run sudo apt-get install -y build-essential git openocd gcc-arm-none-eabi=4.8.4.2014q3-0trusty11
 # 2.2.2 Buildbot
 run sudo apt-get install -y buildbot buildbot-slave
 # 2.2.3 OpenOCD build dependancies
