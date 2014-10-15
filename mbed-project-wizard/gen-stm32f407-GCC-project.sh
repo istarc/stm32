@@ -171,7 +171,7 @@ else
 	cp -LR $SAFERTOS/src/source/* $(pwd)/src
 	cp $SAFERTOS/SafeRTOS_STM32F407VG_FLASH.ld stm32f407.ld
 fi
-if [[ "$1" != "copy" ]]; then
+if [[ "$1" == "link" ]]; then
 	# Abs to Rel Symlinks
 	symlinks -rc $(pwd) 1>/dev/null
 fi
@@ -187,6 +187,15 @@ case "$1" in
 	cp $SCRIPTDIR/mbed-none/main.cpp $(pwd)/src/main.cpp
 	cp $SCRIPTDIR/mbed-none/Makefile $(pwd)/Makefile
 	;;
+  mbed-none-sim)
+        echo "Project template created by ${0##*/} $1" > $(pwd)/README
+        echo "   mbed-none-sim ... creates a bare-metal project with mbed SDK suitable for QEMU simulation" >> $(pwd)/README
+        do_create_dir $2
+        do_deploy_mbed $2
+        cp $SCRIPTDIR/mbed-none-sim/main.cpp $(pwd)/src/main.cpp
+        cp $SCRIPTDIR/mbed-none-sim/Makefile $(pwd)/Makefile
+	rm *.ld # Delete the linker script
+        ;;
   mbed-none-lib)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
 	echo "   mbed-none-lib ... creates a bare-metal project with mbed SDK" >> $(pwd)/README
