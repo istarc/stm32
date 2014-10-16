@@ -32,15 +32,14 @@ CXXSOURCES+=$(shell find -L $(LIBDIR) -name '*.cpp')
 # Find header directories
 INC=$(shell find -L $(INCDIR) -name '*.h' -exec dirname {} \; | uniq)
 INC+=$(shell find -L $(LIBDIR) -name '*.h' -exec dirname {} \; | uniq)
-INC+=../../lib/cpputest/include
 INCLUDES=$(INC:%=-I%)
 # Find libraries
-INCLUDES_LIBS=-L../../lib/cpputest/lib
-LINK_LIBS=-lCppUTest -lCppUTestExt
+INCLUDES_LIBS=
+LINK_LIBS=
 # Create object list
-AOBJECTS=$(ASOURCES:%.s=%.o)
-COBJECTS+=$(CSOURCES:%.c=%.o)
-CXXOBJECTS+=$(CXXSOURCES:%.cpp=%.o)
+OBJECTS=$(ASOURCES:%.s=%.o)
+OBJECTS+=$(CSOURCES:%.c=%.o)
+OBJECTS+=$(CXXSOURCES:%.cpp=%.o)
 # Define output files ELF & IHEX
 BINELF=outp.elf
 BINHEX=outp.hex
@@ -50,7 +49,7 @@ BINHEX=outp.hex
 MCFLAGS=-mcpu=cortex-m4 -mthumb -mlittle-endian \
 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork
 # COMPILE FLAGS
-DEFS=-DTARGET_STM32F407 -D__CORTEX_M4 -D__FPU_PRESENT -DWORDS_STACK_SIZE=200 #-DDEVICE_SERIAL
+DEFS=-DTARGET_STM32F407 -D__CORTEX_M4 -D__FPU_PRESENT -DWORDS_STACK_SIZE=200
 CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c99
 CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11
 CXXFLAGS+=-U__STRICT_ANSI__ # Undefine __STRICT_ANSI__ to compile Stream.cpp using c++11. This is a dirty hack!
@@ -91,8 +90,8 @@ $(BINDIR)/$(BINHEX): $(BINDIR)/$(BINELF)
 	$(CP) -O ihex $< $@
 	@echo "Objcopy from ELF to IHEX complete!\n"
 
-$(BINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
-	$(CXX) $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(LDFLAGS) -o $@
+$(BINDIR)/$(BINELF): $(OBJECTS)
+	$(CXX) $(OBJECTS) $(LDFLAGS) -o $@
 	@echo "Linking complete!\n"
 	$(SIZE) $(BINDIR)/$(BINELF)
 
@@ -109,7 +108,29 @@ $(BINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
 	@echo "Assambled "$<"!\n"
 
 clean:
-	rm -f $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
+	rm -f $(OBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
+
+test-release:
+	$(MAKE) -f Makefile-test release
+
+test-debug:
+	$(MAKE) -f Makefile-test debug
+
+test-release-memopt:
+	$(MAKE) -f Makefile-test release-memopt
+
+test-release-memopt-blame:
+	$(MAKE) -f Makefile-test release-memopt-blame
+	
+test-deps:
+	$(MAKE) -f Makefile-test deps-clean
+	$(MAKE) -f Makefile-test deps
+
+test-deploy:
+	$(MAKE) -f Makefile-test deploy
+
+test-clean:
+	$(MAKE) -f Makefile-test clean
 
 deploy:
 ifeq ($(wildcard /opt/openocd/bin/openocd),)

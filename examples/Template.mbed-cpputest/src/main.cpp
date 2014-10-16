@@ -10,13 +10,37 @@
   * @retval None
   */
 #include "mbed.h"
-#include "CppUTest/CommandLineTestRunner.h"
-
-Serial device(STDIO_UART_TX, STDIO_UART_RX);
-
+ 
+DigitalOut myled(LED1);
+ 
 int main() {
-	int argc = 0;
-	char* argv[] = {""};
-	device.printf("Hello World\n");
-	CommandLineTestRunner::RunAllTests(argc, argv);
+    while(1) {
+        myled = 1;
+        wait(0.2);
+        myled = 0;
+        wait(0.2);
+    }
 }
+
+/*
+ * Override C++ new/delete operators to reduce memory footprint
+ */
+#ifdef CUSTOM_NEW
+
+void *operator new(size_t size) {
+        return malloc(size);
+}
+
+void *operator new[](size_t size) {
+        return malloc(size);
+}
+
+void operator delete(void *p) {
+        free(p);
+}
+
+void operator delete[](void *p) {
+        free(p);
+}
+
+#endif
