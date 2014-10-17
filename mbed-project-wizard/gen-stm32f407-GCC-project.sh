@@ -78,6 +78,22 @@ echo 'Your application source files (*.c, *.cpp, *.s).' > $(pwd)/src/README
 }
 
 ##
+# Create directory structure /w unit test support
+do_create_tdir()
+{
+mkdir -p $(pwd)/bin
+touch $(pwd)/bin/.gitkeep # A dummy file to keep directory structure in place
+mkdir -p $(pwd)/inc
+echo 'Your application header files (*.h).' > $(pwd)/inc/README
+mkdir -p $(pwd)/lib
+echo 'Place third-party source code or libraries here.' > $(pwd)/lib/README
+mkdir -p $(pwd)/src
+echo 'Your application source files (*.c, *.cpp, *.s).' > $(pwd)/src/README
+mkdir -p $(pwd)/test
+echo 'Your test source files (*.c, *.cpp).' > $(pwd)/test/README
+}
+
+##
 # Deploy mbed SDK and tailor to fit STM32F4XX and GCC
 do_deploy_mbed()
 {
@@ -182,14 +198,44 @@ case "$1" in
   mbed-none)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
 	echo "   mbed-none ... creates a bare-metal project with mbed SDK" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Usage: make && sudo make deploy" >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	cp $SCRIPTDIR/mbed-none/main.cpp $(pwd)/src/main.cpp
 	cp $SCRIPTDIR/mbed-none/Makefile $(pwd)/Makefile
 	;;
+  mbed-none-cpput)
+	echo "Project template created by ${0##*/} $1" > $(pwd)/README
+	echo "   mbed-none-cpput ... creates a bare-metal project with mbed SDK and cpputest support" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Usage [app]:  make clean && make && sudo make deploy" >> $(pwd)/README
+	echo "Usage [test]: make clean && make test-deps && make test && sudo make test-deploy"  >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "              Works with STM32F4-Disocvery /w STM32F4-BB" >> $(pwd)/README
+	echo "              Unit Test Results are Displayed on Serial Device" >> $(pwd)/README
+	echo "              cat /dev/ttyS0 (cat /dev/ttyUSB0)" >> $(pwd)/README
+	do_create_tdir $2
+	do_deploy_mbed $2
+	# Deploy project files
+	cp $SCRIPTDIR/mbed-none-cpput/main.cpp $(pwd)/src/main.cpp
+	cp $SCRIPTDIR/mbed-none-cpput/add.cpp $(pwd)/src/add.cpp
+	cp $SCRIPTDIR/mbed-none-cpput/add.h $(pwd)/inc/add.h
+	# Deploy test files
+	cp $SCRIPTDIR/mbed-none-cpput/test-main.cpp $(pwd)/test/test-main.cpp
+	cp $SCRIPTDIR/mbed-none-cpput/test-fail.cpp $(pwd)/test/test-fail.cpp
+	cp $SCRIPTDIR/mbed-none-cpput/test-add.cpp $(pwd)/test/test-add.cpp
+	# Deploy Makefiles
+	cp $SCRIPTDIR/mbed-none-cpput/Makefile $(pwd)/Makefile
+	cp $SCRIPTDIR/mbed-none-cpput/Makefile-test $(pwd)/Makefile-test
+	# Patch mbed library (retarget STDIO)
+	patch -p1 < $SCRIPTDIR/mbed-none-cpput/PeripheralNames.patch
+	;;
   mbed-none-sim)
-        echo "Project template created by ${0##*/} $1" > $(pwd)/README
-        echo "   mbed-none-sim ... creates a bare-metal project with mbed SDK suitable for QEMU simulation" >> $(pwd)/README
+    echo "Project template created by ${0##*/} $1" > $(pwd)/README
+    echo "   mbed-none-sim ... creates a bare-metal project with mbed SDK suitable for QEMU simulation" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Usage: make && sudo make deploy" >> $(pwd)/README
         do_create_dir $2
         do_deploy_mbed $2
         cp $SCRIPTDIR/mbed-none-sim/main.cpp $(pwd)/src/main.cpp
@@ -199,6 +245,8 @@ case "$1" in
   mbed-none-lib)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
 	echo "   mbed-none-lib ... creates a bare-metal project with mbed SDK" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Usage: make && sudo make deploy" >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	cp $SCRIPTDIR/mbed/Makefile-lib $(pwd)/lib/mbed/Makefile
@@ -208,6 +256,8 @@ case "$1" in
   mbed-freertos)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
 	echo "   mbed-freertos ... creates a FreeRTOS project with mbed SDK (/w libraries)" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Usage: make && sudo make deploy" >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	do_deploy_freertos
@@ -217,6 +267,8 @@ case "$1" in
   mbed-freertos-lib)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
 	echo "   mbed-freertos-lib ... creates a FreeRTOS project with mbed SDK (/w libraries)" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Usage: make && sudo make deploy" >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	cp $SCRIPTDIR/mbed/Makefile-lib $(pwd)/lib/mbed/Makefile
@@ -228,6 +280,8 @@ case "$1" in
   mbed-mbedrtos)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
 	echo "   mbed-mbedrtos ... creates a mbedRTOS project with mbed SDK" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Usage: make && sudo make deploy" >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	do_deploy_mbedrots $2
@@ -237,6 +291,8 @@ case "$1" in
   mbed-mbedrtos-lib)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
 	echo "   mbed-mbedrtos-lib ... creates a mbedRTOS project with mbed SDK (/w libraries)" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Usage: make && sudo make deploy" >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	cp $SCRIPTDIR/mbed/Makefile-lib $(pwd)/lib/mbed/Makefile
@@ -253,14 +309,17 @@ case "$1" in
 	fi
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
 	echo "   none-safertos ... creates a SafeRTOS project with mbed SDK (/w libraries)" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Usage: make && sudo make deploy" >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_safertos $2
 	cp $SCRIPTDIR/none-safertos/Makefile $(pwd)/Makefile
 	;;
   --help)
-	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-sim|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
+	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-cpput|mbed-none-sim|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
 	echo ""
 	echo "   mbed-none ........... creates a bare-metal project with mbed SDK"
+	echo "   mbed-none-cpput ..... creates a bare-metal project with mbed SDK and cpputest support"
 	echo "   mbed-none-sim ....... creates a bare-metal project with mbed SDK suitable for QEMU simulation"
 	echo "   mbed-none-lib ....... creates a bare-metal project with mbed SDK"
 	echo "   mbed-freertos ....... creates a FreeRTOS project with mbed SDK (/w libraries)"
@@ -273,8 +332,7 @@ case "$1" in
 	echo " "
 	;;
   *)
-	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-sim|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
+	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-cpput|mbed-none-sim|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
 	exit 3
 	;;
 esac
-
