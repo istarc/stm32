@@ -213,7 +213,7 @@ case "$1" in
 	echo "Usage [test]: make clean && make test-deps && make test && sudo make test-deploy"  >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "              Works with STM32F4-Disocvery /w STM32F4-BB" >> $(pwd)/README
-	echo "              Unit Test Results are Displayed on Serial Device" >> $(pwd)/README
+	echo "              Unit Test Results are Displayed on UART 6 Serial Device (that is routed to RS-232 interface of the STM32F4-BB board)" >> $(pwd)/README
 	echo "              cat /dev/ttyS0 (cat /dev/ttyUSB0)" >> $(pwd)/README
 	do_create_tdir $2
 	do_deploy_mbed $2
