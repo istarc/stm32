@@ -1,5 +1,9 @@
 ###
-# Purpose: to create a bare-metal with mbed SDK and cpputest
+# Purpose: to create a bare-metal with mbed SDK and cpputest suitable for QEMU simulation
+
+###
+# Time in seconds to simulate unit tests
+SIMTIME=2
 
 ###
 # GNU ARM Embedded Toolchain
@@ -13,6 +17,7 @@ OD=arm-none-eabi-objdump
 NM=arm-none-eabi-nm
 SIZE=arm-none-eabi-size
 A2L=arm-none-eabi-addr2line
+GCOV=arm-none-eabi-gcov
 
 ###
 # Directory Structure
@@ -45,11 +50,11 @@ INCLUDES=$(INC:%=-I%)
 LIBFILES=$(shell find $(LIBDIR) -type f -name '*.a')
 INCLUDES_LIBS=$(patsubst %,-L%, $(dir $(LIBFILES)))
 LINK_LIBS=$(patsubst lib%, -l%, $(basename $(notdir $(LIBFILES))))
-LINK_LIBS+=-lrdimon
+LINK_LIBS+=-lrdimon -lgcov
 # Create object list
 AOBJECTS=$(ASOURCES:%.s=%.o)
-COBJECTS+=$(CSOURCES:%.c=%.o)
-CXXOBJECTS+=$(CXXSOURCES:%.cpp=%.o)
+COBJECTS=$(CSOURCES:%.c=%.o)
+CXXOBJECTS=$(CXXSOURCES:%.cpp=%.o)
 # Define output files ELF & IHEX
 BINELF=test.elf
 BINHEX=test.hex
@@ -60,9 +65,8 @@ BINHEX=test.hex
 MCFLAGS=-mcpu=cortex-m3 -mthumb -mlittle-endian -mfloat-abi=soft -mthumb-interwork
 # COMPILE FLAGS
 DEFS=-DTARGET_STM32F407 -D__CORTEX_M4 -D__FPU_PRESENT -DWORDS_STACK_SIZE=200
-#DEFS+=-DDEVICE_SERIAL -DSTDIO_UART_TX=PC_6 -DSTDIO_UART_RX=PC_7 -DSTDIO_UART=UART_6
-CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c99
-CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11
+CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -fprofile-arcs -ftest-coverage -std=c99
+CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -fprofile-arcs -ftest-coverage -std=c++11
 CXXFLAGS+=-U__STRICT_ANSI__ # Undefine __STRICT_ANSI__ to compile Stream.cpp using c++11. This is a dirty hack!
 # LINKER FLAGS
 LDFLAGS =$(MCFLAGS) --specs=nosys.specs --specs=rdimon.specs $(INCLUDES_LIBS) $(LINK_LIBS)
@@ -118,16 +122,23 @@ $(BINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
 	@echo "Assambled "$<"!\n"
 
 deps:
-	mkdir -p tmp && rm -rf tmp/*
-	cd $(CPPUTEST_SRCDIR) && ./autogen.sh 
+	mkdir -p tmp && rm -rf tmp/* # && cd $(CPPUTEST_SRCDIR) && ./autogen.sh 
 	cd tmp && $(CPPUTEST_SRCDIR)/configure --host=arm-none-eabi --prefix=$(shell pwd)/lib/cpputest  LDFLAGS="$(MCFLAGS) --specs=rdimon.specs $(INCLUDES_LIBS) $(LINK_LIBS)" CFLAGS="$(MCFLAGS) $(INCLUDES) -std=c99" CXXFLAGS="$(MCFLAGS) $(INCLUDES)" && make && make install
 	rm -rf tmp
 
 clean:
 	rm -f $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
+	find . -type f -name '*.gcno' -exec rm -f {} \;
+	find . -type f -name '*.gcda' -exec rm -f {} \;
+	find . -type f -name '*.gcov' -exec rm -f {} \;
 
 deps-clean:
 	rm -rf lib/cpputest
 
 deploy:
-	qemu-system-arm -cpu cortex-m3 -machine versatilepb -monitor null -serial null -semihosting -nographic -kernel bin/$(BINELF)
+	@echo "\nRunning Unit Tests on QEMU Simulator (change SIMTIME variable to adjust simulation time)\n" 
+	(timeout $(SIMTIME) qemu-system-arm -cpu cortex-m3 -machine versatilepb -monitor null -serial null -semihosting -nographic -kernel bin/$(BINELF) || true)
+	@echo "Evaluating Test Coverage\n"
+	find src -name '*.cpp' -not -name 'main.cpp' -not -name 'main.c' -exec $(GCOV) {} \;
+	@echo "Displaying Test Coverage Details\n"
+	find . -name '*.gcov' -exec sed -e 1s/^/---\\n/g {} \;

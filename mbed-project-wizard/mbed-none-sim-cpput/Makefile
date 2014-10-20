@@ -1,5 +1,9 @@
 ###
-# Purpose: to create a bare-metal project with mbed SDK.
+# Purpose: to create a bare-metal with mbed SDK and cpputest suitable for QEMU simulation
+
+###
+# Time in seconds to simulate program
+SIMTIME=2
 
 ###
 # GNU ARM Embedded Toolchain
@@ -24,7 +28,7 @@ LIBDIR=lib
 ###
 # Find source files
 ASOURCES=$(shell find -L $(SRCDIR) -name '*.s')
-ASOURCES+=$(shell find -L $(LIBDIR) -name '*.s')
+ASOURCES+=$(shell find -L $(LIBDIR) -name '*.s' -not -name 'startup_stm32f407xx.s')
 CSOURCES=$(shell find -L $(SRCDIR) -name '*.c')
 CSOURCES+=$(shell find -L $(LIBDIR) -name '*.c')
 CXXSOURCES=$(shell find -L $(SRCDIR) -name '*.cpp')
@@ -39,9 +43,9 @@ INCLUDES=$(INC:%=-I%)
 INCLUDES_LIBS=
 LINK_LIBS=-lrdimon
 # Create object list
-OBJECTS=$(ASOURCES:%.s=%.o)
-OBJECTS+=$(CSOURCES:%.c=%.o)
-OBJECTS+=$(CXXSOURCES:%.cpp=%.o)
+AOBJECTS=$(ASOURCES:%.s=%.o)
+COBJECTS=$(CSOURCES:%.c=%.o)
+CXXOBJECTS=$(CXXSOURCES:%.cpp=%.o)
 # Define output files ELF & IHEX
 BINELF=outp.elf
 BINHEX=outp.hex
@@ -76,7 +80,7 @@ release-memopt-blame:
 
 release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS
 release-memopt: CFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin # -flto
-release-memopt: CXXFLAGS+=-Os -fno-exceptions -ffunction-sections -fdata-sections -fno-builtin -fno-rtti # -flto
+release-memopt: CXXFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin #-fno-exceptions -fno-rtti # -flto
 release-memopt: LDFLAGS+=-Os -Wl,-gc-sections #--specs=nano.specs # -flto
 release-memopt: release
 
@@ -91,8 +95,8 @@ $(BINDIR)/$(BINHEX): $(BINDIR)/$(BINELF)
 	$(CP) -O ihex $< $@
 	@echo "Objcopy from ELF to IHEX complete!\n"
 
-$(BINDIR)/$(BINELF): $(OBJECTS)
-	$(CXX) $(OBJECTS) $(LDFLAGS) -o $@
+$(BINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
+	$(CXX) $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(LDFLAGS) -o $@
 	@echo "Linking complete!\n"
 	$(SIZE) $(BINDIR)/$(BINELF)
 
@@ -109,7 +113,7 @@ $(BINDIR)/$(BINELF): $(OBJECTS)
 	@echo "Assambled "$<"!\n"
 
 clean:
-	rm -f $(OBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
+	rm -f $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
 
 test: test-release
 
@@ -136,4 +140,5 @@ test-clean:
 	$(MAKE) -f Makefile-test clean
 
 deploy:
-	qemu-system-arm -cpu cortex-m3 -machine versatilepb -monitor null -serial null -semihosting -nographic -kernel bin/$(BINELF)
+	@echo "\nRunning Unit Tests on QEMU Simulator (change SIMTIME variable to adjust simulation time)\n" 
+	(timeout $(SIMTIME) qemu-system-arm -cpu cortex-m3 -machine versatilepb -monitor null -serial null -semihosting -nographic -kernel bin/$(BINELF) || true)

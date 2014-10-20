@@ -15,12 +15,13 @@ extern "C" {
 }
 #include "CppUTest/CommandLineTestRunner.h"
 
+extern "C" void __gcov_flush();
+
 int main() {
 	int argc = 0;
 	char* argv[] = {""};
-	printf("Hello World\n");
+	printf("Executing Unit Tests ...\n");
 	CommandLineTestRunner::RunAllTests(argc, argv);
-	fflush(stdout);
-
-	while(1);
+	__gcov_flush();
+	return 0;
 }
