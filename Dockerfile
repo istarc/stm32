@@ -130,8 +130,8 @@ run sudo apt-get install -y buildbot buildbot-slave
 run sudo apt-get install -y libtool libftdi-dev libusb-1.0-0-dev automake pkg-config texinfo
 # 2.2.4 Clone and init stm32 repository
 run mkdir -p /home/admin
-run cd /home/admin; git clone --depth 1 https://github.com/istarc/stm32.git
-run cd /home/admin/stm32; git submodule update --init --depth 1
+run cd /home/admin; git clone https://github.com/istarc/stm32.git # --depth 1
+run cd /home/admin/stm32; git submodule update --init # --depth 1
 
 # 3. Add user admin with password "admin"
 run useradd -s /bin/bash -m -d /home/admin -p $(openssl passwd -1 admin)  admin
