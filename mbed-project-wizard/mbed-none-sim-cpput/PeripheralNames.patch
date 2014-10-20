@@ -1,5 +1,5 @@
---- BaseBoardUART.mbed-Serial/lib/mbed/targets/hal/TARGET_STM/TARGET_STM32F407VG/PeripheralNames.h	2014-10-08 08:14:02.490663681 +0200
-+++ BaseBoardUART.mbed-RetargetSTDIO/lib/mbed/targets/hal/TARGET_STM/TARGET_STM32F407VG/PeripheralNames.h	2014-10-08 09:25:18.510547009 +0200
+--- BaseBoardUART.mbed-Serial/lib/mbed/targets/hal/TARGET_STM/TARGET_STM32F407VG/TARGET_DISCO_F407VG/PeripheralNames.h	2014-10-08 08:14:02.490663681 +0200
++++ BaseBoardUART.mbed-RetargetSTDIO/lib/mbed/targets/hal/TARGET_STM/TARGET_STM32F407VG/TARGET_DISCO_F407VG/PeripheralNames.h	2014-10-08 09:25:18.510547009 +0200
 @@ -51,9 +51,17 @@
      UART_6 = (int)USART6_BASE
  } UARTName;
