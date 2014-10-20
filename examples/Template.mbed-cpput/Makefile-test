@@ -45,8 +45,8 @@ INCLUDES_LIBS=$(patsubst %,-L%, $(dir $(LIBFILES)))
 LINK_LIBS=$(patsubst lib%, -l%, $(basename $(notdir $(LIBFILES))))
 # Create object list
 AOBJECTS=$(ASOURCES:%.s=%.o)
-COBJECTS+=$(CSOURCES:%.c=%.o)
-CXXOBJECTS+=$(CXXSOURCES:%.cpp=%.o)
+COBJECTS=$(CSOURCES:%.c=%.o)
+CXXOBJECTS=$(CXXSOURCES:%.cpp=%.o)
 # Define output files ELF & IHEX
 BINELF=test.elf
 BINHEX=test.hex
@@ -116,8 +116,7 @@ $(BINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
 	@echo "Assambled "$<"!\n"
 
 deps:
-	mkdir -p tmp && rm -rf tmp/*
-	cd $(CPPUTEST_SRCDIR) && ./autogen.sh 
+	mkdir -p tmp && rm -rf tmp/* # && cd $(CPPUTEST_SRCDIR) && ./autogen.sh 
 	cd tmp && $(CPPUTEST_SRCDIR)/configure --host=arm-none-eabi --prefix=$(shell pwd)/lib/cpputest  LDFLAGS="$(MCFLAGS) --specs=nosys.specs $(INCLUDES_LIBS) $(LINK_LIBS)" CFLAGS="$(MCFLAGS) $(INCLUDES) -std=c99" CXXFLAGS="$(MCFLAGS) $(INCLUDES)" && make && make install
 	rm -rf tmp
 

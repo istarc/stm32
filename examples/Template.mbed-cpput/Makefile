@@ -37,9 +37,9 @@ INCLUDES=$(INC:%=-I%)
 INCLUDES_LIBS=
 LINK_LIBS=
 # Create object list
-OBJECTS=$(ASOURCES:%.s=%.o)
-OBJECTS+=$(CSOURCES:%.c=%.o)
-OBJECTS+=$(CXXSOURCES:%.cpp=%.o)
+AOBJECTS=$(ASOURCES:%.s=%.o)
+COBJECTS=$(CSOURCES:%.c=%.o)
+CXXOBJECTS=$(CXXSOURCES:%.cpp=%.o)
 # Define output files ELF & IHEX
 BINELF=outp.elf
 BINHEX=outp.hex
@@ -50,6 +50,7 @@ MCFLAGS=-mcpu=cortex-m4 -mthumb -mlittle-endian \
 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork
 # COMPILE FLAGS
 DEFS=-DTARGET_STM32F407 -D__CORTEX_M4 -D__FPU_PRESENT -DWORDS_STACK_SIZE=200
+DEFS+=-DDEVICE_SERIAL -DSTDIO_UART_TX=PC_6 -DSTDIO_UART_RX=PC_7 -DSTDIO_UART=UART_6
 CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c99
 CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11
 CXXFLAGS+=-U__STRICT_ANSI__ # Undefine __STRICT_ANSI__ to compile Stream.cpp using c++11. This is a dirty hack!
@@ -75,7 +76,8 @@ release-memopt-blame:
 
 release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS
 release-memopt: CFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin # -flto
-release-memopt: CXXFLAGS+=-Os -fno-exceptions -ffunction-sections -fdata-sections -fno-builtin -fno-rtti # -flto
+release-memopt: CXXFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin #-fno-exceptions -fno-rtti # -flto
+
 release-memopt: LDFLAGS+=-Os -Wl,-gc-sections #--specs=nano.specs # -flto
 release-memopt: release
 
@@ -90,8 +92,8 @@ $(BINDIR)/$(BINHEX): $(BINDIR)/$(BINELF)
 	$(CP) -O ihex $< $@
 	@echo "Objcopy from ELF to IHEX complete!\n"
 
-$(BINDIR)/$(BINELF): $(OBJECTS)
-	$(CXX) $(OBJECTS) $(LDFLAGS) -o $@
+$(BINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
+	$(CXX) $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(LDFLAGS) -o $@
 	@echo "Linking complete!\n"
 	$(SIZE) $(BINDIR)/$(BINELF)
 
@@ -108,7 +110,7 @@ $(BINDIR)/$(BINELF): $(OBJECTS)
 	@echo "Assambled "$<"!\n"
 
 clean:
-	rm -f $(OBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
+	rm -f $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
 
 test: test-release
 

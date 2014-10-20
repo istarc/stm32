@@ -13,13 +13,14 @@
 #include "add.h"
 
 DigitalOut myled(LED1);
- 
+
 int main() {
+    int i = 0;
     while(1) {
-        myled = 1;
-        wait(add(0,1));
-        myled = 0;
-        wait(add(1,1));
+        i = add(i,1);
+        printf("%d Hello world!\n", i);
+        myled = i%2;
+        wait(i%10);
     }
 }
 
