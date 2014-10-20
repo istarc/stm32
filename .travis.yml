@@ -6,15 +6,15 @@ before_script:
   - sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
   - sudo apt-get update -q
   - sudo apt-get install -y gcc-arm-none-eabi
-  - mkdir -p $HOME/istarc/stm32/examples/mbed-none && cd $HOME/istarc/stm32/examples/mbed-none && $HOME/istarc/stm32/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none
-  - mkdir -p $HOME/istarc/stm32/examples/mbed-none-cpput && cd $HOME/istarc/stm32/examples/mbed-none-cpput && $HOME/istarc/stm32/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-cpput
-  - mkdir -p $HOME/istarc/stm32/examples/mbed-none-sim && cd $HOME/istarc/stm32/examples/mbed-none-sim && $HOME/istarc/stm32/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-sim
-  - mkdir -p $HOME/istarc/stm32/examples/mbed-none-sim-cpput && cd $HOME/istarc/stm32/examples/mbed-none-sim-cpput && $HOME/istarc/stm32/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-sim-cpput
-  - mkdir -p $HOME/istarc/stm32/examples/mbed-none-lib && cd $HOME/istarc/stm32/examples/mbed-freertos && $HOME/istarc/stm32/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-lib
-  - mkdir -p $HOME/istarc/stm32/examples/mbed-freertos && cd $HOME/istarc/stm32/examples/mbed-freertos-lib && $HOME/istarc/stm32/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-freertos
-  - mkdir -p $HOME/istarc/stm32/examples/mbed-freertos-lib && cd $HOME/istarc/stm32/examples/mbed-mbedrtos && $HOME/istarc/stm32/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-freertos-lib
-  - mkdir -p $HOME/istarc/stm32/examples/mbed-mbedrtos && cd $HOME/istarc/stm32/examples/mbed-mbedrtos && $HOME/istarc/stm32/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-mbedrtos
-  - mkdir -p $HOME/istarc/stm32/examples/mbed-mbedrtos-lib && cd $HOME/istarc/stm32/examples/mbed-mbedrtos-lib && $HOME/istarc/stm32/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-mbedrtos-lib
+  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none && cd $TRAVIS_BUILD_DIR/examples/mbed-none && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none
+  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-cpput && cd $TRAVIS_BUILD_DIR/examples/mbed-none-cpput && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-cpput
+  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-sim && cd $TRAVIS_BUILD_DIR/examples/mbed-none-sim && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-sim
+  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-sim-cpput && cd $TRAVIS_BUILD_DIR/examples/mbed-none-sim-cpput && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-sim-cpput
+  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-lib && cd $TRAVIS_BUILD_DIR/examples/mbed-freertos && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-lib
+  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-freertos && cd $TRAVIS_BUILD_DIR/examples/mbed-freertos-lib && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-freertos
+  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-freertos-lib && cd $TRAVIS_BUILD_DIR/examples/mbed-mbedrtos && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-freertos-lib
+  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-mbedrtos && cd $TRAVIS_BUILD_DIR/examples/mbed-mbedrtos && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-mbedrtos
+  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-mbedrtos-lib && cd $TRAVIS_BUILD_DIR/examples/mbed-mbedrtos-lib && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-mbedrtos-lib
 
 language: cpp
 
