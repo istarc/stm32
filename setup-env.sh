@@ -85,9 +85,9 @@ sudo apt-get install -y libtool libftdi-dev libusb-1.0-0-dev automake pkg-config
 # 1.2.4 Clone and init stm32 repository
 if [ ! -d "$PREFIX/stm32" ]; then
 	cd $PREFIX
-	git clone --depth 1 https://github.com/istarc/stm32.git
+	git clone https://github.com/istarc/stm32.git # --depth 1
 	cd $PREFIX/stm32
-	git submodule update --init --depth 1
+	git submodule update --init # --depth 1
 else
 	cd $PREFIX/stm32
 	git pull
