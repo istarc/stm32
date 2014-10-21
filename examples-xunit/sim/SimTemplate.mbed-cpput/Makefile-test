@@ -138,10 +138,11 @@ test-deps-clean:
 	rm -rf lib/cpputest
 
 check:
+	test -s $(BINDIR)/$(BINELF) || (echo "\nCheck failed! Build the unit tests before you run them. Use: make test-clean && make test-deps && make test\n" && false)
 	@echo "\nRunning Unit Tests on QEMU Simulator (change SIMTIME variable to adjust simulation time)\n" 
 	(timeout $(SIMTIME) qemu-system-arm -cpu cortex-m3 -machine versatilepb -monitor null -serial null -semihosting -nographic -kernel bin/$(BINELF) 2>sim.err | tee check.log || true)
-	@echo "\nBreak if unit test log contains errors.\n"
-	if grep -e 'Errors ([0-9].* failures, [0-9].* tests, [0-9].* ran, [0-9].* checks, [0-9].* ignored, [0-9].* filtered out, [0-9].* ms)' check.log; then false; fi
+	@echo "\nBreak if one or more unit test failed.\n"
+	if grep -e 'Errors ([0-9].* failures, [0-9].* tests, [0-9].* ran, [0-9].* checks, [0-9].* ignored, [0-9].* filtered out, [0-9].* ms)' check.log; then echo "\nCheck failed! One or more unit tests failed.\n" && false; else echo "\nCheck OK! :-)\n"; fi
 
 check-coverage:
 	@echo "\nEvaluating Test Coverage\n"
