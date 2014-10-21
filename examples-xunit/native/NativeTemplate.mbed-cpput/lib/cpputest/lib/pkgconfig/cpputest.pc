@@ -1,0 +1,11 @@
+prefix=/home/iztok/stm32/examples-xunit/native/NativeTemplate.mbed-cpput/lib/cpputest
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: CppUtest
+URL: https://github.com/cpputest/cpputest
+Description: Easy to use unit test framework for C/C++
+Version: 3.6
+Cflags: -I${includedir}
+Libs: -L${libdir} -lstdc++ -lCppUTest -lCppUTestExt
