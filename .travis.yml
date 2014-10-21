@@ -22,5 +22,3 @@ language: cpp
 script:
   - make clean
   - make
-  - make test-clean
-  - make check
