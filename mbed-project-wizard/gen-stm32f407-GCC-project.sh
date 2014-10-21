@@ -210,7 +210,7 @@ case "$1" in
 	echo "   mbed-none-cpput ... creates a bare-metal project with mbed SDK and cpputest support" >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Usage [app]:  make clean && make && sudo make deploy" >> $(pwd)/README
-	echo "Usage [test]: make clean && make test-deps && make test && sudo make test-deploy"  >> $(pwd)/README
+	echo "Usage [test]: make test-clean && make test-deps && make test && sudo make check"  >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "              Works with STM32F4-Disocvery /w STM32F4-BB" >> $(pwd)/README
 	echo "              Unit Test Results are Displayed on UART 6 Serial Device (that is routed to RS-232 interface of the STM32F4-BB board)" >> $(pwd)/README
@@ -247,7 +247,7 @@ case "$1" in
 	echo "   mbed-none-sim-cpput ... creates a bare-metal project with mbed SDK and cpputest support suitable for QEMU simulation" >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Usage [app]:  make clean && make && sudo make deploy" >> $(pwd)/README
-	echo "Usage [test]: make clean && make test-deps && make test && sudo make test-deploy"  >> $(pwd)/README
+	echo "Usage [test]: make test-clean && make test-deps && make test && sudo make check"  >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	do_create_tdir $2
 	do_deploy_mbed $2
