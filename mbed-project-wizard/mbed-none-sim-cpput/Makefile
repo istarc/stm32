@@ -64,7 +64,7 @@ LDFLAGS =$(MCFLAGS) --specs=rdimon.specs $(INCLUDES_LIBS) $(LINK_LIBS)
 
 ###
 # Build Rules
-.PHONY: all release release-memopt debug clean test test-release test-debug test-release-memopt test-release-memopt-blame test-deps test-deploy test-clean
+.PHONY: all release release-memopt debug clean deploy test test-deps test-clean check
 
 all: release-memopt
 
@@ -115,29 +115,21 @@ $(BINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
 clean:
 	rm -f $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
 
-test: test-release
+test:
+	$(MAKE) -f Makefile-test test
 
-test-release:
-	$(MAKE) -f Makefile-test release
-
-test-debug:
-	$(MAKE) -f Makefile-test debug
-
-test-release-memopt:
-	$(MAKE) -f Makefile-test release-memopt
-
-test-release-memopt-blame:
-	$(MAKE) -f Makefile-test release-memopt-blame
-	
 test-deps:
-	$(MAKE) -f Makefile-test deps-clean
-	$(MAKE) -f Makefile-test deps
+	$(MAKE) -f Makefile-test test-deps-clean
+	$(MAKE) -f Makefile-test test-deps
 
-test-deploy:
-	$(MAKE) -f Makefile-test deploy
+check:
+	$(MAKE) -f Makefile-test check
+
+check-coverage:
+	$(MAKE) -f Makefile-test check-coverage
 
 test-clean:
-	$(MAKE) -f Makefile-test clean
+	$(MAKE) -f Makefile-test test-clean
 
 deploy:
 	@echo "\nRunning Unit Tests on QEMU Simulator (change SIMTIME variable to adjust simulation time)\n" 

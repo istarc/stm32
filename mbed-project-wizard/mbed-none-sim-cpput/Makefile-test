@@ -73,32 +73,33 @@ LDFLAGS =$(MCFLAGS) --specs=nosys.specs --specs=rdimon.specs $(INCLUDES_LIBS) $(
 
 ###
 # Build Rules
-.PHONY: all release release-memopt debug deps clean deps-clean
+.PHONY: all test test-release test-release-memopt test-debug test-deps test-clean test-deps-clean check
 
-all: release-memopt
+all: test-release-memopt
+test: test-release-memopt
 
-release-memopt-blame: CFLAGS+=-g
-release-memopt-blame: CXXFLAGS+=-g
-release-memopt-blame: LDFLAGS+=-g -Wl,-Map=$(BINDIR)/output.map
-release-memopt-blame: release-memopt
-release-memopt-blame:
+test-release-memopt-blame: CFLAGS+=-g
+test-release-memopt-blame: CXXFLAGS+=-g
+test-release-memopt-blame: LDFLAGS+=-g -Wl,-Map=$(BINDIR)/output.map
+test-release-memopt-blame: test-release-memopt
+test-release-memopt-blame:
 	@echo "Top 10 space consuming symbols from the object code ...\n"
 	$(NM) -A -l -C -td --reverse-sort --size-sort $(BINDIR)/$(BINELF) | head -n10 | cat -n # Output legend: man nm
 	@echo "\n... and corresponging source files to blame.\n"
 	$(NM) --reverse-sort --size-sort -S -tx $(BINDIR)/$(BINELF) | head -10 | cut -d':' -f2 | cut -d' ' -f1 | $(A2L) -e $(BINDIR)/$(BINELF) | cat -n # Output legend: man addr2line
 
-release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS
-release-memopt: CFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin # -flto
-release-memopt: CXXFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin #-fno-exceptions -fno-rtti # -flto
-release-memopt: LDFLAGS+=-Os -Wl,-gc-sections #--specs=nano.specs # -flto
-release-memopt: release
+test-release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS
+test-release-memopt: CFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin # -flto
+test-release-memopt: CXXFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin #-fno-exceptions -fno-rtti # -flto
+test-release-memopt: LDFLAGS+=-Os -Wl,-gc-sections #--specs=nano.specs # -flto
+test-release-memopt: test-release
 
-debug: CFLAGS+=-g
-debug: CXXFLAGS+=-g
-debug: LDFLAGS+=-g
-debug: release
+test-debug: CFLAGS+=-g
+test-debug: CXXFLAGS+=-g
+test-debug: LDFLAGS+=-g
+test-debug: release
 
-release: $(BINDIR)/$(BINHEX)
+test-release: $(BINDIR)/$(BINHEX)
 
 $(BINDIR)/$(BINHEX): $(BINDIR)/$(BINELF)
 	$(CP) -O ihex $< $@
@@ -121,23 +122,25 @@ $(BINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
 	$(CC) $(CFLAGS) $< -o $@
 	@echo "Assambled "$<"!\n"
 
-deps:
+test-deps:
 	mkdir -p tmp && rm -rf tmp/* # && cd $(CPPUTEST_SRCDIR) && ./autogen.sh 
 	cd tmp && $(CPPUTEST_SRCDIR)/configure --host=arm-none-eabi --prefix=$(shell pwd)/lib/cpputest  LDFLAGS="$(MCFLAGS) --specs=rdimon.specs $(INCLUDES_LIBS) $(LINK_LIBS)" CFLAGS="$(MCFLAGS) $(INCLUDES) -std=c99" CXXFLAGS="$(MCFLAGS) $(INCLUDES)" && make && make install
 	rm -rf tmp
 
-clean:
+test-clean:
 	rm -f $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
 	find . -type f -name '*.gcno' -exec rm -f {} \;
 	find . -type f -name '*.gcda' -exec rm -f {} \;
 	find . -type f -name '*.gcov' -exec rm -f {} \;
 
-deps-clean:
+test-deps-clean:
 	rm -rf lib/cpputest
 
-deploy:
+check:
 	@echo "\nRunning Unit Tests on QEMU Simulator (change SIMTIME variable to adjust simulation time)\n" 
 	(timeout $(SIMTIME) qemu-system-arm -cpu cortex-m3 -machine versatilepb -monitor null -serial null -semihosting -nographic -kernel bin/$(BINELF) || true)
+
+check-coverage:
 	@echo "Evaluating Test Coverage\n"
 	find src -name '*.cpp' -not -name 'main.cpp' -not -name 'main.c' -exec $(GCOV) {} \;
 	@echo "Displaying Test Coverage Details\n"
