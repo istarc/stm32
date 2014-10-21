@@ -60,7 +60,7 @@ LDFLAGS =-T $(LDSCRIPT) $(MCFLAGS) --specs=nosys.specs $(INCLUDES_LIBS) $(LINK_L
 
 ###
 # Build Rules
-.PHONY: all release release-memopt debug clean test test-release test-debug test-release-memopt test-release-memopt-blame test-deps test-deploy test-clean
+.PHONY: all release release-memopt debug clean deploy test test-deps check test-clean
 
 all: release-memopt
 
@@ -112,29 +112,18 @@ $(BINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
 clean:
 	rm -f $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
 
-test: test-release
+test:
+	$(MAKE) -f Makefile-test test
 
-test-release:
-	$(MAKE) -f Makefile-test release
-
-test-debug:
-	$(MAKE) -f Makefile-test debug
-
-test-release-memopt:
-	$(MAKE) -f Makefile-test release-memopt
-
-test-release-memopt-blame:
-	$(MAKE) -f Makefile-test release-memopt-blame
-	
 test-deps:
-	$(MAKE) -f Makefile-test deps-clean
-	$(MAKE) -f Makefile-test deps
+	$(MAKE) -f Makefile-test test-deps-clean
+	$(MAKE) -f Makefile-test test-deps
 
-test-deploy:
-	$(MAKE) -f Makefile-test deploy
+check:
+	$(MAKE) -f Makefile-test check
 
 test-clean:
-	$(MAKE) -f Makefile-test clean
+	$(MAKE) -f Makefile-test test-clean
 
 deploy:
 ifeq ($(wildcard /opt/openocd/bin/openocd),)
