@@ -14,7 +14,7 @@ all:
 	for d in $(BDIRS); do $(MAKE) -C $$d; done
 
 check:
-	for d in $(BDIRS); do $(MAKE) -C $$d check; done
+	for d in $(TDIRS); do $(MAKE) -C $$d check; done
 
 clean:
 	for d in $(BDIRS); do $(MAKE) -C $$d clean; done
