@@ -13,8 +13,8 @@
 #include "CppUTest/CommandLineTestRunner.h"
 
 int main() {
-	int argc = 0;
-	char* argv[] = {""};
+	int argc = 3;
+	char* argv[] = {"", "-v", "-c"};
 	printf("Hello World\n");
 	CommandLineTestRunner::RunAllTests(argc, argv);
 	fflush(stdout);

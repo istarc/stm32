@@ -18,8 +18,8 @@ extern "C" {
 extern "C" void __gcov_flush();
 
 int main() {
-	int argc = 0;
-	char* argv[] = {""};
+	int argc = 3;
+	char* argv[] = {"", "-v", "-c"};
 	printf("Executing Unit Tests ...\n");
 	CommandLineTestRunner::RunAllTests(argc, argv);
 	__gcov_flush();
