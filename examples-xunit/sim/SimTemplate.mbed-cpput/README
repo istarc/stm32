@@ -2,5 +2,5 @@ Project template created by gen-stm32f407-GCC-project.sh mbed-none-sim-cpput
    mbed-none-sim-cpput ... creates a bare-metal project with mbed SDK and cpputest support suitable for QEMU simulation
 
 Usage [app]:  make clean && make && sudo make deploy
-Usage [test]: make clean && make test-deps && make test && sudo make test-deploy
+Usage [test]: make test-clean && make test-deps && make test && sudo make check
 
