@@ -15,6 +15,7 @@ before_script:
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-freertos-lib && cd $TRAVIS_BUILD_DIR/examples/mbed-freertos-lib && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-freertos-lib
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-mbedrtos && cd $TRAVIS_BUILD_DIR/examples/mbed-mbedrtos && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-mbedrtos
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-mbedrtos-lib && cd $TRAVIS_BUILD_DIR/examples/mbed-mbedrtos-lib && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-mbedrtos-lib
+  - cd $TRAVIS_BUILD_DIR
 
 language: cpp
 
