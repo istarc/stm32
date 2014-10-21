@@ -132,16 +132,19 @@ test-clean:
 	find . -type f -name '*.gcno' -exec rm -f {} \;
 	find . -type f -name '*.gcda' -exec rm -f {} \;
 	find . -type f -name '*.gcov' -exec rm -f {} \;
+	rm check.log sim.err
 
 test-deps-clean:
 	rm -rf lib/cpputest
 
 check:
 	@echo "\nRunning Unit Tests on QEMU Simulator (change SIMTIME variable to adjust simulation time)\n" 
-	(timeout $(SIMTIME) qemu-system-arm -cpu cortex-m3 -machine versatilepb -monitor null -serial null -semihosting -nographic -kernel bin/$(BINELF) || true)
+	(timeout $(SIMTIME) qemu-system-arm -cpu cortex-m3 -machine versatilepb -monitor null -serial null -semihosting -nographic -kernel bin/$(BINELF) 2>sim.err | tee check.log || true)
+	@echo "\nBreak if unit test log contains errors.\n"
+	if grep -e 'Errors ([0-9].* failures, [0-9].* tests, [0-9].* ran, [0-9].* checks, [0-9].* ignored, [0-9].* filtered out, [0-9].* ms)' check.log; then false; fi
 
 check-coverage:
-	@echo "Evaluating Test Coverage\n"
+	@echo "\nEvaluating Test Coverage\n"
 	find src -name '*.cpp' -not -name 'main.cpp' -not -name 'main.c' -exec $(GCOV) {} \;
-	@echo "Displaying Test Coverage Details\n"
+	@echo "\nDisplaying Test Coverage Details\n"
 	find . -name '*.gcov' -exec sed -e 1s/^/---\\n/g {} \;
