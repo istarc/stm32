@@ -5,7 +5,7 @@ branches:
 before_script:
   - sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
   - sudo apt-get update -q
-  - sudo apt-get install -y gcc-arm-none-eabi qemu-system symlinks
+  - sudo apt-get install -y gcc-arm-none-eabi qemu-system symlinks build-essential
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none && cd $TRAVIS_BUILD_DIR/examples/mbed-none && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-cpput && cd $TRAVIS_BUILD_DIR/examples/mbed-none-cpput && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-cpput
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-sim && cd $TRAVIS_BUILD_DIR/examples/mbed-none-sim && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-sim
