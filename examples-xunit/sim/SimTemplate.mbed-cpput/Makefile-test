@@ -26,7 +26,8 @@ INCDIR=inc
 SRCDIR=src
 LIBDIR=lib
 TESTDIR=test
-CPPUTEST_SRCDIR=~/stm32/cpputest
+# CPPUTEST_SRCDIR=~/stm32/cpputest # Change absolute to relative path to cpputest (due to Travis-CI build issues)
+CPPUTEST_SRCDIR=../../../../cpputest
 
 ###
 # Find source files
