@@ -228,6 +228,7 @@ case "$1" in
 	# Deploy Makefiles
 	cp $SCRIPTDIR/mbed-none-cpput/Makefile $(pwd)/Makefile
 	cp $SCRIPTDIR/mbed-none-cpput/Makefile-test $(pwd)/Makefile-test
+	sed -ie "s|CPPUTEST_SRCDIR=~/stm32/cpputest|CPPUTEST_SRCDIR=$BASEDIR/cpputest|g" $(pwd)/Makefile-test
 	# Patch mbed library (retarget STDIO)
 	patch -p1 < $SCRIPTDIR/mbed-none-cpput/PeripheralNames.patch
 	;;
@@ -262,6 +263,7 @@ case "$1" in
 	# Deploy Makefiles
 	cp $SCRIPTDIR/mbed-none-sim-cpput/Makefile $(pwd)/Makefile
 	cp $SCRIPTDIR/mbed-none-sim-cpput/Makefile-test $(pwd)/Makefile-test
+	sed -ie "s|CPPUTEST_SRCDIR=~/stm32/cpputest|CPPUTEST_SRCDIR=$BASEDIR/cpputest|g" $(pwd)/Makefile-test
 	# Patch mbed library (retarget STDIO)
 	patch -p1 < $SCRIPTDIR/mbed-none-sim-cpput/PeripheralNames.patch
 	rm *.ld # Delete the linker script
