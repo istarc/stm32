@@ -33,6 +33,9 @@
 # - mbed-mbedrtos[-lib] - mbedRTOS project /w mbed SDK [with library].
 # - none-safertos - SafeRTOS project
 
+set -e
+#set -x
+
 ##
 # Variables:
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -83,14 +86,16 @@ do_create_tdir()
 {
 mkdir -p $(pwd)/bin
 touch $(pwd)/bin/.gitkeep # A dummy file to keep directory structure in place
+mkdir -p $(pwd)/test-bin
+touch $(pwd)/test-bin/.gitkeep # A dummy file to keep directory structure in place
 mkdir -p $(pwd)/inc
 echo 'Your application header files (*.h).' > $(pwd)/inc/README
 mkdir -p $(pwd)/lib
 echo 'Place third-party source code or libraries here.' > $(pwd)/lib/README
 mkdir -p $(pwd)/src
 echo 'Your application source files (*.c, *.cpp, *.s).' > $(pwd)/src/README
-mkdir -p $(pwd)/test
-echo 'Your test source files (*.c, *.cpp).' > $(pwd)/test/README
+mkdir -p $(pwd)/test-src
+echo 'Your test source files (*.c, *.cpp).' > $(pwd)/test-src/README
 }
 
 ##
@@ -222,15 +227,17 @@ case "$1" in
 	cp $SCRIPTDIR/mbed-none-cpput/add.cpp $(pwd)/src/add.cpp
 	cp $SCRIPTDIR/mbed-none-cpput/add.h $(pwd)/inc/add.h
 	# Deploy test files
-	cp $SCRIPTDIR/mbed-none-cpput/test-main.cpp $(pwd)/test/test-main.cpp
-	cp $SCRIPTDIR/mbed-none-cpput/test-fail.cpp $(pwd)/test/test-fail.cpp
-	cp $SCRIPTDIR/mbed-none-cpput/test-add.cpp $(pwd)/test/test-add.cpp
+	cp $SCRIPTDIR/mbed-none-cpput/test-main.cpp $(pwd)/test-src/test-main.cpp
+	cp $SCRIPTDIR/mbed-none-cpput/test-fail.cpp $(pwd)/test-src/test-fail.cpp
+	cp $SCRIPTDIR/mbed-none-cpput/test-add.cpp $(pwd)/test-src/test-add.cpp
 	# Deploy Makefiles
 	cp $SCRIPTDIR/mbed-none-cpput/Makefile $(pwd)/Makefile
 	cp $SCRIPTDIR/mbed-none-cpput/Makefile-test $(pwd)/Makefile-test
-	sed -ie "s|CPPUTEST_SRCDIR=~/stm32/cpputest|CPPUTEST_SRCDIR=$BASEDIR/cpputest|g" $(pwd)/Makefile-test
+	#sed -ie "s|CPPUTEST_SRCDIR=~/stm32/cpputest|CPPUTEST_SRCDIR=$BASEDIR/cpputest|g" $(pwd)/Makefile-test
 	# Patch mbed library (retarget STDIO)
 	patch -p1 < $SCRIPTDIR/mbed-none-cpput/PeripheralNames.patch
+	# Copy cpputest src (exluding .git)
+	rsync -a --exclude .git $BASEDIR/cpputest/ $(pwd)/test-cpputest
 	;;
   mbed-none-sim)
     echo "Project template created by ${0##*/} $1" > $(pwd)/README
