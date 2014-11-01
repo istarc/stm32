@@ -71,7 +71,7 @@ CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11
 CXXFLAGS+=-U__STRICT_ANSI__ # Undefine __STRICT_ANSI__ to compile Stream.cpp using c++11. This is a dirty hack!
 # LINKER FLAGS
 LDSCRIPT=stm32f407.ld
-LDFLAGS =-T $(LDSCRIPT) $(MCFLAGS) --specs=nosys.specs $(INCLUDES_LIBS) $(LINK_LIBS)
+LDFLAGS=-T $(LDSCRIPT) $(MCFLAGS) --specs=nosys.specs $(INCLUDES_LIBS) $(LINK_LIBS)
 
 ###
 # Build Rules
@@ -125,7 +125,7 @@ $(TBINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
 	@echo "Assambled "$<"!\n"
 
 test-deps: 
-	cd $(TCPPUTEST) && ./configure --prefix=$(shell pwd) --host=arm-none-eabi LDFLAGS="$(MCFLAGS) --specs=nosys.specs $(CPPUTEST_INCLUDES_LIBS) $(CPPUTEST_LINK_LIBS)" CFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) -std=c99" CXXFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES)" && make clean && make && make install # ./autogen.sh
+	cd $(TCPPUTEST) && ./configure --prefix=$(shell pwd)/$(TCPPUTEST) --host=arm-none-eabi LDFLAGS="$(MCFLAGS) --specs=nosys.specs $(CPPUTEST_INCLUDES_LIBS) $(CPPUTEST_LINK_LIBS)" CFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) -std=c99" CXXFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES)" && make clean && make # make install (src and target dir are the same) # ./autogen.sh (use this in the new release)
 
 test-clean:
 	rm -f $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
