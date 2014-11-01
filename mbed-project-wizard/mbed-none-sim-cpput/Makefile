@@ -60,7 +60,7 @@ CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c99
 CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11
 CXXFLAGS+=-U__STRICT_ANSI__ # Undefine __STRICT_ANSI__ to compile Stream.cpp using c++11. This is a dirty hack!
 # LINKER FLAGS
-LDFLAGS =$(MCFLAGS) --specs=rdimon.specs $(INCLUDES_LIBS) $(LINK_LIBS)
+LDFLAGS=$(MCFLAGS) --specs=rdimon.specs $(INCLUDES_LIBS) $(LINK_LIBS)
 
 ###
 # Build Rules
@@ -119,7 +119,6 @@ test:
 	$(MAKE) -f Makefile-test test
 
 test-deps:
-	$(MAKE) -f Makefile-test test-deps-clean
 	$(MAKE) -f Makefile-test test-deps
 
 check:

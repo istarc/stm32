@@ -25,8 +25,10 @@ BINDIR=bin
 INCDIR=inc
 SRCDIR=src
 LIBDIR=lib
-TESTDIR=test
-CPPUTEST_SRCDIR=~/stm32/cpputest
+
+TBINDIR=test-bin
+TSRCDIR=test-src
+TCPPUTEST=test-cpputest
 
 ###
 # Find source files
@@ -34,23 +36,29 @@ ASOURCES=$(shell find -L $(SRCDIR) -name '*.s')
 ASOURCES+=$(shell find -L $(LIBDIR) -name '*.s' -not -name 'startup_stm32f407xx.s')
 CSOURCES=$(shell find -L $(SRCDIR) -name '*.c' -not -name 'main.c')
 CSOURCES+=$(shell find -L $(LIBDIR) -name '*.c')
-CSOURCES+=$(shell find -L $(TESTDIR) -name '*.c')
+CSOURCES+=$(shell find -L $(TSRCDIR) -name '*.c')
 CXXSOURCES=$(shell find -L $(SRCDIR) -name '*.cpp' -not -name 'main.cpp')
 # Filter out mbed IO retarget. We use newlib rdimon IO retarget (via lib) that is 
 # suitable for QEMU semihosted simulation
-CXXSOURCES+=$(filter-out %retarget.cpp, $(shell find -L $(LIBDIR)/cpputest -name '*.cpp'))
-CXXSOURCES+=$(shell find -L $(TESTDIR) -name '*.cpp')
+CXXSOURCES+=$(filter-out %retarget.cpp, $(shell find -L $(LIBDIR) -name '*.cpp'))
+CXXSOURCES+=$(shell find -L $(TSRCDIR) -name '*.cpp')
 # Find header directories
 INC=$(shell find -L $(INCDIR) -type f -name '*.h' -exec dirname {} \; | uniq)
 INC+=$(shell find -L $(LIBDIR) -type f -name '*.h' -exec dirname {} \; | uniq)
 INC+=$(shell find -L $(LIBDIR) -type d -name '*include' | uniq)
-INC+=$(shell find -L $(TESTDIR) -type f -name '*.h' -exec dirname {} \; | uniq)
-INCLUDES=$(INC:%=-I%)
+INC+=$(shell find -L $(TSRCDIR) -type f -name '*.h' -exec dirname {} \; | uniq)
+CPPUTEST_INCLUDES=$(INC:%=-I%)
+INCLUDES=$(CPPUTEST_INCLUDES)
+INCLUDES+=-I$(TCPPUTEST)/include
 # Find libraries
 LIBFILES=$(shell find $(LIBDIR) -type f -name '*.a')
-INCLUDES_LIBS=$(patsubst %,-L%, $(dir $(LIBFILES)))
-LINK_LIBS=$(patsubst lib%, -l%, $(basename $(notdir $(LIBFILES))))
-LINK_LIBS+=-lrdimon -lgcov
+CPPUTEST_INCLUDES_LIBS=$(patsubst %,-L%, $(dir $(LIBFILES)))
+INCLUDES_LIBS=$(CPPUTEST_INCLUDES_LIBS)
+INCLUDES_LIBS+=-L$(TCPPUTEST)/lib
+CPPUTEST_LINK_LIBS=$(patsubst lib%, -l%, $(basename $(notdir $(LIBFILES))))
+CPPUTEST_LINK_LIBS+=-lrdimon -lgcov
+LINK_LIBS=$(CPPUTEST_LINK_LIBS)
+LINK_LIBS+=-lCppUTest -lCppUTestExt
 # Create object list
 AOBJECTS=$(ASOURCES:%.s=%.o)
 COBJECTS=$(CSOURCES:%.c=%.o)
@@ -99,16 +107,16 @@ test-debug: CXXFLAGS+=-g
 test-debug: LDFLAGS+=-g
 test-debug: release
 
-test-release: $(BINDIR)/$(BINHEX)
+test-release: $(TBINDIR)/$(BINHEX)
 
-$(BINDIR)/$(BINHEX): $(BINDIR)/$(BINELF)
+$(TBINDIR)/$(BINHEX): $(TBINDIR)/$(BINELF)
 	$(CP) -O ihex $< $@
 	@echo "Objcopy from ELF to IHEX complete!\n"
 
-$(BINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
+$(TBINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
 	$(CXX) $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(LDFLAGS) -o $@
 	@echo "Linking complete!\n"
-	$(SIZE) $(BINDIR)/$(BINELF)
+	$(SIZE) $(TBINDIR)/$(BINELF)
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
@@ -122,10 +130,8 @@ $(BINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
 	$(CC) $(CFLAGS) $< -o $@
 	@echo "Assambled "$<"!\n"
 
-test-deps:
-	mkdir -p tmp && rm -rf tmp/* # && cd $(CPPUTEST_SRCDIR) && ./autogen.sh 
-	cd tmp && $(CPPUTEST_SRCDIR)/configure --host=arm-none-eabi --prefix=$(shell pwd)/lib/cpputest  LDFLAGS="$(MCFLAGS) --specs=rdimon.specs $(INCLUDES_LIBS) $(LINK_LIBS)" CFLAGS="$(MCFLAGS) $(INCLUDES) -std=c99" CXXFLAGS="$(MCFLAGS) $(INCLUDES)" && make && make install
-	rm -rf tmp
+test-deps: 
+	cd $(TCPPUTEST) && ./configure --prefix=$(shell pwd)/$(TCPPUTEST) --host=arm-none-eabi LDFLAGS="$(MCFLAGS) --specs=nosys.specs $(CPPUTEST_INCLUDES_LIBS) $(CPPUTEST_LINK_LIBS)" CFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) -std=c99" CXXFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES)" && make clean && make # make install (src and target dir are the same) # ./autogen.sh (use this in the new release)
 
 test-clean:
 	rm -f $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
@@ -135,12 +141,12 @@ test-clean:
 	rm -f check.log sim.err
 
 test-deps-clean:
-	rm -rf lib/cpputest
+	cd $(TCPPUTEST) && make clean
 
 check:
-	test -s $(BINDIR)/$(BINELF) || (echo "\nCheck failed! Build the unit tests before you run them. Use: make test-clean && make test-deps && make test\n" && false)
+	test -s $(TBINDIR)/$(BINELF) || (echo "\nCheck failed! Build the unit tests before you run them. Use: make test-clean && make test-deps && make test\n" && false)
 	@echo "\nRunning Unit Tests on QEMU Simulator (change SIMTIME variable to adjust simulation time)\n" 
-	(timeout $(SIMTIME) qemu-system-arm -cpu cortex-m3 -machine versatilepb -monitor null -serial null -semihosting -nographic -kernel bin/$(BINELF) 2>sim.err | tee check.log || true)
+	(timeout $(SIMTIME) qemu-system-arm -cpu cortex-m3 -machine versatilepb -monitor null -serial null -semihosting -nographic -kernel test-bin/$(BINELF) 2>sim.err | tee check.log || true)
 	@echo "\nBreak if one or more unit test failed.\n"
 	if grep -e 'Errors ([0-9].* failures, [0-9].* tests, [0-9].* ran, [0-9].* checks, [0-9].* ignored, [0-9].* filtered out, [0-9].* ms)' check.log; then echo "\nCheck failed! One or more unit tests failed.\n" && false; else echo "\nCheck OK! :-)\n"; fi
 
@@ -148,4 +154,4 @@ check-coverage:
 	@echo "\nEvaluating Test Coverage\n"
 	find src -name '*.cpp' -not -name 'main.cpp' -not -name 'main.c' -exec $(GCOV) {} \;
 	@echo "\nDisplaying Test Coverage Details\n"
-	find . -name '*.gcov' -exec sed -e 1s/^/---\\n/g {} \;
+	find src -name '*.gcov' -exec sed -e 1s/^/---\\n/g {} \;

@@ -233,15 +233,14 @@ case "$1" in
 	# Deploy Makefiles
 	cp $SCRIPTDIR/mbed-none-cpput/Makefile $(pwd)/Makefile
 	cp $SCRIPTDIR/mbed-none-cpput/Makefile-test $(pwd)/Makefile-test
-	#sed -ie "s|CPPUTEST_SRCDIR=~/stm32/cpputest|CPPUTEST_SRCDIR=$BASEDIR/cpputest|g" $(pwd)/Makefile-test
 	# Patch mbed library (retarget STDIO)
 	patch -p1 < $SCRIPTDIR/mbed-none-cpput/PeripheralNames.patch
 	# Copy cpputest src (exluding .git)
 	rsync -a --exclude .git $BASEDIR/cpputest/ $(pwd)/test-cpputest
 	;;
   mbed-none-sim)
-    echo "Project template created by ${0##*/} $1" > $(pwd)/README
-    echo "   mbed-none-sim ... creates a bare-metal project with mbed SDK suitable for QEMU simulation" >> $(pwd)/README
+  echo "Project template created by ${0##*/} $1" > $(pwd)/README
+  echo "   mbed-none-sim ... creates a bare-metal project with mbed SDK suitable for QEMU simulation" >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Usage: make && sudo make deploy" >> $(pwd)/README
         do_create_dir $2
@@ -264,16 +263,18 @@ case "$1" in
 	cp $SCRIPTDIR/mbed-none-sim-cpput/add.cpp $(pwd)/src/add.cpp
 	cp $SCRIPTDIR/mbed-none-sim-cpput/add.h $(pwd)/inc/add.h
 	# Deploy test files
-	cp $SCRIPTDIR/mbed-none-sim-cpput/test-main.cpp $(pwd)/test/test-main.cpp
-	cp $SCRIPTDIR/mbed-none-sim-cpput/test-fail.cpp $(pwd)/test/test-fail.cpp
-	cp $SCRIPTDIR/mbed-none-sim-cpput/test-add.cpp $(pwd)/test/test-add.cpp
+	cp $SCRIPTDIR/mbed-none-sim-cpput/test-main.cpp $(pwd)/test-src/test-main.cpp
+	cp $SCRIPTDIR/mbed-none-sim-cpput/test-fail.cpp $(pwd)/test-src/test-fail.cpp
+	cp $SCRIPTDIR/mbed-none-sim-cpput/test-add.cpp $(pwd)/test-src/test-add.cpp
 	# Deploy Makefiles
 	cp $SCRIPTDIR/mbed-none-sim-cpput/Makefile $(pwd)/Makefile
 	cp $SCRIPTDIR/mbed-none-sim-cpput/Makefile-test $(pwd)/Makefile-test
-	sed -ie "s|CPPUTEST_SRCDIR=~/stm32/cpputest|CPPUTEST_SRCDIR=$BASEDIR/cpputest|g" $(pwd)/Makefile-test
 	# Patch mbed library (retarget STDIO)
 	patch -p1 < $SCRIPTDIR/mbed-none-sim-cpput/PeripheralNames.patch
-	rm *.ld # Delete the linker script
+	# Copy cpputest src (exluding .git)
+	rsync -a --exclude .git $BASEDIR/cpputest/ $(pwd)/test-cpputest
+	# Delete the linker script
+	rm *.ld
 	;;
   mbed-none-lib)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
