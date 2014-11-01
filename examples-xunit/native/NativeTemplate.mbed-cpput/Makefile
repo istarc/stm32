@@ -116,7 +116,6 @@ test:
 	$(MAKE) -f Makefile-test test
 
 test-deps:
-	$(MAKE) -f Makefile-test test-deps-clean
 	$(MAKE) -f Makefile-test test-deps
 
 check:
