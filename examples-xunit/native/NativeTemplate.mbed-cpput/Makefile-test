@@ -51,7 +51,6 @@ INCLUDES_LIBS+=-L$(TCPPUTEST)/libs
 CPPUTEST_LINK_LIBS=$(patsubst lib%, -l%, $(basename $(notdir $(LIBFILES))))
 LINK_LIBS=$(CPPUTEST_LINK_LIBS)
 LINK_LIBS+=-lCppUTest -lCppUTestExt
-# TODO Dodaj zraven CppUTest Libs
 # Create object list
 AOBJECTS=$(ASOURCES:%.s=%.o)
 COBJECTS=$(CSOURCES:%.c=%.o)
