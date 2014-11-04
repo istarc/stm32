@@ -154,6 +154,6 @@ check:
 
 check-coverage:
 	@echo "\nEvaluating Test Coverage\n"
-	find src -name '*.cpp' -not -name 'main.cpp' -not -name 'main.c' -exec $(GCOV) {} \;
+	find src -name '*.cpp' -not -name 'main.cpp' -not -name 'main.c' -exec $(GCOV) --relative-only {} \;
 	@echo "\nDisplaying Test Coverage Details\n"
-	find src -name '*.gcov' -exec sed -e 1s/^/---\\n/g {} \;
+	find . -name '*.gcov' -exec sed -e 1s/^/---\\n/g {} \;
