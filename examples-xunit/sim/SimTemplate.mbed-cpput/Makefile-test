@@ -50,6 +50,8 @@ INC+=$(shell find -L $(TSRCDIR) -type f -name '*.h' -exec dirname {} \; | uniq)
 CPPUTEST_INCLUDES=$(INC:%=-I%)
 INCLUDES=$(CPPUTEST_INCLUDES)
 INCLUDES+=-I$(TCPPUTEST)/include
+INCLUDES+=-include $(TCPPUTEST)/include/CppUTest/MemoryLeakDetectorNewMacros.h
+INCLUDES+=-include $(TCPPUTEST)/include/CppUTest/MemoryLeakDetectorMallocMacros.h
 # Find libraries
 LIBFILES=$(shell find $(LIBDIR) -type f -name '*.a')
 CPPUTEST_INCLUDES_LIBS=$(patsubst %,-L%, $(dir $(LIBFILES)))
