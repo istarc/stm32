@@ -1,0 +1,15 @@
+        -:    0:Source:src/add.cpp
+        -:    0:Graph:src/add.gcno
+        -:    0:Data:src/add.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#include "add.h"
+        -:    2:
+        4:    3:int add(int x, int y)
+        -:    4:{
+        4:    5:	if(x<0)
+    #####:    6:		x=-x;
+        4:    7:	if(y<0)
+    #####:    8:		y=-y;
+        4:    9:	return x+y;
+        -:   10:}

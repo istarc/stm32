@@ -1,0 +1,28 @@
+        -:    0:Source:src/dadd.cpp
+        -:    0:Graph:src/dadd.gcno
+        -:    0:Data:src/dadd.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#include <stdlib.h>
+        -:    2:#include "dadd.h"
+        -:    3:
+        -:    4:#define ARGC 2
+        -:    5:
+        4:    6:int dadd(int x, int y)
+        -:    7:{
+        -:    8:	int i = 0;
+        -:    9:	int retVal = 0;
+        4:   10:	int *ptr = (int*) malloc(ARGC * sizeof(int));
+        -:   11:
+        4:   12:	ptr[0] = x;
+        4:   13:	ptr[1] = y;
+        -:   14:
+        -:   15:	retVal = 0;
+       12:   16:	for(i=0; i < ARGC; i++) {
+        8:   17:		if(ptr[i]<0)
+    #####:   18:			ptr[i]=-ptr[i];
+        8:   19:		retVal += ptr[i];
+        -:   20:	}
+        -:   21:
+        4:   22:	return retVal;
+        -:   23:}
