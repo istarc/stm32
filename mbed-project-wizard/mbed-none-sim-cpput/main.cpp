@@ -14,13 +14,16 @@ extern "C" {
 #include <stdio.h>
 }
 #include "add.h"
+#include "dadd.h"
 
-int main() {
+int main(void) {
     int i = 0;
     i = add(i,1);
     printf("%d Hello world!\n", i);
-    i = add(i,1);
+    i = dadd(i,1);
     printf("%d Hello world!\n", i);
+
+    return 0;
 }
 
 /*

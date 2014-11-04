@@ -16,6 +16,8 @@ int main() {
 	int argc = 3;
 	char* argv[] = {"", "-v", "-c"};
 	printf("Hello World\n");
+	
+	//MemoryLeakWarningPlugin::turnOffNewDeleteOverloads(); // Uncomment to disable memory leaks detection
 	CommandLineTestRunner::RunAllTests(argc, argv);
 	fflush(stdout);
 

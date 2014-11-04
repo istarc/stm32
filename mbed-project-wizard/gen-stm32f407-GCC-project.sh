@@ -225,11 +225,14 @@ case "$1" in
 	# Deploy project files
 	cp $SCRIPTDIR/mbed-none-cpput/main.cpp $(pwd)/src/main.cpp
 	cp $SCRIPTDIR/mbed-none-cpput/add.cpp $(pwd)/src/add.cpp
+	cp $SCRIPTDIR/mbed-none-cpput/dadd.cpp $(pwd)/src/dadd.cpp
 	cp $SCRIPTDIR/mbed-none-cpput/add.h $(pwd)/inc/add.h
+	cp $SCRIPTDIR/mbed-none-cpput/dadd.h $(pwd)/inc/dadd.h
 	# Deploy test files
 	cp $SCRIPTDIR/mbed-none-cpput/test-main.cpp $(pwd)/test-src/test-main.cpp
 	cp $SCRIPTDIR/mbed-none-cpput/test-fail.cpp $(pwd)/test-src/test-fail.cpp
-	cp $SCRIPTDIR/mbed-none-cpput/test-add.cpp $(pwd)/test-src/test-add.cpp
+	cp $SCRIPTDIR/mbed-none-cpput/test-add.cpp $(pwd)/test-src/test-dadd.cpp
+	cp $SCRIPTDIR/mbed-none-cpput/test-dadd.cpp $(pwd)/test-src/test-add.cpp
 	# Deploy Makefiles
 	cp $SCRIPTDIR/mbed-none-cpput/Makefile $(pwd)/Makefile
 	cp $SCRIPTDIR/mbed-none-cpput/Makefile-test $(pwd)/Makefile-test
@@ -261,11 +264,14 @@ case "$1" in
 	# Deploy project files
 	cp $SCRIPTDIR/mbed-none-sim-cpput/main.cpp $(pwd)/src/main.cpp
 	cp $SCRIPTDIR/mbed-none-sim-cpput/add.cpp $(pwd)/src/add.cpp
+	cp $SCRIPTDIR/mbed-none-sim-cpput/dadd.cpp $(pwd)/src/dadd.cpp
 	cp $SCRIPTDIR/mbed-none-sim-cpput/add.h $(pwd)/inc/add.h
+	cp $SCRIPTDIR/mbed-none-sim-cpput/dadd.h $(pwd)/inc/dadd.h
 	# Deploy test files
 	cp $SCRIPTDIR/mbed-none-sim-cpput/test-main.cpp $(pwd)/test-src/test-main.cpp
 	cp $SCRIPTDIR/mbed-none-sim-cpput/test-fail.cpp $(pwd)/test-src/test-fail.cpp
 	cp $SCRIPTDIR/mbed-none-sim-cpput/test-add.cpp $(pwd)/test-src/test-add.cpp
+	cp $SCRIPTDIR/mbed-none-sim-cpput/test-dadd.cpp $(pwd)/test-src/test-dadd.cpp
 	# Deploy Makefiles
 	cp $SCRIPTDIR/mbed-none-sim-cpput/Makefile $(pwd)/Makefile
 	cp $SCRIPTDIR/mbed-none-sim-cpput/Makefile-test $(pwd)/Makefile-test

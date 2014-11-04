@@ -21,7 +21,10 @@ int main() {
 	int argc = 3;
 	char* argv[] = {"", "-v", "-c"};
 	printf("Executing Unit Tests ...\n");
+	
+	//MemoryLeakWarningPlugin::turnOffNewDeleteOverloads(); // Uncomment to disable memory leaks detection
 	CommandLineTestRunner::RunAllTests(argc, argv);
 	__gcov_flush();
+	
 	return 0;
 }

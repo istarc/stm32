@@ -43,11 +43,13 @@ INC+=$(shell find -L $(TSRCDIR) -type f -name '*.h' -exec dirname {} \; | uniq)
 CPPUTEST_INCLUDES=$(INC:%=-I%)
 INCLUDES=$(CPPUTEST_INCLUDES)
 INCLUDES+=-I$(TCPPUTEST)/include
+INCLUDES+=-include $(TCPPUTEST)/include/CppUTest/MemoryLeakDetectorNewMacros.h
+INCLUDES+=-include $(TCPPUTEST)/include/CppUTest/MemoryLeakDetectorMallocMacros.h
 # Find libraries
 LIBFILES=$(shell find $(LIBDIR) -type f -name '*.a')
 CPPUTEST_INCLUDES_LIBS=$(patsubst %,-L%, $(dir $(LIBFILES)))
 INCLUDES_LIBS=$(CPPUTEST_INCLUDES_LIBS)
-INCLUDES_LIBS+=-L$(TCPPUTEST)/libs
+INCLUDES_LIBS+=-L$(TCPPUTEST)/lib
 CPPUTEST_LINK_LIBS=$(patsubst lib%, -l%, $(basename $(notdir $(LIBFILES))))
 LINK_LIBS=$(CPPUTEST_LINK_LIBS)
 LINK_LIBS+=-lCppUTest -lCppUTestExt
