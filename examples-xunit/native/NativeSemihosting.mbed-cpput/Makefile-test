@@ -34,8 +34,7 @@ CSOURCES=$(shell find -L $(SRCDIR) -name '*.c' -not -name 'main.c')
 CSOURCES+=$(shell find -L $(LIBDIR) -name '*.c')
 CSOURCES+=$(shell find -L $(TSRCDIR) -name '*.c')
 CXXSOURCES=$(shell find -L $(SRCDIR) -name '*.cpp' -not -name 'main.cpp')
-# Filter out mbed IO retarget. We use newlib rdimon IO retarget (via lib) that is 
-# suitable for semihosted environment
+# Filter retarget.cpp, because it overrides the retarget of the semihosted environment.
 CXXSOURCES+=$(filter-out %retarget.cpp, $(shell find -L $(LIBDIR) -name '*.cpp'))
 CXXSOURCES+=$(shell find -L $(TSRCDIR) -name '*.cpp')
 # Find header directories
@@ -70,8 +69,9 @@ BINHEX=test.hex
 MCFLAGS=-mcpu=cortex-m4 -mthumb -mlittle-endian \
 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork
 # COMPILE FLAGS
-DEFS=-DTARGET_STM32F407 -D__CORTEX_M4 -D__FPU_PRESENT -DWORDS_STACK_SIZE=200
-DEFS+=-DDEVICE_SERIAL -DSTDIO_UART_TX=PC_6 -DSTDIO_UART_RX=PC_7 -DSTDIO_UART=UART_6
+DEFS=-DTARGET_STM32F407 -D__CORTEX_M4 -D__FPU_PRESENT 
+#DEFS+=-DWORDS_STACK_SIZE=200 # @FreeRTOS Stack Size Definition
+#DEFS+=-DDEVICE_SERIAL -DSTDIO_UART_TX=PC_6 -DSTDIO_UART_RX=PC_7 -DSTDIO_UART=UART_6 # STDIO target is not UART, because we use semihosted environment. 
 CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c99 #-fprofile-arcs and -ftest-coverage are used on a per file basis due to high memory consumption
 CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11 #-fprofile-arcs and -ftest-coverage are used on a per file basis due to memory consumption
 CXXFLAGS+=-U__STRICT_ANSI__ # Undefine __STRICT_ANSI__ to compile Stream.cpp using c++11. This is a dirty hack!
