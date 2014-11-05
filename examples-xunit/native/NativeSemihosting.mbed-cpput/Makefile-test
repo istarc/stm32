@@ -30,11 +30,14 @@ TCPPUTEST=test-cpputest
 # Find source files
 ASOURCES=$(shell find -L $(SRCDIR) -name '*.s')
 ASOURCES+=$(shell find -L $(LIBDIR) -name '*.s')
+# Exclude main.c (if exists), because test-main.cpp is used for unit testing.
 CSOURCES=$(shell find -L $(SRCDIR) -name '*.c' -not -name 'main.c')
 CSOURCES+=$(shell find -L $(LIBDIR) -name '*.c')
 CSOURCES+=$(shell find -L $(TSRCDIR) -name '*.c')
+# Exclude main.cpp (if exists), because test-main.cpp is used for unit testing.
 CXXSOURCES=$(shell find -L $(SRCDIR) -name '*.cpp' -not -name 'main.cpp')
-# Filter retarget.cpp, because it overrides the retarget of the semihosted environment.
+# Filter retarget.cpp from mbed library, because it is already defined in librdimon,
+# which is used to provide semihosted enviornment.
 CXXSOURCES+=$(filter-out %retarget.cpp, $(shell find -L $(LIBDIR) -name '*.cpp'))
 CXXSOURCES+=$(shell find -L $(TSRCDIR) -name '*.cpp')
 # Find header directories
@@ -42,9 +45,12 @@ INC=$(shell find -L $(INCDIR) -type f -name '*.h' -exec dirname {} \; | uniq)
 INC+=$(shell find -L $(LIBDIR) -type f -name '*.h' -exec dirname {} \; | uniq)
 INC+=$(shell find -L $(LIBDIR) -type d -name '*include' | uniq)
 INC+=$(shell find -L $(TSRCDIR) -type f -name '*.h' -exec dirname {} \; | uniq)
+# CPPUTEST_INCLUDES are used to build CppUTest framework.
 CPPUTEST_INCLUDES=$(INC:%=-I%)
+# INCLUDES are used at building unit tests.
 INCLUDES=$(CPPUTEST_INCLUDES)
 INCLUDES+=-I$(TCPPUTEST)/include
+# Memory leak detection is enabled by adding the following includes below.
 INCLUDES+=-include $(TCPPUTEST)/include/CppUTest/MemoryLeakDetectorNewMacros.h
 INCLUDES+=-include $(TCPPUTEST)/include/CppUTest/MemoryLeakDetectorMallocMacros.h
 # Find libraries
@@ -52,8 +58,12 @@ LIBFILES=$(shell find $(LIBDIR) -type f -name '*.a')
 CPPUTEST_INCLUDES_LIBS=$(patsubst %,-L%, $(dir $(LIBFILES)))
 INCLUDES_LIBS=$(CPPUTEST_INCLUDES_LIBS)
 INCLUDES_LIBS+=-L$(TCPPUTEST)/lib
+# CPPUTEST_LINK_LIBS are used at building CppUTest framework.
 CPPUTEST_LINK_LIBS=$(patsubst lib%, -l%, $(basename $(notdir $(LIBFILES))))
 CPPUTEST_LINK_LIBS+=
+# LINK_LIBS are used at building unit tests.
+# librdimon enables semihosting environment (retargets STDIO)
+# libgcov enables test coverage
 LINK_LIBS=$(CPPUTEST_LINK_LIBS)
 LINK_LIBS+=-lCppUTest -lCppUTestExt -lrdimon -lgcov
 # Create object list
@@ -70,13 +80,20 @@ MCFLAGS=-mcpu=cortex-m4 -mthumb -mlittle-endian \
 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork
 # COMPILE FLAGS
 DEFS=-DTARGET_STM32F407 -D__CORTEX_M4 -D__FPU_PRESENT 
-#DEFS+=-DWORDS_STACK_SIZE=200 # @FreeRTOS Stack Size Definition
-#DEFS+=-DDEVICE_SERIAL -DSTDIO_UART_TX=PC_6 -DSTDIO_UART_RX=PC_7 -DSTDIO_UART=UART_6 # STDIO target is not UART, because we use semihosted environment. 
-CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c99 #-fprofile-arcs and -ftest-coverage are used on a per file basis due to high memory consumption
-CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11 #-fprofile-arcs and -ftest-coverage are used on a per file basis due to memory consumption
-CXXFLAGS+=-U__STRICT_ANSI__ # Undefine __STRICT_ANSI__ to compile Stream.cpp using c++11. This is a dirty hack!
+# FreeRTOS Stack Size Definition is not required
+#DEFS+=-DWORDS_STACK_SIZE=200
+# mbed library retarget.cpp is removed from the build, so the following should be excluded.
+# UART is not used for STDIO, but semihosted environment via CPU's trace unit.
+#DEFS+=-DDEVICE_SERIAL -DSTDIO_UART_TX=PC_6 -DSTDIO_UART_RX=PC_7 -DSTDIO_UART=UART_6
+# Flags -fprofile-arcs and -ftest-coverage are used on a per file basis due to high memory consumption.
+CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c99 #-fprofile-arcs -ftest-coverage
+CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11 #-fprofile-arcs -ftest-coverage
+# A dirty hack to build Stream.cpp according to C+11.
+CXXFLAGS+=-U__STRICT_ANSI__
 # LINKER FLAGS
 LDSCRIPT=stm32f407.ld
+# Use rdimon and nosys specs. The former is used to enable semihosted environment.
+# The latter is used for bare bones target (without OS).
 LDFLAGS=-T $(LDSCRIPT) $(MCFLAGS) --specs=rdimon.specs --specs=nosys.specs $(INCLUDES_LIBS) $(LINK_LIBS)
 
 ###
@@ -96,10 +113,11 @@ test-release-memopt-blame:
 	@echo "\n... and corresponging source files to blame.\n"
 	$(NM) --reverse-sort --size-sort -S -tx $(BINDIR)/$(BINELF) | head -10 | cut -d':' -f2 | cut -d' ' -f1 | $(A2L) -e $(BINDIR)/$(BINELF) | cat -n # Output legend: man addr2line
 
-test-release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS
+# Redefined functions malloc, free, new, delete should not be used with CppUTest. It also requires exeception handling to work properly, so the line below should be disabled.
+#test-release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS 
 test-release-memopt: CFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin # -flto
 test-release-memopt: CXXFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin -fno-exceptions -fno-rtti # -flto
-test-release-memopt: LDFLAGS+=-Os -Wl,-gc-sections #--specs=nano.specs # -flto
+test-release-memopt: LDFLAGS+=-Os -Wl,-gc-sections --specs=nano.specs # -flto
 test-release-memopt: test-release
 
 test-debug: CFLAGS+=-g
