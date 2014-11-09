@@ -1,0 +1,16 @@
+#!/usr/bin/expect -f 
+set timeout 120
+set exitStatus 1
+
+if {[file exists /opt/openocd/bin/openocd]} {
+    spawn /opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg -f check.cfg
+} else {
+    /usr/bin/openocd -f /usr/share/openocd/scripts/board/stm32f4discovery.cfg -f check.cfg
+}
+
+expect {
+	-re "\^.*OK \\(\[0-9]* tests, \[0-9]* ran, \[0-9]* checks.*, \[0-9]* ignored, \[0-9]* filtered out, \[0-9]* ms\\).*\$" { puts "Check OK."; exit 0 }
+	-re "\^.*Errors \\(\[0-9]* failures, \[0-9]* tests, \[0-9]* ran, \[0-9]* checks, \[0-9]* ignored, \[0-9]* filtered out, \[0-9]* ms\\).*\$" { puts "Check Failed: One or more unit tests failed."; exit 2 }
+	eof { exit 1 }
+	timeout { puts "Check Failed: Test execution failed due to timeout (see check.exp; current timeout = $timeout s)."; exit 1 }
+}
