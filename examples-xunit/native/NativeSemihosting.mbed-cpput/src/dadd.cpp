@@ -18,7 +18,7 @@ int dadd(int x, int y)
 			ptr[i]=-ptr[i];
 		retVal += ptr[i];
 	}
-	//free(ptr);
+	free(ptr);
 
 	return retVal;
 }
