@@ -18,13 +18,10 @@ extern "C" void __gcov_flush();
 int main() {
 	int argc = 2;
 	char* argv[] = {"", "-v"};
-
+	printf("--- Test Start ---\n");
 	//MemoryLeakWarningPlugin::turnOffNewDeleteOverloads(); // Uncomment to disable memory leaks detection
 	CommandLineTestRunner::RunAllTests(argc, argv);
-
 	__gcov_flush();
-
-	printf("%d\n", EOF);
-
+	printf("--- Test End ---\n");
 	return 0;
 }
