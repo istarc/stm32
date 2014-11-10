@@ -8,6 +8,6 @@ TEST_GROUP(FirstTestGroup)
 
 TEST(FirstTestGroup, FirstTest)
 {
-   FAIL("Fail me!\n");
+   //FAIL("Fail me!\n");
 }
 

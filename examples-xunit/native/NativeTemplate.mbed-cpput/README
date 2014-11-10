@@ -1,5 +1,5 @@
-Project template created by gen-stm32f407-GCC-project.sh mbed-none-cpput
-   mbed-none-cpput ... creates a bare-metal project with mbed SDK and cpputest support
+Project template created by gen-stm32f407-GCC-project.sh mbed-none-BB
+   mbed-none-BB ... creates a bare-metal project with mbed SDK, cpputest support and redirected STDIO tailored to STM32F4-BB expansion board
 
 Usage [app]:  make clean && make && sudo make deploy
 Usage [test]: make test-clean && make test-deps && make test && sudo make check
