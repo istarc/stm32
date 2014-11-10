@@ -1,9 +1,11 @@
 ###
-# Purpose: to create a bare-metal with mbed SDK and cpputest suitable for QEMU simulation
-
-###
-# Time in seconds to simulate unit tests
-SIMTIME=2
+# Purpose: to create a bare-metal with mbed SDK and cpputest suitable for (ARM semihosting) QEMU simulation
+#
+# Disable coverage testing by removing 
+# (i)   "-lgcov" (Makefile-test, line 70);
+# (ii)  "-fprofile-arcs -ftest-coverage" (Makefile-test, line 143, 152);
+# (iii) "extern "C" void __gcov_flush();" (src-test/test-main.cpp, line 5);
+# (iv)  "__gcov_flush();" (src-test/test-main.cpp, line 14).
 
 ###
 # GNU ARM Embedded Toolchain
@@ -33,13 +35,16 @@ TCPPUTEST=test-cpputest
 ###
 # Find source files
 ASOURCES=$(shell find -L $(SRCDIR) -name '*.s')
+# Exclude startup_stm32f407xx.s (if exists). QEMU simulation uses different startup routine.
 ASOURCES+=$(shell find -L $(LIBDIR) -name '*.s' -not -name 'startup_stm32f407xx.s')
+# Exclude main.c (if exists), because test-main.cpp is used for unit testing.
 CSOURCES=$(shell find -L $(SRCDIR) -name '*.c' -not -name 'main.c')
 CSOURCES+=$(shell find -L $(LIBDIR) -name '*.c')
 CSOURCES+=$(shell find -L $(TSRCDIR) -name '*.c')
+# Exclude main.cpp (if exists), because test-main.cpp is used for unit testing.
 CXXSOURCES=$(shell find -L $(SRCDIR) -name '*.cpp' -not -name 'main.cpp')
-# Filter out mbed IO retarget. We use newlib rdimon IO retarget (via lib) that is 
-# suitable for QEMU semihosted simulation
+# Filter retarget.cpp from mbed library, because it is already defined in librdimon,
+# which is used to provide semihosted environment.
 CXXSOURCES+=$(filter-out %retarget.cpp, $(shell find -L $(LIBDIR) -name '*.cpp'))
 CXXSOURCES+=$(shell find -L $(TSRCDIR) -name '*.cpp')
 # Find header directories
@@ -47,9 +52,12 @@ INC=$(shell find -L $(INCDIR) -type f -name '*.h' -exec dirname {} \; | uniq)
 INC+=$(shell find -L $(LIBDIR) -type f -name '*.h' -exec dirname {} \; | uniq)
 INC+=$(shell find -L $(LIBDIR) -type d -name '*include' | uniq)
 INC+=$(shell find -L $(TSRCDIR) -type f -name '*.h' -exec dirname {} \; | uniq)
+# CPPUTEST_INCLUDES are used to build CppUTest framework.
 CPPUTEST_INCLUDES=$(INC:%=-I%)
+# INCLUDES are used at building unit tests.
 INCLUDES=$(CPPUTEST_INCLUDES)
 INCLUDES+=-I$(TCPPUTEST)/include
+# Memory leak detection is enabled by adding the following includes below.
 INCLUDES+=-include $(TCPPUTEST)/include/CppUTest/MemoryLeakDetectorNewMacros.h
 INCLUDES+=-include $(TCPPUTEST)/include/CppUTest/MemoryLeakDetectorMallocMacros.h
 # Find libraries
@@ -57,33 +65,41 @@ LIBFILES=$(shell find $(LIBDIR) -type f -name '*.a')
 CPPUTEST_INCLUDES_LIBS=$(patsubst %,-L%, $(dir $(LIBFILES)))
 INCLUDES_LIBS=$(CPPUTEST_INCLUDES_LIBS)
 INCLUDES_LIBS+=-L$(TCPPUTEST)/lib
+# CPPUTEST_LINK_LIBS are used at building CppUTest framework.
 CPPUTEST_LINK_LIBS=$(patsubst lib%, -l%, $(basename $(notdir $(LIBFILES))))
-CPPUTEST_LINK_LIBS+=-lrdimon -lgcov
+CPPUTEST_LINK_LIBS+=
+# LINK_LIBS are used at building unit tests.
+# librdimon enables semihosting environment (retargets STDIO)
+# libgcov enables test coverage
 LINK_LIBS=$(CPPUTEST_LINK_LIBS)
-LINK_LIBS+=-lCppUTest -lCppUTestExt
+LINK_LIBS+=-lCppUTest -lCppUTestExt -lrdimon -lgcov
 # Create object list
 AOBJECTS=$(ASOURCES:%.s=%.o)
 COBJECTS=$(CSOURCES:%.c=%.o)
 CXXOBJECTS=$(CXXSOURCES:%.cpp=%.o)
 # Define output files ELF & IHEX
-BINELF=test.elf
-BINHEX=test.hex
+BINELF=outp.elf
+BINHEX=outp.hex
 
 ###
 # MCU FLAGS
 # QEMU currently supports only cortex-m3 CPU and soft FPU (but not cortex-m4 with hard FPU)
 MCFLAGS=-mcpu=cortex-m3 -mthumb -mlittle-endian -mfloat-abi=soft -mthumb-interwork
 # COMPILE FLAGS
-DEFS=-DTARGET_STM32F407 -D__CORTEX_M4 -D__FPU_PRESENT -DWORDS_STACK_SIZE=200
-CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -fprofile-arcs -ftest-coverage -std=c99
-CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -fprofile-arcs -ftest-coverage -std=c++11
-CXXFLAGS+=-U__STRICT_ANSI__ # Undefine __STRICT_ANSI__ to compile Stream.cpp using c++11. This is a dirty hack!
+DEFS=-DTARGET_STM32F407 -D__CORTEX_M4 -D__FPU_PRESENT
+# Flags -fprofile-arcs and -ftest-coverage are used on a per file basis due to high memory consumption.
+CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c99 #-fprofile-arcs -ftest-coverage
+CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11 #-fprofile-arcs -ftest-coverage
+# A dirty hack to build Stream.cpp according to C+11.
+CXXFLAGS+=-U__STRICT_ANSI__
 # LINKER FLAGS
-LDFLAGS =$(MCFLAGS) --specs=nosys.specs --specs=rdimon.specs $(INCLUDES_LIBS) $(LINK_LIBS)
+# Use rdimon and nosys specs. The former is used to enable semihosted environment.
+# The latter is used for bare bones target (without OS).
+LDFLAGS=$(MCFLAGS) $(INCLUDES_LIBS) $(LINK_LIBS) --specs=rdimon.specs --specs=nosys.specs
 
 ###
 # Build Rules
-.PHONY: all test test-release test-release-memopt test-debug test-deps test-clean test-deps-clean check
+.PHONY: all test-release test-release-memopt test-debug test-deps test-clean test-deps-clean test-deploy check check-coverage
 
 all: test-release-memopt
 test: test-release-memopt
@@ -98,16 +114,17 @@ test-release-memopt-blame:
 	@echo "\n... and corresponging source files to blame.\n"
 	$(NM) --reverse-sort --size-sort -S -tx $(BINDIR)/$(BINELF) | head -10 | cut -d':' -f2 | cut -d' ' -f1 | $(A2L) -e $(BINDIR)/$(BINELF) | cat -n # Output legend: man addr2line
 
-test-release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS
+# Redefined functions malloc, free, new, delete should not be used with CppUTest. It also requires exeception handling to work properly, so the line below should be disabled.
+#test-release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS 
 test-release-memopt: CFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin # -flto
 test-release-memopt: CXXFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin #-fno-exceptions -fno-rtti # -flto
-test-release-memopt: LDFLAGS+=-Os -Wl,-gc-sections #--specs=nano.specs # -flto
+test-release-memopt: LDFLAGS+=-Os -Wl,-gc-sections --specs=nano.specs # -flto
 test-release-memopt: test-release
 
 test-debug: CFLAGS+=-g
 test-debug: CXXFLAGS+=-g
 test-debug: LDFLAGS+=-g
-test-debug: release
+test-debug: test-release
 
 test-release: $(TBINDIR)/$(BINHEX)
 
@@ -120,8 +137,18 @@ $(TBINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
 	@echo "Linking complete!\n"
 	$(SIZE) $(TBINDIR)/$(BINELF)
 
+# Due to high memory consumption -fprofile-arcs and -ftest-coverage are used on a per file basis
+$(SRCDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -fprofile-arcs -ftest-coverage $< -o $@
+	@echo "Compiled "$<"!\n"
+
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
+	@echo "Compiled "$<"!\n"
+
+# Due to high memory consumption -fprofile-arcs and -ftest-coverage are used on a per file basis
+$(SRCDIR)/%.o: $(SRCDIR)/%.c
+	$(CC) $(CFLAGS) -fprofile-arcs -ftest-coverage $< -o $@
 	@echo "Compiled "$<"!\n"
 
 %.o: %.c
@@ -133,7 +160,7 @@ $(TBINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
 	@echo "Assambled "$<"!\n"
 
 test-deps: 
-	cd $(TCPPUTEST) && ./configure --prefix=$(shell pwd)/$(TCPPUTEST) --host=arm-none-eabi LDFLAGS="$(MCFLAGS) --specs=nosys.specs $(CPPUTEST_INCLUDES_LIBS) $(CPPUTEST_LINK_LIBS)" CFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) -std=c99" CXXFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES)" && make clean && make # make install (src and target dir are the same) # ./autogen.sh (use this in the new release)
+	cd $(TCPPUTEST) && ./configure --prefix=$(shell pwd)/$(TCPPUTEST) --host=arm-none-eabi LDFLAGS="$(MCFLAGS) --specs=nosys.specs $(CPPUTEST_INCLUDES_LIBS) $(CPPUTEST_LINK_LIBS)" CFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) -std=c99" CXXFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES)" && make clean && make # && make install (not used -- src and target dir are the same) # && ./autogen.sh (will be used in the next release) # CXXFLAGS+=-std=c++11 is currently not supported
 
 test-clean:
 	rm -f $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
@@ -147,10 +174,9 @@ test-deps-clean:
 
 check:
 	test -s $(TBINDIR)/$(BINELF) || (echo "\nCheck failed! Build the unit tests before you run them. Use: make test-clean && make test-deps && make test\n" && false)
-	@echo "\nRunning Unit Tests on QEMU Simulator (change SIMTIME variable to adjust simulation time)\n" 
-	(timeout $(SIMTIME) qemu-system-arm -cpu cortex-m3 -machine versatilepb -monitor null -serial null -semihosting -nographic -kernel test-bin/$(BINELF) 2>sim.err | tee check.log || true)
-	@echo "\nBreak if one or more unit test failed.\n"
-	if grep -e 'Errors ([0-9].* failures, [0-9].* tests, [0-9].* ran, [0-9].* checks, [0-9].* ignored, [0-9].* filtered out, [0-9].* ms)' check.log; then echo "\nCheck failed! One or more unit tests failed.\n" && false; else echo "\nCheck OK! :-)\n"; fi
+	find . -type f -name '*.gcda' -exec rm -f {} \;
+	find . -type f -name '*.gcov' -exec rm -f {} \;
+	expect check.exp
 
 check-coverage:
 	@echo "\nEvaluating Test Coverage\n"

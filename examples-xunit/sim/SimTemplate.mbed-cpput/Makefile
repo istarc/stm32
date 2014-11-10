@@ -2,10 +2,6 @@
 # Purpose: to create a bare-metal with mbed SDK and cpputest suitable for QEMU simulation
 
 ###
-# Time in seconds to simulate program
-SIMTIME=2
-
-###
 # GNU ARM Embedded Toolchain
 CC=arm-none-eabi-gcc
 CXX=arm-none-eabi-g++
@@ -28,20 +24,23 @@ LIBDIR=lib
 ###
 # Find source files
 ASOURCES=$(shell find -L $(SRCDIR) -name '*.s')
+# Exclude startup_stm32f407xx.s (if exists). QEMU simulation uses different startup routine.
 ASOURCES+=$(shell find -L $(LIBDIR) -name '*.s' -not -name 'startup_stm32f407xx.s')
 CSOURCES=$(shell find -L $(SRCDIR) -name '*.c')
 CSOURCES+=$(shell find -L $(LIBDIR) -name '*.c')
 CXXSOURCES=$(shell find -L $(SRCDIR) -name '*.cpp')
-# Filter out mbed IO retarget. We use newlib rdimon IO retarget (via lib) that is 
-# suitable for QEMU semihosted simulation
+# Filter retarget.cpp from mbed library, because it is already defined in librdimon,
+# which is used to provide semihosted environment.
 CXXSOURCES+=$(filter-out %retarget.cpp, $(shell find -L $(LIBDIR) -name '*.cpp'))
 # Find header directories
 INC=$(shell find -L $(INCDIR) -name '*.h' -exec dirname {} \; | uniq)
 INC+=$(shell find -L $(LIBDIR) -name '*.h' -exec dirname {} \; | uniq)
 INCLUDES=$(INC:%=-I%)
 # Find libraries
-INCLUDES_LIBS=
-LINK_LIBS=-lrdimon
+LIBFILES=$(shell find $(LIBDIR) -type f -name '*.a')
+INCLUDES_LIBS=$(patsubst %,-L%, $(dir $(LIBFILES)))
+LINK_LIBS=$(patsubst lib%, -l%, $(basename $(notdir $(LIBFILES))))
+LINK_LIBS+=-lrdimon
 # Create object list
 AOBJECTS=$(ASOURCES:%.s=%.o)
 COBJECTS=$(CSOURCES:%.c=%.o)
@@ -55,16 +54,17 @@ BINHEX=outp.hex
 # QEMU currently supports only cortex-m3 CPU and soft FPU (but not cortex-m4 with hard FPU)
 MCFLAGS=-mcpu=cortex-m3 -mthumb -mlittle-endian -mfloat-abi=soft -mthumb-interwork
 # COMPILE FLAGS
-DEFS=-DTARGET_STM32F407 -D__CORTEX_M4 -D__FPU_PRESENT -DWORDS_STACK_SIZE=200
+DEFS=-DTARGET_STM32F407 -D__CORTEX_M4 -D__FPU_PRESENT
 CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c99
 CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11
-CXXFLAGS+=-U__STRICT_ANSI__ # Undefine __STRICT_ANSI__ to compile Stream.cpp using c++11. This is a dirty hack!
+# A dirty hack to build Stream.cpp according to C+11.
+CXXFLAGS+=-U__STRICT_ANSI__
 # LINKER FLAGS
-LDFLAGS=$(MCFLAGS) --specs=rdimon.specs $(INCLUDES_LIBS) $(LINK_LIBS)
+LDFLAGS=$(MCFLAGS) $(INCLUDES_LIBS) $(LINK_LIBS) --specs=rdimon.specs --specs=nosys.specs
 
 ###
 # Build Rules
-.PHONY: all release release-memopt debug clean deploy test test-deps test-clean check
+.PHONY: all release release-memopt debug clean deploy test test-deps check check-coverage test-clean
 
 all: release-memopt
 
@@ -81,7 +81,7 @@ release-memopt-blame:
 release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS
 release-memopt: CFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin # -flto
 release-memopt: CXXFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin #-fno-exceptions -fno-rtti # -flto
-release-memopt: LDFLAGS+=-Os -Wl,-gc-sections #--specs=nano.specs # -flto
+release-memopt: LDFLAGS+=-Os -Wl,-gc-sections --specs=nano.specs # -flto
 release-memopt: release
 
 debug: CFLAGS+=-g
@@ -131,5 +131,4 @@ test-clean:
 	$(MAKE) -f Makefile-test test-clean
 
 deploy:
-	@echo "\nRunning Unit Tests on QEMU Simulator (change SIMTIME variable to adjust simulation time)\n" 
-	(timeout $(SIMTIME) qemu-system-arm -cpu cortex-m3 -machine versatilepb -monitor null -serial null -semihosting -nographic -kernel bin/$(BINELF) || true)
+	qemu-system-arm -cpu cortex-m3 -machine versatilepb -monitor null -serial null -semihosting -nographic -kernel bin/$(BINELF)

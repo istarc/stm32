@@ -1,30 +1,25 @@
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-/* Private function prototypes -----------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
+/*
+ * Disable coverage testing by removing 
+ * (i)   "-lgcov" (Makefile-test, line 70);
+ * (ii)  "-fprofile-arcs -ftest-coverage" (Makefile-test, line 143, 152);
+ * (iii) "extern "C" void __gcov_flush();" (src-test/test-main.cpp, line 5);
+ * (iv)  "__gcov_flush();" (src-test/test-main.cpp, line 14).
+ */
 
-/**
-  * @brief  Main program
-  * @param  None
-  * @retval None
-  */
-extern "C" {
-#include <stdlib.h>
 #include <stdio.h>
-}
 #include "CppUTest/CommandLineTestRunner.h"
 
 extern "C" void __gcov_flush();
 
 int main() {
-	int argc = 3;
-	char* argv[] = {"", "-v", "-c"};
-	printf("Executing Unit Tests ...\n");
-	
-	//MemoryLeakWarningPlugin::turnOffNewDeleteOverloads(); // Uncomment to disable memory leaks detection
-	CommandLineTestRunner::RunAllTests(argc, argv);
-	__gcov_flush();
-	
+	int argc = 2;
+	char* argv[] = {"", "-v"};
+
+	printf("--- Test Start ---\n"); // Required for automated testing
+	//MemoryLeakWarningPlugin::turnOffNewDeleteOverloads(); // Disables memory leaks detection
+	CommandLineTestRunner::RunAllTests(argc, argv); // Run All Tests
+	__gcov_flush(); // Required for coverage testing
+	printf("--- Test End ---\n"); // Required for automated testing
+
 	return 0;
 }
