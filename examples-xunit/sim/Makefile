@@ -11,7 +11,7 @@ TDIRS=$(shell find . -mindepth 1 -maxdepth 1 -type d)
 .PHONY: all check clean test-clean
 
 all:
-	for d in $(BDIRS); do $(MAKE) -C $$d clean && $(MAKE) -C $$d test-clean && $(MAKE) -C $$d && $(MAKE) -C $$d deploy; done
+	for d in $(BDIRS); do $(MAKE) -C $$d clean && $(MAKE) -C $$d test-clean && $(MAKE) -C $$d; done
 
 check:
 	for d in $(BDIRS); do $(MAKE) -C $$d clean && $(MAKE) -C $$d test-clean && $(MAKE) -C $$d test-deps && $(MAKE) -C $$d test && $(MAKE) -C $$d check; done
