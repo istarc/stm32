@@ -143,4 +143,3 @@ ifeq ($(wildcard /opt/openocd/bin/openocd),)
 else
 	/opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg -c "program test-bin/"$(BINELF)" verify reset"
 endif
-

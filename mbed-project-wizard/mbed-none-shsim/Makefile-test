@@ -173,7 +173,7 @@ test-deps-clean:
 	cd $(TCPPUTEST) && make clean
 
 check:
-	test -s $(TBINDIR)/$(BINELF) || (echo "\nCheck failed! Build the unit tests before you run them. Use: make test-clean && make test-deps && make test\n" && false)
+	test -e $(TBINDIR)/$(BINELF)
 	find . -type f -name '*.gcda' -exec rm -f {} \;
 	find . -type f -name '*.gcov' -exec rm -f {} \;
 	expect check.exp
