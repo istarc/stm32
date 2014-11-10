@@ -210,9 +210,9 @@ case "$1" in
 	cp $SCRIPTDIR/mbed-none/main.cpp $(pwd)/src/main.cpp
 	cp $SCRIPTDIR/mbed-none/Makefile $(pwd)/Makefile
 	;;
-  mbed-none-cpput)
+  mbed-none-BB)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
-	echo "   mbed-none-cpput ... creates a bare-metal project with mbed SDK and cpputest support" >> $(pwd)/README
+	echo "   mbed-none-BB ... creates a bare-metal project with mbed SDK, cpputest support and redirected STDIO tailored to STM32F4-BB expansion board" >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Usage [app]:  make clean && make && sudo make deploy" >> $(pwd)/README
 	echo "Usage [test]: make test-clean && make test-deps && make test && sudo make check"  >> $(pwd)/README
@@ -223,60 +223,77 @@ case "$1" in
 	do_create_tdir $2
 	do_deploy_mbed $2
 	# Deploy project files
-	cp $SCRIPTDIR/mbed-none-cpput/main.cpp $(pwd)/src/main.cpp
-	cp $SCRIPTDIR/mbed-none-cpput/add.cpp $(pwd)/src/add.cpp
-	cp $SCRIPTDIR/mbed-none-cpput/dadd.cpp $(pwd)/src/dadd.cpp
-	cp $SCRIPTDIR/mbed-none-cpput/add.h $(pwd)/inc/add.h
-	cp $SCRIPTDIR/mbed-none-cpput/dadd.h $(pwd)/inc/dadd.h
+	cp $SCRIPTDIR/mbed-none-BB/main.cpp $(pwd)/src/main.cpp
+	cp $SCRIPTDIR/mbed-none-BB/add.cpp $(pwd)/src/add.cpp
+	cp $SCRIPTDIR/mbed-none-BB/dadd.cpp $(pwd)/src/dadd.cpp
+	cp $SCRIPTDIR/mbed-none-BB/add.h $(pwd)/inc/add.h
+	cp $SCRIPTDIR/mbed-none-BB/dadd.h $(pwd)/inc/dadd.h
 	# Deploy test files
-	cp $SCRIPTDIR/mbed-none-cpput/test-main.cpp $(pwd)/test-src/test-main.cpp
-	cp $SCRIPTDIR/mbed-none-cpput/test-fail.cpp $(pwd)/test-src/test-fail.cpp
-	cp $SCRIPTDIR/mbed-none-cpput/test-add.cpp $(pwd)/test-src/test-dadd.cpp
-	cp $SCRIPTDIR/mbed-none-cpput/test-dadd.cpp $(pwd)/test-src/test-add.cpp
+	cp $SCRIPTDIR/mbed-none-BB/test-main.cpp $(pwd)/test-src/test-main.cpp
+	cp $SCRIPTDIR/mbed-none-BB/test-fail.cpp $(pwd)/test-src/test-fail.cpp
+	cp $SCRIPTDIR/mbed-none-BB/test-add.cpp $(pwd)/test-src/test-dadd.cpp
+	cp $SCRIPTDIR/mbed-none-BB/test-dadd.cpp $(pwd)/test-src/test-add.cpp
 	# Deploy Makefiles
-	cp $SCRIPTDIR/mbed-none-cpput/Makefile $(pwd)/Makefile
-	cp $SCRIPTDIR/mbed-none-cpput/Makefile-test $(pwd)/Makefile-test
+	cp $SCRIPTDIR/mbed-none-BB/Makefile $(pwd)/Makefile
+	cp $SCRIPTDIR/mbed-none-BB/Makefile-test $(pwd)/Makefile-test
 	# Patch mbed library (retarget STDIO)
-	patch -p1 < $SCRIPTDIR/mbed-none-cpput/PeripheralNames.patch
+	patch -p1 < $SCRIPTDIR/mbed-none-BB/PeripheralNames.patch
 	# Copy cpputest src (exluding .git)
 	rsync -a --exclude .git $BASEDIR/cpputest/ $(pwd)/test-cpputest
 	;;
-  mbed-none-sim)
-  echo "Project template created by ${0##*/} $1" > $(pwd)/README
-  echo "   mbed-none-sim ... creates a bare-metal project with mbed SDK suitable for QEMU simulation" >> $(pwd)/README
-	echo "" >> $(pwd)/README
-	echo "Usage: make && sudo make deploy" >> $(pwd)/README
-        do_create_dir $2
-        do_deploy_mbed $2
-        cp $SCRIPTDIR/mbed-none-sim/main.cpp $(pwd)/src/main.cpp
-        cp $SCRIPTDIR/mbed-none-sim/Makefile $(pwd)/Makefile
-	rm *.ld # Delete the linker script
-        ;;
-  mbed-none-sim-cpput)
+  mbed-none-sh)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
-	echo "   mbed-none-sim-cpput ... creates a bare-metal project with mbed SDK and cpputest support suitable for QEMU simulation" >> $(pwd)/README
+	echo "   mbed-none-sh ... creates a bare-metal project with mbed SDK, cpputest and ARM semihosting support." >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Usage [app]:  make clean && make && sudo make deploy" >> $(pwd)/README
-	echo "Usage [test]: make test-clean && make test-deps && make test && sudo make check"  >> $(pwd)/README
+	echo "Usage [test]: make test-clean && make test-deps && make test && sudo make check && make check-coverage"  >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	do_create_tdir $2
 	do_deploy_mbed $2
 	# Deploy project files
-	cp $SCRIPTDIR/mbed-none-sim-cpput/main.cpp $(pwd)/src/main.cpp
-	cp $SCRIPTDIR/mbed-none-sim-cpput/add.cpp $(pwd)/src/add.cpp
-	cp $SCRIPTDIR/mbed-none-sim-cpput/dadd.cpp $(pwd)/src/dadd.cpp
-	cp $SCRIPTDIR/mbed-none-sim-cpput/add.h $(pwd)/inc/add.h
-	cp $SCRIPTDIR/mbed-none-sim-cpput/dadd.h $(pwd)/inc/dadd.h
+	cp $SCRIPTDIR/mbed-none-sh/main.cpp $(pwd)/src/main.cpp
+	cp $SCRIPTDIR/mbed-none-sh/add.cpp $(pwd)/src/add.cpp
+	cp $SCRIPTDIR/mbed-none-sh/dadd.cpp $(pwd)/src/dadd.cpp
+	cp $SCRIPTDIR/mbed-none-sh/add.h $(pwd)/inc/add.h
+	cp $SCRIPTDIR/mbed-none-sh/dadd.h $(pwd)/inc/dadd.h
 	# Deploy test files
-	cp $SCRIPTDIR/mbed-none-sim-cpput/test-main.cpp $(pwd)/test-src/test-main.cpp
-	cp $SCRIPTDIR/mbed-none-sim-cpput/test-fail.cpp $(pwd)/test-src/test-fail.cpp
-	cp $SCRIPTDIR/mbed-none-sim-cpput/test-add.cpp $(pwd)/test-src/test-add.cpp
-	cp $SCRIPTDIR/mbed-none-sim-cpput/test-dadd.cpp $(pwd)/test-src/test-dadd.cpp
-	# Deploy Makefiles
-	cp $SCRIPTDIR/mbed-none-sim-cpput/Makefile $(pwd)/Makefile
-	cp $SCRIPTDIR/mbed-none-sim-cpput/Makefile-test $(pwd)/Makefile-test
-	# Patch mbed library (retarget STDIO)
-	patch -p1 < $SCRIPTDIR/mbed-none-sim-cpput/PeripheralNames.patch
+	cp $SCRIPTDIR/mbed-none-sh/test-main.cpp $(pwd)/test-src/test-main.cpp
+	cp $SCRIPTDIR/mbed-none-sh/test-fail.cpp $(pwd)/test-src/test-fail.cpp
+	cp $SCRIPTDIR/mbed-none-sh/test-add.cpp $(pwd)/test-src/test-dadd.cpp
+	cp $SCRIPTDIR/mbed-none-sh/test-dadd.cpp $(pwd)/test-src/test-add.cpp
+	# Deploy Makefiles, automated unit test check script (with the corresponding OpenOCD script)
+	cp $SCRIPTDIR/mbed-none-sh/Makefile $(pwd)/Makefile
+	cp $SCRIPTDIR/mbed-none-sh/Makefile-test $(pwd)/Makefile-test
+	cp $SCRIPTDIR/mbed-none-sh/check.exp $(pwd)/check.exp
+	cp $SCRIPTDIR/mbed-none-sh/check.cfg $(pwd)/check.cfg
+	cp $SCRIPTDIR/mbed-none-sh/deploy.cfg $(pwd)/deploy.cfg
+	# Copy cpputest src (exluding .git)
+	rsync -a --exclude .git $BASEDIR/cpputest/ $(pwd)/test-cpputest
+	;;
+  mbed-none-shsim)
+	echo "Project template created by ${0##*/} $1" > $(pwd)/README
+	echo "   mbed-none-sim-cpput ... creates a bare-metal project with mbed SDK and cpputest support suitable for (ARM semihosted) QEMU simulation" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Usage [app]:  make clean && make && sudo make deploy" >> $(pwd)/README
+	echo "Usage [test]: make test-clean && make test-deps && make test && make check && make check-coverage"  >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	do_create_tdir $2
+	do_deploy_mbed $2
+	# Deploy project files
+	cp $SCRIPTDIR/mbed-none-shsim/main.cpp $(pwd)/src/main.cpp
+	cp $SCRIPTDIR/mbed-none-shsim/add.cpp $(pwd)/src/add.cpp
+	cp $SCRIPTDIR/mbed-none-shsim/dadd.cpp $(pwd)/src/dadd.cpp
+	cp $SCRIPTDIR/mbed-none-shsim/add.h $(pwd)/inc/add.h
+	cp $SCRIPTDIR/mbed-none-shsim/dadd.h $(pwd)/inc/dadd.h
+	# Deploy test files
+	cp $SCRIPTDIR/mbed-none-shsim/test-main.cpp $(pwd)/test-src/test-main.cpp
+	cp $SCRIPTDIR/mbed-none-shsim/test-fail.cpp $(pwd)/test-src/test-fail.cpp
+	cp $SCRIPTDIR/mbed-none-shsim/test-add.cpp $(pwd)/test-src/test-add.cpp
+	cp $SCRIPTDIR/mbed-none-shsim/test-dadd.cpp $(pwd)/test-src/test-dadd.cpp
+	# Deploy Makefiles, automated unit test check script
+	cp $SCRIPTDIR/mbed-none-shsim/Makefile $(pwd)/Makefile
+	cp $SCRIPTDIR/mbed-none-shsim/Makefile-test $(pwd)/Makefile-test
+	cp $SCRIPTDIR/mbed-none-shsim/check.exp $(pwd)/check.exp
 	# Copy cpputest src (exluding .git)
 	rsync -a --exclude .git $BASEDIR/cpputest/ $(pwd)/test-cpputest
 	# Delete the linker script
@@ -359,9 +376,9 @@ case "$1" in
 	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-cpput|mbed-none-sim|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
 	echo ""
 	echo "   mbed-none ........... creates a bare-metal project with mbed SDK"
-	echo "   mbed-none-cpput ..... creates a bare-metal project with mbed SDK and cpputest support"
-	echo "   mbed-none-sim ....... creates a bare-metal project with mbed SDK suitable for QEMU simulation"
-	echo "   mbed-none-sim-cpput . creates a bare-metal project with mbed SDK suitable for QEMU simulation"
+	echo "   mbed-none-BB ........ creates a bare-metal project with mbed SDK, cpputest support and redirected STDIO tailored to STM32F4-BB expansion board"
+	echo "   mbed-none-sh ........ creates a bare-metal project with mbed SDK, cpputest and ARM semihosting support"
+	echo "   mbed-none-shsim ..... creates a bare-metal project with mbed SDK and cpputest support suitable for (ARM semihosted) QEMU simulation"
 	echo "   mbed-none-lib ....... creates a bare-metal project with mbed SDK"
 	echo "   mbed-freertos ....... creates a FreeRTOS project with mbed SDK (/w libraries)"
 	echo "   mbed-freertos-lib ... creates a FreeRTOS project with mbed SDK (/w libraries)"
@@ -373,7 +390,7 @@ case "$1" in
 	echo " "
 	;;
   *)
-	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-cpput|mbed-none-sim|mbed-none-sim-cpput|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
+	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-BB|mbed-none-sh|mbed-none-shsim|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
 	exit 3
 	;;
 esac
