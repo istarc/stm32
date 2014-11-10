@@ -13,9 +13,9 @@ set exitcode 1
 
 # Prefer manually built OpenOCD
 if {[file exists /opt/openocd/bin/openocd]} {
-    spawn /opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg -f check.cfg
+    spawn nice -n-20 /opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg -f check.cfg
 } else {
-    spawn /usr/bin/openocd -f /usr/share/openocd/scripts/board/stm32f4discovery.cfg -f check.cfg
+    spawn nice -n-20 /usr/bin/openocd -f /usr/share/openocd/scripts/board/stm32f4discovery.cfg -f check.cfg
 }
 
 # Checkpoint 1 - Start

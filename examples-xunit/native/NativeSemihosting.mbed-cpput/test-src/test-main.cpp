@@ -6,7 +6,6 @@
  * (iv)  "__gcov_flush();" (src-test/test-main.cpp, line 14).
  */
 
-//#include "mbed.h"
 #include <stdio.h>
 #include "CppUTest/CommandLineTestRunner.h"
 

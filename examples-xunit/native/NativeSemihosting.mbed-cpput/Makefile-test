@@ -1,5 +1,5 @@
 ###
-# Purpose: to create a bare-metal with mbed SDK and cpputest in semihosting environment
+# Purpose: to create a bare-metal with mbed SDK and cpputest in ARM semihosting environment.
 #
 # Disable coverage testing by removing 
 # (i)   "-lgcov" (Makefile-test, line 70);
@@ -77,8 +77,8 @@ AOBJECTS=$(ASOURCES:%.s=%.o)
 COBJECTS=$(CSOURCES:%.c=%.o)
 CXXOBJECTS=$(CXXSOURCES:%.cpp=%.o)
 # Define output files ELF & IHEX
-BINELF=test.elf
-BINHEX=test.hex
+BINELF=outp.elf
+BINHEX=outp.hex
 
 ###
 # MCU FLAGS
@@ -86,11 +86,6 @@ MCFLAGS=-mcpu=cortex-m4 -mthumb -mlittle-endian \
 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork
 # COMPILE FLAGS
 DEFS=-DTARGET_STM32F407 -D__CORTEX_M4 -D__FPU_PRESENT 
-# FreeRTOS Stack Size Definition is not required
-#DEFS+=-DWORDS_STACK_SIZE=200
-# mbed library retarget.cpp is removed from the build, so the following should be excluded.
-# UART is not used for STDIO, but semihosted environment via CPU's trace unit.
-#DEFS+=-DDEVICE_SERIAL -DSTDIO_UART_TX=PC_6 -DSTDIO_UART_RX=PC_7 -DSTDIO_UART=UART_6
 # Flags -fprofile-arcs and -ftest-coverage are used on a per file basis due to high memory consumption.
 CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c99 #-fprofile-arcs -ftest-coverage
 CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11 #-fprofile-arcs -ftest-coverage
@@ -104,7 +99,7 @@ LDFLAGS=-T $(LDSCRIPT) $(MCFLAGS) $(INCLUDES_LIBS) $(LINK_LIBS) --specs=rdimon.s
 
 ###
 # Build Rules
-.PHONY: all test-release test-release-memopt test-debug test-deps test-clean test-deps-clean
+.PHONY: all test-release test-release-memopt test-debug test-deps test-clean test-deps-clean test-deploy check check-coverage
 
 all: test-release-memopt
 test: test-release-memopt
@@ -179,7 +174,7 @@ test-deps-clean:
 test-deploy: check
 
 check:
-	test -e $(TBINDIR)/$(BINELF)
+	test -s $(TBINDIR)/$(BINELF) || (echo "\nCheck failed! Build the unit tests before you run them. Use: make test-clean && make test-deps && make test\n" && false)
 	find . -type f -name '*.gcda' -exec rm -f {} \;
 	find . -type f -name '*.gcov' -exec rm -f {} \;
 	expect check.exp

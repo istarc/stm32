@@ -1,5 +1,5 @@
 ###
-# Purpose: to create a bare-metal project with mbed SDK.
+# Purpose: to create a bare-metal project with mbed SDK in ARM semihosting environment.
 
 ###
 # GNU ARM Embedded Toolchain
@@ -28,14 +28,18 @@ ASOURCES+=$(shell find -L $(LIBDIR) -name '*.s')
 CSOURCES=$(shell find -L $(SRCDIR) -name '*.c')
 CSOURCES+=$(shell find -L $(LIBDIR) -name '*.c')
 CXXSOURCES=$(shell find -L $(SRCDIR) -name '*.cpp')
-CXXSOURCES+=$(shell find -L $(LIBDIR) -name '*.cpp')
+# Filter retarget.cpp from mbed library, because it is already defined in librdimon,
+# which is used to provide semihosted enviornment.
+CXXSOURCES+=$(filter-out %retarget.cpp, $(shell find -L $(LIBDIR) -name '*.cpp'))
 # Find header directories
 INC=$(shell find -L $(INCDIR) -name '*.h' -exec dirname {} \; | uniq)
 INC+=$(shell find -L $(LIBDIR) -name '*.h' -exec dirname {} \; | uniq)
 INCLUDES=$(INC:%=-I%)
 # Find libraries
-INCLUDES_LIBS=
-LINK_LIBS=
+LIBFILES=$(shell find $(LIBDIR) -type f -name '*.a')
+INCLUDES_LIBS=$(patsubst %,-L%, $(dir $(LIBFILES)))
+LINK_LIBS=$(patsubst lib%, -l%, $(basename $(notdir $(LIBFILES))))
+LINK_LIBS+=-lrdimon
 # Create object list
 AOBJECTS=$(ASOURCES:%.s=%.o)
 COBJECTS=$(CSOURCES:%.c=%.o)
@@ -49,18 +53,18 @@ BINHEX=outp.hex
 MCFLAGS=-mcpu=cortex-m4 -mthumb -mlittle-endian \
 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork
 # COMPILE FLAGS
-DEFS=-DTARGET_STM32F407 -D__CORTEX_M4 -D__FPU_PRESENT -DWORDS_STACK_SIZE=200
-DEFS+=-DDEVICE_SERIAL -DSTDIO_UART_TX=PC_6 -DSTDIO_UART_RX=PC_7 -DSTDIO_UART=UART_6
+DEFS=-DTARGET_STM32F407 -D__CORTEX_M4 -D__FPU_PRESENT
 CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c99
 CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11
-CXXFLAGS+=-U__STRICT_ANSI__ # Undefine __STRICT_ANSI__ to compile Stream.cpp using c++11. This is a dirty hack!
+# A dirty hack to build Stream.cpp according to C+11.
+CXXFLAGS+=-U__STRICT_ANSI__
 # LINKER FLAGS
 LDSCRIPT=stm32f407.ld
-LDFLAGS=-T $(LDSCRIPT) $(MCFLAGS) --specs=nosys.specs $(INCLUDES_LIBS) $(LINK_LIBS)
+LDFLAGS=-T $(LDSCRIPT) $(MCFLAGS) $(INCLUDES_LIBS) $(LINK_LIBS) --specs=rdimon.specs --specs=nosys.specs
 
 ###
 # Build Rules
-.PHONY: all release release-memopt debug clean deploy test test-deps check test-clean
+.PHONY: all release release-memopt debug clean deploy test test-deps check check-coverage test-clean
 
 all: release-memopt
 
@@ -77,8 +81,7 @@ release-memopt-blame:
 release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS
 release-memopt: CFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin # -flto
 release-memopt: CXXFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin #-fno-exceptions -fno-rtti # -flto
-
-release-memopt: LDFLAGS+=-Os -Wl,-gc-sections #--specs=nano.specs # -flto
+release-memopt: LDFLAGS+=-Os -Wl,-gc-sections --specs=nano.specs # -flto
 release-memopt: release
 
 debug: CFLAGS+=-g
@@ -129,8 +132,7 @@ test-clean:
 
 deploy:
 ifeq ($(wildcard /opt/openocd/bin/openocd),)
-	/usr/bin/openocd -f /usr/share/openocd/scripts/board/stm32f4discovery.cfg -c "program bin/"$(BINELF)" verify reset"
+	/usr/bin/openocd -f /usr/share/openocd/scripts/board/stm32f4discovery.cfg -f deploy.cfg
 else
-	/opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg -c "program bin/"$(BINELF)" verify reset"
+	/opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg -f deploy.cfg
 endif
-

@@ -1,9 +1,6 @@
-Project template created by gen-stm32f407-GCC-project.sh mbed-none-cpput
-   mbed-none-cpput ... creates a bare-metal project with mbed SDK and cpputest support
+Project template created by gen-stm32f407-GCC-project.sh mbed-none-sh
+   mbed-none-sh ... creates a bare-metal project with mbed SDK, cpputest and ARM semihosting support.
 
 Usage [app]:  make clean && make && sudo make deploy
-Usage [test]: make test-clean && make test-deps && make test && sudo make check
+Usage [test]: make test-clean && make test-deps && make test && sudo make check && make check-coverage
 
-              Works with STM32F4-Disocvery /w STM32F4-BB
-              Unit Test Results are Displayed on UART 6 Serial Device (that is routed to RS-232 interface of the STM32F4-BB board)
-              cat /dev/ttyS0 (cat /dev/ttyUSB0)
