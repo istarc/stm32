@@ -1,24 +1,37 @@
-#!/usr/bin/expect -f 
+#!/usr/bin/expect -f
+#
+# Description: Deploys unit test binary on to the STM32F4 target via OpenOCD and monitors the test output in a
+#              semihosting environment (see check.cfg). There are 3 possible exit codes:
+#              - If test results are OK, then the exit code is 0. 
+#              - If one or more test fails, then the exit code is 2.
+#              - If one or more test fails to execute, then the exit code is 1.
+#              - The test execution timeouts after 240 seconds with the exit code 1.
+#
+
 set timeout 240
 set exitcode 1
 
+# Prefer manually built OpenOCD
 if {[file exists /opt/openocd/bin/openocd]} {
     spawn /opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg -f check.cfg
 } else {
     spawn /usr/bin/openocd -f /usr/share/openocd/scripts/board/stm32f4discovery.cfg -f check.cfg
 }
 
+# Checkpoint 1 - Start
 expect {
 	-re "\^.* Test Start .*\$" {}
 	timeout { puts "Test Results: Failure.\nTest execution failed \[1] due to timeout (see check.exp; current timeout = $timeout s).\n"; exit 1 }
 }
 
+# Checkpoint 2 - Test results
 expect {
 	-re "\^.*OK \\(\[0-9]* tests, \[0-9]* ran, \[0-9]* checks.*, \[0-9]* ignored, \[0-9]* filtered out, \[0-9]* ms\\).*\$" { set exitcode 0 }
 	-re "\^.*Errors \\(\[0-9]* failures, \[0-9]* tests, \[0-9]* ran, \[0-9]* checks, \[0-9]* ignored, \[0-9]* filtered out, \[0-9]* ms\\).*\$" { set exitcode 2 }
 	timeout { puts "Test Results: Failure.\nTest execution failed \[2] due to timeout (see check.exp; current timeout = $timeout s).\n"; exit 1 }
 }
 
+# Checkpoint 3 - Wait for coverage statistic and exit
 expect {
 		-re "\^.* Test End .*\$" {}
 		timeout { puts "Test Results: Failure.\nTest execution failed \[3] due to timeout (see check.exp; current timeout = $timeout s).\n"; exit 1 }
