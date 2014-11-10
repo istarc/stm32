@@ -1,5 +1,5 @@
 ###
-# Purpose: to create a bare-metal with mbed SDK and cpputest
+# Purpose: to create a bare-metal with mbed SDK and cpputest in semihosting environment
 #
 # Disable coverage testing by removing 
 # (i)   "-lgcov" (Makefile-test, line 70);
