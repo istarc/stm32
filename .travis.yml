@@ -7,9 +7,9 @@ before_script:
   - sudo apt-get update -q
   - sudo apt-get install -y gcc-arm-none-eabi symlinks build-essential
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none && cd $TRAVIS_BUILD_DIR/examples/mbed-none && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none
-  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-cpput && cd $TRAVIS_BUILD_DIR/examples/mbed-none-cpput && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-cpput
-  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-sim && cd $TRAVIS_BUILD_DIR/examples/mbed-none-sim && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-sim
-  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-sim-cpput && cd $TRAVIS_BUILD_DIR/examples/mbed-none-sim-cpput && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-sim-cpput
+  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-BB && cd $TRAVIS_BUILD_DIR/examples/mbed-none-BB && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-BB
+  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-sh && cd $TRAVIS_BUILD_DIR/examples/mbed-none-sh && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-sh
+  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-sim-shsim && cd $TRAVIS_BUILD_DIR/examples/mbed-none-sim-shsim && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-sim-shsim
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-lib && cd $TRAVIS_BUILD_DIR/examples/mbed-none-lib && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-lib
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-freertos && cd $TRAVIS_BUILD_DIR/examples/mbed-freertos && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-freertos
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-freertos-lib && cd $TRAVIS_BUILD_DIR/examples/mbed-freertos-lib && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-freertos-lib
