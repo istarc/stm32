@@ -62,12 +62,14 @@ sudo apt-get install -y build-essential git libgmp-dev libmpfr-dev libmpc-dev zl
 export BINUTILS=binutils-2.24
 export GCC=gcc-4.9.1
 export NEWLIB=newlib-2.1.0
+export NEWLIB_NANO=newlib-nano-2.1.0
 export GDB=gdb-7.8
 # 1.2 Target system
 export TARGET=arm-none-eabi
 # 1.3 Build directory
 export PREFIX=~/arm
-export PATH=$PREFIX/bin:$PATH
+OLDPATH=$PATH
+export PATH=$PREFIX/bin:$OLDPATH
 export SCRIPTDIR=$(pwd)
 # 1.4 Stop on first error
 set -e
@@ -124,12 +126,12 @@ if [ ! -d $PREFIX/src/$GCC ]; then
 	cd $PREFIX/src
 	tar xzf $PREFIX/orig/$GCC.tar.gz
 fi
-# 2.2.4 Download Newlib
+# 2.2.4A Download Newlib
 cd $PREFIX/orig
 if [ ! -f $NEWLIB.tar.gz ]; then
 	wget ftp://sources.redhat.com/pub/newlib/$NEWLIB.tar.gz
 fi
-# 2.2.5 Unpack Newlib
+# 2.2.5A Unpack Newlib
 if [ ! -d $PREFIX/src/$NEWLIB ]; then
 	cd $PREFIX/src
 	tar xzf $PREFIX/orig/$NEWLIB.tar.gz
@@ -137,6 +139,21 @@ if [ ! -d $PREFIX/src/$NEWLIB ]; then
 		cd $PREFIX/src/$NEWLIB
 		patch -p0 < $SCRIPTDIR/newlib-2.1.0.patch/
 	fi
+fi
+# 2.2.4B Download Newlib-nano
+cd $PREFIX/orig
+if [ ! -d $NEWLIB_NANO ]; then
+	#git clone --depth 1 --branch newlib-nano-2.1 https://github.com/istarc/newlib-nano-2.git $NEWLIB_NANO
+	git clone --depth 1 --branch master https://github.com/istarc/newlib-nano-2.git $NEWLIB_NANO
+else
+	cd $NEWLIB_NANO && git pull
+fi
+# 2.2.5B Copy Newlib-nano
+if [ ! -d $PREFIX/src/$NEWLIB_NANO ]; then
+	cd $PREFIX/src
+	rsync -a --exclude .git $PREFIX/orig/$NEWLIB_NANO/ $(pwd)/$NEWLIB_NANO
+	chmod +x $(pwd)/$NEWLIB_NANO/configure
+	#TODO Apply patch (copy sys/config.h from newlib)
 fi
 # 2.2.6 Download GDB
 cd $PREFIX/orig
@@ -150,15 +167,20 @@ if [ ! -d $PREFIX/src/$GDB ]; then
 fi
 # 2.3 Create build directories
 cd $PREFIX/build
-for x in $(ls $PREFIX/src); do
-	if [ ! -d $x ]; then
-		mkdir $x
-	fi
-done
+mkdir -p $BINUTILS
+mkdir -p $BINUTILS-nano
+mkdir -p $GCC-boot
+mkdir -p $GCC-nanoboot
+mkdir -p $NEWLIB
+mkdir -p $NEWLIB_NANO
+mkdir -p $GCC
+mkdir -p $GCC-nano
+mkdir -p $GDB
 
 ### 
 # 3. Build & install GNU ARM cross-toolchain
 # 3.1 Build Binutils
+export PATH=$PREFIX/bin:$OLDPATH
 cd $PREFIX/build/$BINUTILS
 $PREFIX/src/$BINUTILS/configure --target=$TARGET --prefix=$PREFIX --with-cpu=cortex-m4 --with-fpu=fpv4-sp-d16 --with-float=hard --with-mode=thumb --enable-interwork --enable-multilib --with-gnu-as --with-gnu-ld --disable-nls
 # The meaning of flags:
@@ -175,8 +197,16 @@ $PREFIX/src/$BINUTILS/configure --target=$TARGET --prefix=$PREFIX --with-cpu=cor
 make -j4 all
 make install
 
+export PATH=$PREFIX/build/nano-libs/bin:$OLDPATH
+cd $PREFIX/build/$BINUTILS-nano
+$PREFIX/src/$BINUTILS/configure --target=$TARGET --prefix=$PREFIX/build/nano-libs --with-cpu=cortex-m4 --with-fpu=fpv4-sp-d16 --with-float=hard --with-mode=thumb --enable-interwork --enable-multilib --with-gnu-as --with-gnu-ld --disable-nls
+# make clean
+make -j4 all
+make install
+
 # 3.2 Build & install bootstrap GCC (C cross-compiler only)
-cd $PREFIX/build/$GCC
+export PATH=$PREFIX/bin:$OLDPATH
+cd $PREFIX/build/$GCC-boot
 $PREFIX/src/$GCC/configure --target=$TARGET --prefix=$PREFIX --with-cpu=cortex-m4 --with-fpu=fpv4-sp-d16 --with-float=hard --with-mode=thumb --enable-interwork --enable-multilib --with-system-zlib --with-newlib --without-headers --disable-shared --disable-nls --with-gnu-as --with-gnu-ld --enable-languages="c"
 # The meaning of flags (see https://gcc.gnu.org/install/configure.html):
 # --with-system-zlib ...... use the system's zlib library
@@ -189,7 +219,15 @@ $PREFIX/src/$GCC/configure --target=$TARGET --prefix=$PREFIX --with-cpu=cortex-m
 make -j4 all-gcc
 make install-gcc
 
-# 3.3 Build & install newlib library
+export PATH=$PREFIX/build/nano-libs/bin:$OLDPATH
+cd $PREFIX/build/$GCC-nanoboot
+$PREFIX/src/$GCC/configure --target=$TARGET --prefix=$PREFIX/build/nano-libs --with-cpu=cortex-m4 --with-fpu=fpv4-sp-d16 --with-float=hard --with-mode=thumb --enable-interwork --enable-multilib --with-system-zlib --with-newlib --without-headers --disable-shared --disable-nls --with-gnu-as --with-gnu-ld --enable-languages="c"
+# make clean
+make -j4 all-gcc
+make install-gcc
+
+# 3.3A Build & install newlib library
+export PATH=$PREFIX/bin:$OLDPATH
 cd $PREFIX/build/$NEWLIB
 $PREFIX/src/$NEWLIB/configure --target=$TARGET --prefix=$PREFIX --with-cpu=cortex-m4 --with-fpu=fpv4-sp-d16 --with-float=hard --with-mode=thumb --enable-interwork --enable-multilib --disable-newlib-supplied-syscalls --with-gnu-as --with-gnu-ld --disable-nls --enable-newlib-nano-malloc
 # The meaning of flags:
@@ -199,14 +237,36 @@ $PREFIX/src/$NEWLIB/configure --target=$TARGET --prefix=$PREFIX --with-cpu=corte
 make -j4 all
 make install
 
-# 3.4 Build & install GCC C, C++, libstdc++ with newlib library
+# 3.3B Build & install newlib library
+export PATH=$PREFIX/build/nano-libs/bin:$OLDPATH
+cd $PREFIX/build/$NEWLIB_NANO
+#make distclean || true
+#make clean || true
+$PREFIX/src/$NEWLIB_NANO/configure --target=$TARGET --prefix=$PREFIX/build/nano-libs  --with-cpu=cortex-m4 --with-fpu=fpv4-sp-d16 --with-float=hard --with-mode=thumb --enable-interwork --enable-multilib --with-gnu-as --with-gnu-ld --disable-nls --disable-newlib-supplied-syscalls --enable-newlib-reent-small --disable-newlib-fvwrite-in-streamio --disable-newlib-fseek-optimization --disable-newlib-wide-orient --enable-newlib-nano-malloc --disable-newlib-unbuf-stream-opt --enable-lite-exit --enable-newlib-global-atexit
+# The meaning of flags:
+# --disable-newlib-supplied-syscalls ... disable syscalls, because we are building for bare-metal target.
+# --enable-newlib-nano-malloc ... enable nano implementation of malloc suitable for devices with limited memory resources
+make -j4 all
+make install
+
+# 3.4A Build & install GCC C, C++, libstdc++ with newlib library
+export PATH=$PREFIX/bin:$OLDPATH
 cd $PREFIX/build/$GCC
 $PREFIX/src/$GCC/configure --target=$TARGET --prefix=$PREFIX --with-cpu=cortex-m4 --with-fpu=fpv4-sp-d16 --with-float=hard --with-mode=thumb --enable-interwork --enable-interwork --enable-multilib --with-system-zlib --with-newlib --disable-shared --disable-nls --with-gnu-as --with-gnu-ld --enable-languages="c,c++"
 # make clean
 make -j4 all
 make install
 
+# 3.4B Build & install GCC C, C++, libstdc++ with newlib-nano library
+export PATH=$PREFIX/build/nano-libs/bin:$OLDPATH
+cd $PREFIX/build/$GCC-nano
+$PREFIX/src/$GCC/configure --target=$TARGET --prefix=$PREFIX/build/nano-libs --with-cpu=cortex-m4 --with-fpu=fpv4-sp-d16 --with-float=hard --with-mode=thumb --enable-interwork --enable-interwork --enable-multilib --with-system-zlib --with-newlib --disable-shared --disable-nls --with-gnu-as --with-gnu-ld --enable-languages="c,c++"
+# make clean
+make -j4 all
+make install
+
 # 3.5 Build & install GDB debugger
+export PATH=$PREFIX/bin:$OLDPATH
 cd $PREFIX/build/$GDB
 $PREFIX/src/$GDB/configure --target=$TARGET --prefix=$PREFIX
 # make clean
