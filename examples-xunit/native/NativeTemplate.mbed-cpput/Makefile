@@ -78,7 +78,7 @@ release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS
 release-memopt: CFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin # -flto
 release-memopt: CXXFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin #-fno-exceptions -fno-rtti # -flto
 
-release-memopt: LDFLAGS+=-Os -Wl,-gc-sections #--specs=nano.specs # -flto
+release-memopt: LDFLAGS+=-Os -Wl,-gc-sections --specs=nano.specs # -flto
 release-memopt: release
 
 debug: CFLAGS+=-g

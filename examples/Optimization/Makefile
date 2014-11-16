@@ -88,7 +88,7 @@ CXXFLAGS+=-fno-rtti # Disable type introspection
 endif
 
 ifneq ($(findstring O8,$(OPT)),)
-LDFLAGS+=#--specs=nano.specs # Use size optimized newlib
+LDFLAGS+=--specs=nano.specs # Use size optimized newlib
 endif
 endif
 

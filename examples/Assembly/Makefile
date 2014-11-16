@@ -75,7 +75,7 @@ release-memopt-blame:
 
 release-memopt: CFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin # -flto
 release-memopt: CXXFLAGS+=-Os -fno-exceptions -ffunction-sections -fdata-sections -fno-builtin -fno-rtti # -flto
-release-memopt: LDFLAGS+=-Os -Wl,-gc-sections #--specs=nano.specs # -flto
+release-memopt: LDFLAGS+=-Os -Wl,-gc-sections --specs=nano.specs # -flto
 release-memopt: release
 
 debug: CFLAGS+=-g
