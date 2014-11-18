@@ -205,6 +205,10 @@ case "$1" in
 	echo "   mbed-none ... creates a bare-metal project with mbed SDK" >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Usage: make && sudo make deploy" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Git rev. info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	cp $SCRIPTDIR/mbed-none/main.cpp $(pwd)/src/main.cpp
@@ -220,6 +224,11 @@ case "$1" in
 	echo "              Works with STM32F4-Disocvery /w STM32F4-BB" >> $(pwd)/README
 	echo "              Unit Test Results are Displayed on UART 6 Serial Device (that is routed to RS-232 interface of the STM32F4-BB board)" >> $(pwd)/README
 	echo "              cat /dev/ttyS0 (cat /dev/ttyUSB0)" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Git rev. info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "   cpput:    "$(cd $BASEDIR/cpputest && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
 	do_create_tdir $2
 	do_deploy_mbed $2
 	# Deploy project files
@@ -248,6 +257,10 @@ case "$1" in
 	echo "Usage [app]:  make clean && make && sudo make deploy" >> $(pwd)/README
 	echo "Usage [test]: make test-clean && make test-deps && make test && sudo make check && make check-coverage"  >> $(pwd)/README
 	echo "" >> $(pwd)/README
+	echo "Git rev. info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "   cpputest: "$(cd $BASEDIR/cpputest && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
 	do_create_tdir $2
 	do_deploy_mbed $2
 	# Deploy project files
@@ -277,6 +290,10 @@ case "$1" in
 	echo "Usage [app]:  make clean && make && sudo make deploy" >> $(pwd)/README
 	echo "Usage [test]: make test-clean && make test-deps && make test && make check && make check-coverage"  >> $(pwd)/README
 	echo "" >> $(pwd)/README
+	echo "Git rev. info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "   cpputest: "$(cd $BASEDIR/cpputest && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
 	do_create_tdir $2
 	do_deploy_mbed $2
 	# Deploy project files
@@ -304,6 +321,10 @@ case "$1" in
 	echo "   mbed-none-lib ... creates a bare-metal project with mbed SDK" >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Usage: make && sudo make deploy" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Git rev. info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	cp $SCRIPTDIR/mbed/Makefile-lib $(pwd)/lib/mbed/Makefile
@@ -315,6 +336,11 @@ case "$1" in
 	echo "   mbed-freertos ... creates a FreeRTOS project with mbed SDK (/w libraries)" >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Usage: make && sudo make deploy" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Git rev. info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "   freertos: "$(cd $BASEDIR/cpputest && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	do_deploy_freertos
@@ -326,6 +352,11 @@ case "$1" in
 	echo "   mbed-freertos-lib ... creates a FreeRTOS project with mbed SDK (/w libraries)" >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Usage: make && sudo make deploy" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Git rev. info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "   freertos: "$(cd $BASEDIR/cpputest && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	cp $SCRIPTDIR/mbed/Makefile-lib $(pwd)/lib/mbed/Makefile
@@ -339,6 +370,10 @@ case "$1" in
 	echo "   mbed-mbedrtos ... creates a mbedRTOS project with mbed SDK" >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Usage: make && sudo make deploy" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Git rev. info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	do_deploy_mbedrots $2
@@ -350,6 +385,10 @@ case "$1" in
 	echo "   mbed-mbedrtos-lib ... creates a mbedRTOS project with mbed SDK (/w libraries)" >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Usage: make && sudo make deploy" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Git rev. info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	cp $SCRIPTDIR/mbed/Makefile-lib $(pwd)/lib/mbed/Makefile
@@ -368,6 +407,9 @@ case "$1" in
 	echo "   none-safertos ... creates a SafeRTOS project with mbed SDK (/w libraries)" >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Usage: make && sudo make deploy" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Git rev. info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_safertos $2
 	cp $SCRIPTDIR/none-safertos/Makefile $(pwd)/Makefile
