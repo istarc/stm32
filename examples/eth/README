@@ -1,0 +1,13 @@
+Project template created by gen-stm32f407-GCC-project.sh mbed-none
+   mbed-none ... creates a bare-metal project with mbed SDK
+
+Usage: make && sudo make deploy
+
+This project should be used with STM32F4DIS-BB.
+Board IP: 192.168.34.10 (see main.h)
+Board MAC: 02:00:00:00:00 (see main.h)
+Target IP: 192.168.34.110 (see main.h)
+
+To monitor networking use wireshark and apply filter: eth.src==02:00:00:00:00:00 || eth.dst==02:00:00:00:00:00
+
+tcp_echoclient application (see tcp_echoclient.c) starts when user button is pressed (see stm32f4xx_it.c via EXTI interrupt handler)
