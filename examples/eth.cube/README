@@ -1,0 +1,7 @@
+Project template created by gen-stm32f407-GCC-project.sh mbed-none
+   mbed-none ... creates a bare-metal project with mbed SDK
+
+Usage: make && sudo make deploy
+
+Copied from /home/iztok/Downloads/STM32Cube_FW_F4_V1.3.0/Projects/STM324xG_EVAL/Applications/LwIP/LwIP_TCP_Echo_Client
+Copiles, but does not work.
