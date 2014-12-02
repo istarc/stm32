@@ -106,13 +106,13 @@ test: test-release-memopt
 
 test-release-memopt-blame: CFLAGS+=-g
 test-release-memopt-blame: CXXFLAGS+=-g
-test-release-memopt-blame: LDFLAGS+=-g -Wl,-Map=$(BINDIR)/output.map
+test-release-memopt-blame: LDFLAGS+=-g -Wl,-Map=$(TBINDIR)/output.map
 test-release-memopt-blame: test-release-memopt
 test-release-memopt-blame:
 	@echo "Top 10 space consuming symbols from the object code ...\n"
-	$(NM) -A -l -C -td --reverse-sort --size-sort $(BINDIR)/$(BINELF) | head -n10 | cat -n # Output legend: man nm
+	$(NM) -A -l -C -td --reverse-sort --size-sort $(TBINDIR)/$(BINELF) | head -n10 | cat -n # Output legend: man nm
 	@echo "\n... and corresponging source files to blame.\n"
-	$(NM) --reverse-sort --size-sort -S -tx $(BINDIR)/$(BINELF) | head -10 | cut -d':' -f2 | cut -d' ' -f1 | $(A2L) -e $(BINDIR)/$(BINELF) | cat -n # Output legend: man addr2line
+	$(NM) --reverse-sort --size-sort -S -tx $(TBINDIR)/$(BINELF) | head -10 | cut -d':' -f2 | cut -d' ' -f1 | $(A2L) -e $(TBINDIR)/$(BINELF) | cat -n # Output legend: man addr2line
 
 # Redefined functions malloc, free, new, delete should not be used with CppUTest. It also requires exeception handling to work properly, so the line below should be disabled.
 #test-release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS 
@@ -163,7 +163,7 @@ test-deps:
 	cd $(TCPPUTEST) && ./configure --prefix=$(shell pwd)/$(TCPPUTEST) --host=arm-none-eabi LDFLAGS="$(MCFLAGS) --specs=nosys.specs $(CPPUTEST_INCLUDES_LIBS) $(CPPUTEST_LINK_LIBS)" CFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) -std=c99" CXXFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES)" && make clean && make # && make install (not used -- src and target dir are the same) # && ./autogen.sh (will be used in the next release) # CXXFLAGS+=-std=c++11 is currently not supported
 
 test-clean:
-	rm -f $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
+	rm -f $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(TBINDIR)/$(BINELF) $(TBINDIR)/$(BINHEX) $(TBINDIR)/output.map
 	find . -type f -name '*.gcno' -exec rm -f {} \;
 	find . -type f -name '*.gcda' -exec rm -f {} \;
 	find . -type f -name '*.gcov' -exec rm -f {} \;
