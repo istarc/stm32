@@ -259,7 +259,7 @@ case "$1" in
 	echo "   mbed-none-sh ... creates a bare-metal project with mbed SDK, cpputest and ARM semihosting support." >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Usage [app]:  make clean && make && sudo make deploy" >> $(pwd)/README
-	echo "Usage [test]: make test-clean && make test-deps && make test && sudo make check && make check-coverage"  >> $(pwd)/README
+	echo "Usage [test]: make test-clean && make test-deps && make test && sudo make check"  >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Git info:" >> $(pwd)/README
 	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
@@ -284,6 +284,8 @@ case "$1" in
 	cp $SCRIPTDIR/mbed-none-sh/check.exp $(pwd)/check.exp
 	cp $SCRIPTDIR/mbed-none-sh/check.cfg $(pwd)/check.cfg
 	cp $SCRIPTDIR/mbed-none-sh/deploy.cfg $(pwd)/deploy.cfg
+	cp $SCRIPTDIR/mbed-none-sh/gprof.cfg $(pwd)/gprof.cfg
+	cp $SCRIPTDIR/mbed-none-sh/test-gprof.cfg $(pwd)/test-gprof.cfg
 	# Copy cpputest src (exluding .git)
 	rsync -a --exclude .git $BASEDIR/cpputest/ $(pwd)/test-cpputest
 	# Print usage instructions
@@ -294,7 +296,7 @@ case "$1" in
 	echo "   mbed-none-sim-cpput ... creates a bare-metal project with mbed SDK and cpputest support suitable for (ARM semihosted) QEMU simulation" >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Usage [app]:  make clean && make && sudo make deploy" >> $(pwd)/README
-	echo "Usage [test]: make test-clean && make test-deps && make test && make check && make check-coverage"  >> $(pwd)/README
+	echo "Usage [test]: make test-clean && make test-deps && make test && make check"  >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Git info:" >> $(pwd)/README
 	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README

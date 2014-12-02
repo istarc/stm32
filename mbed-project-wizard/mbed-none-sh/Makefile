@@ -1,6 +1,10 @@
 ###
 # Purpose: to create a bare-metal project with mbed SDK in ARM semihosting environment.
 
+#########################
+# Configuration Options #
+#########################
+
 ###
 # GNU ARM Embedded Toolchain
 CC=arm-none-eabi-gcc
@@ -13,6 +17,8 @@ OD=arm-none-eabi-objdump
 NM=arm-none-eabi-nm
 SIZE=arm-none-eabi-size
 A2L=arm-none-eabi-addr2line
+GCOV=arm-none-eabi-gcov
+GPROF=arm-none-eabi-gprof
 
 ###
 # Directory Structure
@@ -62,35 +68,33 @@ CXXFLAGS+=-U__STRICT_ANSI__
 LDSCRIPT=stm32f407.ld
 LDFLAGS=-T $(LDSCRIPT) $(MCFLAGS) $(INCLUDES_LIBS) $(LINK_LIBS) --specs=rdimon.specs --specs=nosys.specs
 
-###
-# Build Rules
-.PHONY: all release release-memopt debug clean deploy test test-deps check check-coverage test-clean
+###############
+# Build Rules #
+###############
 
+##
+# Build flavors
+.PHONY: all
 all: release-memopt
 
-release-memopt-blame: CFLAGS+=-g
-release-memopt-blame: CXXFLAGS+=-g
-release-memopt-blame: LDFLAGS+=-g -Wl,-Map=$(BINDIR)/output.map
-release-memopt-blame: release-memopt
-release-memopt-blame:
-	@echo "Top 10 space consuming symbols from the object code ...\n"
-	$(NM) -A -l -C -td --reverse-sort --size-sort $(BINDIR)/$(BINELF) | head -n10 | cat -n # Output legend: man nm
-	@echo "\n... and corresponging source files to blame.\n"
-	$(NM) --reverse-sort --size-sort -S -tx $(BINDIR)/$(BINELF) | head -10 | cut -d':' -f2 | cut -d' ' -f1 | $(A2L) -e $(BINDIR)/$(BINELF) | cat -n # Output legend: man addr2line
-
+.PHONY: release-memopt
 release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS
 release-memopt: CFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin # -flto
 release-memopt: CXXFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin #-fno-exceptions -fno-rtti # -flto
 release-memopt: LDFLAGS+=-Os -Wl,-gc-sections --specs=nano.specs # -flto
 release-memopt: release
 
+.PHONY: debug
 debug: CFLAGS+=-g
 debug: CXXFLAGS+=-g
 debug: LDFLAGS+=-g
 debug: release
 
+.PHONY: release
 release: $(BINDIR)/$(BINHEX)
 
+##
+# General build rules
 $(BINDIR)/$(BINHEX): $(BINDIR)/$(BINELF)
 	$(CP) -O ihex $< $@
 	@echo "Objcopy from ELF to IHEX complete!\n"
@@ -112,27 +116,85 @@ $(BINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
 	$(CC) $(CFLAGS) $< -o $@
 	@echo "Assambled "$<"!\n"
 
+##
+# Clean rules
+.PHONY: clean
 clean:
 	rm -f $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
 
-test:
-	$(MAKE) -f Makefile-test test
+###########################
+# Deploy & Profile Rules  #
+###########################
 
-test-deps:
-	$(MAKE) -f Makefile-test test-deps
-
-check:
-	$(MAKE) -f Makefile-test check
-	
-check-coverage:
-	$(MAKE) -f Makefile-test check-coverage
-
-test-clean:
-	$(MAKE) -f Makefile-test test-clean
-
+##
+# Deploy the binary
+# Usage: make clean && make && make deploy
+.PHONY: deploy
 deploy:
 ifeq ($(wildcard /opt/openocd/bin/openocd),)
 	/usr/bin/openocd -f /usr/share/openocd/scripts/board/stm32f4discovery.cfg -f deploy.cfg
 else
 	/opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg -f deploy.cfg
 endif
+
+##
+# Profile code size
+# Usage: make clean && make profile-code-size
+.PHONY: profile-code-size
+profile-code-size: CFLAGS+=-g
+profile-code-size: CXXFLAGS+=-g
+profile-code-size: LDFLAGS+=-g -Wl,-Map=$(BINDIR)/output.map
+profile-code-size: release-memopt
+profile-code-size:
+	@echo "Top 10 space consuming symbols from the object code ...\n"
+	$(NM) -A -l -C -td --reverse-sort --size-sort $(BINDIR)/$(BINELF) | head -n10 | cat -n # Output legend: man nm
+	@echo "\n... and corresponging source files to blame.\n"
+	$(NM) --reverse-sort --size-sort -S -tx $(BINDIR)/$(BINELF) | head -10 | cut -d':' -f2 | cut -d' ' -f1 | $(A2L) -e $(BINDIR)/$(BINELF) | cat -n # Output legend: man addr2line
+
+##
+# Profile execution time
+# Usage: make clean && make && make profile-exec-time
+.PHONY: profile-exec-time
+profile-exec-time:
+	test -e $(BINDIR)/$(BINELF)
+	find . -type f -name '*.gmon' -exec rm -f {} \;
+ifeq ($(wildcard /opt/openocd/bin/openocd),)
+	/usr/bin/openocd -f /usr/share/openocd/scripts/board/stm32f4discovery.cfg -f gprof.cfg
+else
+	/opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg -f gprof.cfg
+endif
+	$(GPROF) $(BINDIR)/$(BINELF) gmon.out
+
+################################
+# Test Script Rule Invocation  #
+################################
+
+.PHONY: test-deps
+test-deps:
+	$(MAKE) -f Makefile-test test-deps
+
+.PHONY: test
+test:
+	$(MAKE) -f Makefile-test test
+
+.PHONY: check
+check:
+	$(MAKE) -f Makefile-test check
+
+.PHONY: check-exec-coverage
+check-exec-coverage:
+	$(MAKE) -f Makefile-test check-exec-coverage
+
+.PHONY: check-code-size
+check-code-size:
+	$(MAKE) -f Makefile-test check-code-size
+
+.PHONY: check-exec-time
+check-exec-time:
+	$(MAKE) -f Makefile-test check-exec-time
+
+.PHONY: test-clean
+test-clean:
+	$(MAKE) -f Makefile-test test-clean
+
+
