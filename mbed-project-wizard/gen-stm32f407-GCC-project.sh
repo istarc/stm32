@@ -206,13 +206,15 @@ case "$1" in
 	echo "" >> $(pwd)/README
 	echo "Usage: make && sudo make deploy" >> $(pwd)/README
 	echo "" >> $(pwd)/README
-	echo "Git rev. info:" >> $(pwd)/README
-	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
-	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "Git info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/mbed && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	cp $SCRIPTDIR/mbed-none/main.cpp $(pwd)/src/main.cpp
 	cp $SCRIPTDIR/mbed-none/Makefile $(pwd)/Makefile
+	# Print usage instructions
+	cat README
 	;;
   mbed-none-BB)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
@@ -225,10 +227,10 @@ case "$1" in
 	echo "              Unit Test Results are Displayed on UART 6 Serial Device (that is routed to RS-232 interface of the STM32F4-BB board)" >> $(pwd)/README
 	echo "              cat /dev/ttyS0 (cat /dev/ttyUSB0)" >> $(pwd)/README
 	echo "" >> $(pwd)/README
-	echo "Git rev. info:" >> $(pwd)/README
-	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
-	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
-	echo "   cpput:    "$(cd $BASEDIR/cpputest && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "Git info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/mbed && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   cpput:    "$(cd $BASEDIR/cpputest && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/cpputest && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
 	do_create_tdir $2
 	do_deploy_mbed $2
 	# Deploy project files
@@ -249,6 +251,8 @@ case "$1" in
 	patch -p1 < $SCRIPTDIR/mbed-none-BB/PeripheralNames.patch
 	# Copy cpputest src (exluding .git)
 	rsync -a --exclude .git $BASEDIR/cpputest/ $(pwd)/test-cpputest
+	# Print usage instructions
+	cat README
 	;;
   mbed-none-sh)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
@@ -257,10 +261,10 @@ case "$1" in
 	echo "Usage [app]:  make clean && make && sudo make deploy" >> $(pwd)/README
 	echo "Usage [test]: make test-clean && make test-deps && make test && sudo make check && make check-coverage"  >> $(pwd)/README
 	echo "" >> $(pwd)/README
-	echo "Git rev. info:" >> $(pwd)/README
-	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
-	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
-	echo "   cpputest: "$(cd $BASEDIR/cpputest && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "Git info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/mbed && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   cpputest: "$(cd $BASEDIR/cpputest && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/cpputest && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
 	do_create_tdir $2
 	do_deploy_mbed $2
 	# Deploy project files
@@ -282,6 +286,8 @@ case "$1" in
 	cp $SCRIPTDIR/mbed-none-sh/deploy.cfg $(pwd)/deploy.cfg
 	# Copy cpputest src (exluding .git)
 	rsync -a --exclude .git $BASEDIR/cpputest/ $(pwd)/test-cpputest
+	# Print usage instructions
+	cat README
 	;;
   mbed-none-shsim)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
@@ -290,10 +296,10 @@ case "$1" in
 	echo "Usage [app]:  make clean && make && sudo make deploy" >> $(pwd)/README
 	echo "Usage [test]: make test-clean && make test-deps && make test && make check && make check-coverage"  >> $(pwd)/README
 	echo "" >> $(pwd)/README
-	echo "Git rev. info:" >> $(pwd)/README
-	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
-	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
-	echo "   cpputest: "$(cd $BASEDIR/cpputest && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "Git info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/mbed && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   cpputest: "$(cd $BASEDIR/cpputest && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/cpputest && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
 	do_create_tdir $2
 	do_deploy_mbed $2
 	# Deploy project files
@@ -315,6 +321,8 @@ case "$1" in
 	rsync -a --exclude .git $BASEDIR/cpputest/ $(pwd)/test-cpputest
 	# Delete the linker script
 	rm *.ld
+	# Print usage instructions
+	cat README
 	;;
   mbed-none-lib)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
@@ -322,9 +330,9 @@ case "$1" in
 	echo "" >> $(pwd)/README
 	echo "Usage: make && sudo make deploy" >> $(pwd)/README
 	echo "" >> $(pwd)/README
-	echo "Git rev. info:" >> $(pwd)/README
-	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
-	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "Git info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/mbed && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	cp $SCRIPTDIR/mbed/Makefile-lib $(pwd)/lib/mbed/Makefile
@@ -337,15 +345,17 @@ case "$1" in
 	echo "" >> $(pwd)/README
 	echo "Usage: make && sudo make deploy" >> $(pwd)/README
 	echo "" >> $(pwd)/README
-	echo "Git rev. info:" >> $(pwd)/README
-	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
-	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
-	echo "   freertos: "$(cd $BASEDIR/cpputest && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "Git info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/mbed && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   freertos: "$(cd $BASEDIR/cpputest && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/cpputest && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	do_deploy_freertos
 	cp $SCRIPTDIR/mbed-freertos/main.cpp $(pwd)/src/main.cpp
 	cp $SCRIPTDIR/mbed-freertos/Makefile $(pwd)/Makefile
+	# Print usage instructions
+	cat README
 	;;
   mbed-freertos-lib)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
@@ -353,10 +363,10 @@ case "$1" in
 	echo "" >> $(pwd)/README
 	echo "Usage: make && sudo make deploy" >> $(pwd)/README
 	echo "" >> $(pwd)/README
-	echo "Git rev. info:" >> $(pwd)/README
-	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
-	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
-	echo "   freertos: "$(cd $BASEDIR/cpputest && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "Git info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/mbed && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   freertos: "$(cd $BASEDIR/cpputest && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/cpputest && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	cp $SCRIPTDIR/mbed/Makefile-lib $(pwd)/lib/mbed/Makefile
@@ -364,6 +374,8 @@ case "$1" in
 	cp $SCRIPTDIR/freertos/Makefile-lib $(pwd)/lib/FreeRTOS/Makefile
 	cp $SCRIPTDIR/mbed-freertos/main.cpp $(pwd)/src/main.cpp
 	cp $SCRIPTDIR/mbed-freertos/Makefile-lib $(pwd)/Makefile
+	# Print usage instructions
+	cat README
 	;;
   mbed-mbedrtos)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
@@ -371,14 +383,16 @@ case "$1" in
 	echo "" >> $(pwd)/README
 	echo "Usage: make && sudo make deploy" >> $(pwd)/README
 	echo "" >> $(pwd)/README
-	echo "Git rev. info:" >> $(pwd)/README
-	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
-	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "Git info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/mbed && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	do_deploy_mbedrots $2
 	cp $SCRIPTDIR/mbed-mbedrtos/main.cpp $(pwd)/src/main.cpp
 	cp $SCRIPTDIR/mbed-mbedrtos/Makefile $(pwd)/Makefile
+	# Print usage instructions
+	cat README
 	;;
   mbed-mbedrtos-lib)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
@@ -386,9 +400,9 @@ case "$1" in
 	echo "" >> $(pwd)/README
 	echo "Usage: make && sudo make deploy" >> $(pwd)/README
 	echo "" >> $(pwd)/README
-	echo "Git rev. info:" >> $(pwd)/README
-	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
-	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "Git info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/mbed && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_mbed $2
 	cp $SCRIPTDIR/mbed/Makefile-lib $(pwd)/lib/mbed/Makefile
@@ -396,6 +410,8 @@ case "$1" in
 	cp $SCRIPTDIR/mbedrtos/Makefile-lib $(pwd)/lib/mbedrtos/Makefile
 	cp $SCRIPTDIR/mbed-mbedrtos/main.cpp $(pwd)/src/main.cpp
 	cp $SCRIPTDIR/mbed-mbedrtos/Makefile-lib $(pwd)/Makefile
+	# Print usage instructions
+	cat README
 	;;
   none-safertos)
 	if [ ! -d "$SAFERTOS" ]; then
@@ -408,11 +424,13 @@ case "$1" in
 	echo "" >> $(pwd)/README
 	echo "Usage: make && sudo make deploy" >> $(pwd)/README
 	echo "" >> $(pwd)/README
-	echo "Git rev. info:" >> $(pwd)/README
-	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 --verify HEAD) >> $(pwd)/README
+	echo "Git info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
 	do_create_dir $2
 	do_deploy_safertos $2
 	cp $SCRIPTDIR/none-safertos/Makefile $(pwd)/Makefile
+	# Print usage instructions
+	cat README
 	;;
   --help)
 	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-cpput|mbed-none-sim|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
