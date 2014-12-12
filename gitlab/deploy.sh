@@ -35,19 +35,22 @@ export DBCI_NAME="gitlab_ci"
 export DBCI_USER="gitlab_ci"
 export DBCI_PASS="gitlab_ci" # Use apg to generate the password, e.g. "apg -a0 sNCL -m 16 -x 16 -t"
 # 0.4 GitLab Configuration
-export GITLAB_IP=192.168.34.34
+export GITLAB_IP=192.168.255.2
 if [ $(ip addr | grep $GITLAB_IP | wc -l) == 0 ]; then
-	echo "Bring up GitLab network device"
-	echo "E.g. sudo ifconfig eth0:1 $GITLAB netmask 255.255.255.0 up"
+	export DEVICE="$(ls /sys/class/net | grep eth | head -n1):1"
+	echo "Error: GitLab network device not detected."
+	echo "Try: sudo ifconfig $DEVICE $GITLAB_IP netmask 255.255.255.0 up"
 	exit 1
 fi
 export GITLAB_PORT="80"
 export GITLAB_SSH_PORT="22"
 # 0.5 GitLab CI Configuration
-export GITLABCI_IP=192.168.34.35
+export GITLABCI_IP=192.168.255.3
 if [ $(ip addr | grep $GITLABCI_IP | wc -l) == 0 ]; then
-	echo "Bring up GitLab-CI network device"
-	echo "E.g. sudo ifconfig eth0:2 $GITLABCI_IP netmask 255.255.255.0 up"
+	export DEVICE="$(ls /sys/class/net | grep eth | head -n1):2"
+	export NETMASK="255.255.255.0"
+	echo "Error: GitLab network device not detected."
+	echo "Try: sudo ifconfig $DEVICE $GITLABCI_IP netmask 255.255.255.0 up"
 	exit 1
 fi
 export GITLAB_CI_PORT="80"
@@ -61,10 +64,14 @@ if [ -z "$(cat /etc/os-release | grep "Ubuntu 14.04")" ]; then
 	echo ""
 	cat /etc/os-release
 	echo ""
-	echo "Use the following Docker image instead."
-	echo "https://registry.hub.docker.com/u/istarc/stm32/"
-	echo ""
-	exit 1
+	read -r -p "Continue? [y/N] " response
+	case $response in
+	    [yY][eE][sS]|[yY])
+	        ;;
+	    *)
+					exit 0
+	        ;;
+	esac
 fi
 # 0.8 Check if clean
 if [ -d "/opt/postgresql" ] || [ -d "/opt/gitlab" ] || [ -d "/opt/gitlab-ci" ] || [ -d "/opt/gitlab-ci-runner" ]; then
@@ -108,6 +115,13 @@ if [ ! -d "/opt/postgresql/data" ]; then
 	sudo mkdir -p /opt/postgresql/data
 # 2.2A Run the Image
 	sudo docker run --name=postgresql -d -v /opt/postgresql/data:/var/lib/postgresql sameersbn/postgresql:latest
+# 2.3A Wait for PostgreSQL to Start
+#until $(: </dev/tcp/$POSTGRES_PORT_5432_TCP_ADDR/$POSTGRES_PORT_5432_TCP_PORT); do 	 
+#	sleep 1 	 
+#done
+#	until pids=$(sudo docker exec -it postgresql sudo pidof postgres); do
+#		sleep 1
+#	done
 # 2.3A Create GitLab DB
 	sudo docker exec -it postgresql sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';"
 	sudo docker exec -it postgresql sudo -u postgres psql -c "CREATE DATABASE $DB_NAME;"
