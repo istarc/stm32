@@ -14,20 +14,19 @@
 #    GitLab installation to run tests for your projects". It supports
 #    GNU Tools for ARM Embedded Processors
 #    (see https://launchpad.net/gcc-arm-embedded).
-#
 
 ##
 # Some Further Details
 #
 # - This GitLab & GitLab CI system is deployed as a docker container
-#    to decrease host system pollution. These containers can be stopped,
-#    restarted or moved to a different system. Only ruby, ruby-mechanize,
+#    to decrease host system pollution. Only ruby, ruby-mechanize,
 #    wget, curl, nc and lxc-docker-1.3.2 packages are installed. The latter
 #    is installed from a 3rd party repository maintained by docker.com.
 #
-# - The GitLab & GitLab CI store data on host computer to avoid data loss, 
-#    when docker containers are deleted. The GitLab & GitLab CI data store 
-#    is located at "/opt" directory.
+# - Docker containers store GitLab and GitLab CI data on host computer 
+#    to avoid data loss, when they are stopped or deleted. "/opt" directory 
+#    is used to store the data. The GitLab and GitLab CI services are resumed
+#    by running this script again.
 
 ##
 # Prerequisites: Ubuntu 14.04 LTS
@@ -41,7 +40,7 @@
 # 0.1 Stop on first error
 set -e 
 # 0.2 Be verbose
-set -x
+# set -x
 # 0.3 PostgreSQL Configuration
 # 0.3.1 GitLab DB
 export DB_NAME="gitlab"
@@ -89,12 +88,16 @@ fi
 # 0.6 GitLab CI Runner Configuration
 export CI_SERVER_URL="http://$GITLABCI_IP:$GITLAB_PORT"
 export CI_RUNNERS_COUNT=2
-# 0.7 Check if Ubuntu 14.04 LTS
+# 0.7 Install software dependencies
 if [ -z "$(cat /etc/os-release | grep "Ubuntu 14.04")" ]; then
-	echo "This script should be only used with Ubuntu 14.04,"
-	echo "but your system is"
+	echo "Software dependencies are automatically installed on"
+	echo "Ubuntu 14.04 LTS, but your system is"
 	echo ""
 	cat /etc/os-release
+	echo ""
+	echo "Before you continue you should manually install the following packages:"
+	echo ""
+	echo "lxc-docker-1.3.2 ruby ruby-mechanize wget curl netcat"
 	echo ""
 	read -r -p "Continue? [y/N] " response
 	case $response in
@@ -104,6 +107,18 @@ if [ -z "$(cat /etc/os-release | grep "Ubuntu 14.04")" ]; then
 					exit 0
 	        ;;
 	esac
+else
+	# 0.7.1 Install platform dependencies
+	export DEBIAN_FRONTEND=noninteractive
+	if [ ! -f "/etc/apt/sources.list.d/docker.list" ]; then
+		sudo sh -c "wget -qO- https://get.docker.io/gpg | apt-key add -"
+		sudo sh -c "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"
+	fi
+	sudo apt-get update -q
+	# 0.7.2 Install Docker 1.3.2
+	sudo apt-get install -y lxc-docker-1.3.2
+	# 0.7.3 Install Ruby et al.
+	sudo apt-get install -y ruby ruby-mechanize wget curl netcat
 fi
 # 0.8 Get Existing Docker Containers ID
 #
@@ -124,7 +139,7 @@ fi
 # 0.9 Check Existing Data Store
 if [ -d "/opt/postgresql" ] || [ -d "/opt/gitlab" ] || [ -d "/opt/gitlab-ci" ] || [ -d "/opt/gitlab-ci-runner" ]; then
 	echo ""
-	echo "Wipe out previous deployment?"
+	echo "Wipe out the previous deployment?"
 	echo ""
 	echo " - /opt/postgresql"
 	echo " - /opt/gitlab"
@@ -149,20 +164,6 @@ if [ -d "/opt/postgresql" ] || [ -d "/opt/gitlab" ] || [ -d "/opt/gitlab-ci" ] |
 	        ;;
 	esac
 fi
-
-# 1. Install dependancies
-# 1.1 Install platform dependancies
-export DEBIAN_FRONTEND=noninteractive
-if [ ! -f "/etc/apt/sources.list.d/docker.list" ]; then
-	sudo sh -c "wget -qO- https://get.docker.io/gpg | apt-key add -"
-	sudo sh -c "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"
-fi
-sudo apt-get update -q
-# 1.2 Install project dependancies
-# 1.2.1 Install Docker 1.3.2
-sudo apt-get install -y lxc-docker-1.3.2
-# 1.2.2 Install Ruby
-sudo apt-get install -y ruby ruby-mechanize wget curl nc
 
 # 2. Deploy PostgreSQL
 echo -e "Deploying PostgreSQL"
