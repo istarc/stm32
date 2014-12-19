@@ -1,11 +1,11 @@
 ###
 # Purpose: to create a bare-metal with mbed SDK and cpputest in ARM semihosting environment.
 #
-# Disable coverage testing by removing 
-# (i)   "-lgcov" (Makefile-test, line 70);
-# (ii)  "-fprofile-arcs -ftest-coverage" (Makefile-test, line 143, 152);
-# (iii) "extern "C" void __gcov_flush();" (src-test/test-main.cpp, line 5);
-# (iv)  "__gcov_flush();" (src-test/test-main.cpp, line 14).
+# Basic usage: make test-clean && make test-deps && make test && make check
+
+#########################
+# Configuration Options #
+#########################
 
 ###
 # GNU ARM Embedded Toolchain
@@ -20,6 +20,7 @@ NM=arm-none-eabi-nm
 SIZE=arm-none-eabi-size
 A2L=arm-none-eabi-addr2line
 GCOV=arm-none-eabi-gcov
+GPROF=arm-none-eabi-gprof
 
 ###
 # Directory Structure
@@ -97,23 +98,19 @@ LDSCRIPT=stm32f407.ld
 # The latter is used for bare bones target (without OS).
 LDFLAGS=-T $(LDSCRIPT) $(MCFLAGS) $(INCLUDES_LIBS) $(LINK_LIBS) --specs=rdimon.specs --specs=nosys.specs
 
-###
-# Build Rules
-.PHONY: all test-release test-release-memopt test-debug test-deps test-clean test-deps-clean test-deploy check check-coverage
+###############
+# Build Rules #
+###############
 
+##
+# Build flavors
+.PHONY: all
 all: test-release-memopt
+
+.PHONY: test
 test: test-release-memopt
 
-test-release-memopt-blame: CFLAGS+=-g
-test-release-memopt-blame: CXXFLAGS+=-g
-test-release-memopt-blame: LDFLAGS+=-g -Wl,-Map=$(BINDIR)/output.map
-test-release-memopt-blame: test-release-memopt
-test-release-memopt-blame:
-	@echo "Top 10 space consuming symbols from the object code ...\n"
-	$(NM) -A -l -C -td --reverse-sort --size-sort $(BINDIR)/$(BINELF) | head -n10 | cat -n # Output legend: man nm
-	@echo "\n... and corresponging source files to blame.\n"
-	$(NM) --reverse-sort --size-sort -S -tx $(BINDIR)/$(BINELF) | head -10 | cut -d':' -f2 | cut -d' ' -f1 | $(A2L) -e $(BINDIR)/$(BINELF) | cat -n # Output legend: man addr2line
-
+.PHONY: test-release-memopt
 # Redefined functions malloc, free, new, delete should not be used with CppUTest. It also requires exeception handling to work properly, so the line below should be disabled.
 #test-release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS 
 test-release-memopt: CFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin # -flto
@@ -121,13 +118,17 @@ test-release-memopt: CXXFLAGS+=-Os -ffunction-sections -fdata-sections -fno-buil
 test-release-memopt: LDFLAGS+=-Os -Wl,-gc-sections --specs=nano.specs # -flto
 test-release-memopt: test-release
 
+.PHONY: test-debug
 test-debug: CFLAGS+=-g
 test-debug: CXXFLAGS+=-g
 test-debug: LDFLAGS+=-g
 test-debug: test-release
 
+.PHONY: test-release
 test-release: $(TBINDIR)/$(BINHEX)
 
+##
+# General build rules
 $(TBINDIR)/$(BINHEX): $(TBINDIR)/$(BINELF)
 	$(CP) -O ihex $< $@
 	@echo "Objcopy from ELF to IHEX complete!\n"
@@ -159,28 +160,81 @@ $(SRCDIR)/%.o: $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) $< -o $@
 	@echo "Assambled "$<"!\n"
 
+##
+# Build dependencies
+# TODO CXXFLAGS+=-std=c++11 works only with -Wno-error (Dirty Hack!)
+.PHONY: test-deps
 test-deps: 
-	cd $(TCPPUTEST) && ./configure --prefix=$(shell pwd)/$(TCPPUTEST) --host=arm-none-eabi LDFLAGS="$(MCFLAGS) --specs=nosys.specs $(CPPUTEST_INCLUDES_LIBS) $(CPPUTEST_LINK_LIBS)" CFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) -std=c99" CXXFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES)" && make clean && make # && make install (not used -- src and target dir are the same) # && ./autogen.sh (will be used in the next release) # CXXFLAGS+=-std=c++11 is currently not supported
+	cd $(TCPPUTEST) && ./configure --prefix=$(shell pwd)/$(TCPPUTEST) --host=arm-none-eabi LDFLAGS="$(MCFLAGS) --specs=nosys.specs $(CPPUTEST_INCLUDES_LIBS) $(CPPUTEST_LINK_LIBS)" CFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) -std=c99" CXXFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) -std=c++11 -Wno-error" && make clean && make # && make install (not used -- src and target dir are the same) # && ./autogen.sh (will be used in the next release) # CXXFLAGS+=-std=c++11 is currently not supported
 
+##
+# Clean rules
+.PHONY: test-clean
 test-clean:
-	rm -f $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(BINDIR)/$(BINELF) $(BINDIR)/$(BINHEX) $(BINDIR)/output.map
+	rm -f $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(TBINDIR)/$(BINELF) $(TBINDIR)/$(BINHEX) $(TBINDIR)/output.map
 	find . -type f -name '*.gcno' -exec rm -f {} \;
 	find . -type f -name '*.gcda' -exec rm -f {} \;
 	find . -type f -name '*.gcov' -exec rm -f {} \;
 
+.PHONY: test-deps-clean
 test-deps-clean:
 	cd $(TCPPUTEST) && make clean
 
-test-deploy: check
+################
+# Check Rules  #
+################
 
+##
+# Check unit test
+# Usage: make test-clean && make test-deps && make test && make check
+.PHONY: check
 check:
 	test -e $(TBINDIR)/$(BINELF)
 	find . -type f -name '*.gcda' -exec rm -f {} \;
 	find . -type f -name '*.gcov' -exec rm -f {} \;
 	expect check.exp
 
-check-coverage:
+##
+# Profile execution coverage
+#
+# Disable coverage testing by removing 
+# (i)   "-lgcov" (Makefile-test, line 70);
+# (ii)  "-fprofile-arcs -ftest-coverage" (Makefile-test, line 143, 152);
+# (iii) "extern "C" void __gcov_flush();" (src-test/test-main.cpp, line 5);
+# (iv)  "__gcov_flush();" (src-test/test-main.cpp, line 14).
+#
+# Usage: make test-clean && make test-deps && make test && make check && make check-exec-coverage
+.PHONY: check-exec-coverage
+check-exec-coverage:
 	@echo "\nEvaluating Test Coverage\n"
 	find src -name '*.cpp' -not -name 'main.cpp' -not -name 'main.c' -exec $(GCOV) --relative-only {} \;
 	@echo "\nDisplaying Test Coverage Details\n"
 	find . -name '*.gcov' -exec sed -e 1s/^/---\\n/g {} \;
+
+##
+# Profile code size
+# Usage: make test-clean && make test-deps && make check-code-size
+.PHONY: check-code-size
+check-code-size: CFLAGS+=-g
+check-code-size: CXXFLAGS+=-g
+check-code-size: LDFLAGS+=-g -Wl,-Map=$(TBINDIR)/output.map
+check-code-size: test-release-memopt
+check-code-size:
+	@echo "Top 10 space consuming symbols from the object code ...\n"
+	$(NM) -A -l -C -td --reverse-sort --size-sort $(TBINDIR)/$(BINELF) | head -n10 | cat -n # Output legend: man nm
+	@echo "\n... and corresponging source files to blame.\n"
+	$(NM) --reverse-sort --size-sort -S -tx $(TBINDIR)/$(BINELF) | head -10 | cut -d':' -f2 | cut -d' ' -f1 | $(A2L) -e $(TBINDIR)/$(BINELF) | cat -n # Output legend: man addr2line
+
+##
+# Profile execution time
+# Usage: make test-clean && make test-deps && make check-exec-time
+.PHONY: check-exec-time
+check-exec-time:
+	test -e $(TBINDIR)/$(BINELF)
+	find . -type f -name '*.gmon' -exec rm -f {} \;
+ifeq ($(wildcard /opt/openocd/bin/openocd),)
+	/usr/bin/openocd -f /usr/share/openocd/scripts/board/stm32f4discovery.cfg -f test-gprof.cfg
+else
+	/opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg -f test-gprof.cfg
+endif
+	$(GPROF) $(TBINDIR)/$(BINELF) gmon.out
