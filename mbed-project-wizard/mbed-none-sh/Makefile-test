@@ -162,9 +162,10 @@ $(SRCDIR)/%.o: $(SRCDIR)/%.c
 
 ##
 # Build dependencies
+# TODO CXXFLAGS+=-std=c++11 works only with -Wno-error (Dirty Hack!)
 .PHONY: test-deps
 test-deps: 
-	cd $(TCPPUTEST) && ./configure --prefix=$(shell pwd)/$(TCPPUTEST) --host=arm-none-eabi LDFLAGS="$(MCFLAGS) --specs=nosys.specs $(CPPUTEST_INCLUDES_LIBS) $(CPPUTEST_LINK_LIBS)" CFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) -std=c99" CXXFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES)" && make clean && make # && make install (not used -- src and target dir are the same) # && ./autogen.sh (will be used in the next release) # CXXFLAGS+=-std=c++11 is currently not supported
+	cd $(TCPPUTEST) && ./configure --prefix=$(shell pwd)/$(TCPPUTEST) --host=arm-none-eabi LDFLAGS="$(MCFLAGS) --specs=nosys.specs $(CPPUTEST_INCLUDES_LIBS) $(CPPUTEST_LINK_LIBS)" CFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) -std=c99" CXXFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) -std=c++11 -Wno-error" && make clean && make # && make install (not used -- src and target dir are the same) # && ./autogen.sh (will be used in the next release) # CXXFLAGS+=-std=c++11 is currently not supported
 
 ##
 # Clean rules
