@@ -1,0 +1,40 @@
+#!/usr/bin/expect -f
+#
+# Description: Deploys unit test binary on to the STM32F4 target via OpenOCD and monitors the test output in a
+#              semihosting environment (see check.cfg). There are 3 possible exit codes:
+#              - If test results are OK, then the exit code is 0. 
+#              - If one or more test fails, then the exit code is 2.
+#              - If one or more test fails to execute, then the exit code is 1.
+#              - The test execution timeouts after 240 seconds with the exit code 1.
+#
+
+set timeout 240
+set exitcode 1
+
+# Prefer manually built OpenOCD
+if {[file exists /opt/openocd/bin/openocd]} {
+    spawn nice -n-20 /opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg -f check.cfg
+} else {
+    spawn nice -n-20 /usr/bin/openocd -f /usr/share/openocd/scripts/board/stm32f4discovery.cfg -f check.cfg
+}
+
+# Checkpoint 1 - Start
+expect {
+	-re "\^.* Test Start .*\$" { set exitcode 0 }
+	timeout { puts "Test Results: Failure.\nTest execution failed \[1] due to timeout (see check.exp; current timeout = $timeout s).\n"; exit 1 }
+}
+
+# Checkpoint 2 - Test results || Wait for coverage statistic and exit
+expect {
+	-re "\^.*\[0-9]* FAILED TEST.*\$" { set exitcode 2 }
+	-re "\^.* Test End .*\$" {}
+	timeout { puts "Test Results: Failure.\nTest execution failed \[3] due to timeout (see check.exp; current timeout = $timeout s).\n"; exit 1 }
+}
+
+if { $exitcode == 0 } { 
+	puts "Test Results: Success.\n"; exit 0 
+} elseif { $exitcode == 2 } { 
+	puts "Test Results: Failure.\nOne or more unit tests failed."; exit 2 
+} else { 
+	puts "Test Results: Failure.\nTest execution failed."; exit 1
+}

@@ -1,0 +1,10 @@
+Project template created by gen-stm32f407-GCC-project.sh mbed-none-shsimgtest
+   mbed-none-shsimgtest ... creates a bare-metal project with mbed SDK and googletest support suitable for (ARM semihosted) QEMU simulation
+
+Usage [app]:  make clean && make && sudo make deploy
+Usage [test]: make test-clean && make test-deps && make test && make check
+
+Git info:
+   stm32:    c9598bb6ec (master)
+   mbed:     a94eb663dc (mbed_lib_rev91)
+   gtest:    2ad076167a (release-1.7.0)
