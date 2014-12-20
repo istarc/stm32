@@ -28,6 +28,7 @@ set -e
 ##
 # Variables:
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPTNAME="$(basename $0)"
 BASEDIR=$SCRIPTDIR/..
 CMSIS=$BASEDIR/STM32F4-Discovery_FW_V1.0.0
 MBED=$BASEDIR/mbed/libraries/mbed
@@ -54,6 +55,41 @@ do
 		exit 2
 	fi
 done
+
+##
+# Print usage
+do_print_usage()
+{
+	echo "Usage: $SCRIPTNAME <project template> [link]"
+	echo ""
+	echo "   Project Templates:"
+	echo ""
+	echo "   mbed-none ................. creates a bare-metal project with mbed SDK"
+	echo "   mbed-none-BB .............. creates a bare-metal project with mbed SDK, cpputest support"
+	echo "                                and redirected STDIO tailored to STM32F4-BB expansion board"
+	echo ""
+	echo "   mbed-none-sh[|cpput] ...... creates a bare-metal project with mbed SDK, cpputest and"
+	echo "                                ARM semihosting support"
+	echo ""
+	echo "   mbed-none-shgtest ......... creates a bare-metal project with mbed SDK, googletest and"
+	echo "                                ARM semihosting support"
+	echo ""
+	echo "   mbed-none-shsim[|cpput] ... creates a bare-metal project with mbed SDK and cpputest support"
+	echo "                                suitable for (ARM semihosted) QEMU simulation"
+	echo ""
+	echo "   mbed-none-shsimgtest ...... creates a bare-metal project with mbed SDK and googletest support"
+	echo "                                suitable for (ARM semihosted) QEMU simulation"
+	echo ""
+	echo "   mbed-none-lib ............. creates a bare-metal project with mbed SDK"
+	echo "   mbed-freertos ............. creates a FreeRTOS project with mbed SDK"
+	echo "   mbed-freertos-lib ......... creates a FreeRTOS project with mbed SDK (/w libraries)"
+	echo "   mbed-mbedrtos ............. creates a mbedRTOS project with mbed SDK"
+	echo "   mbed-mbedrtos-lib ......... creates a mbedRTOS project with mbed SDK (/w libraries)"
+	echo "   none-safertos ............. creates a SafeRTOS project"
+	echo ""
+	echo "   link ...................... creates symlinks instead of file copies"
+	echo ""
+}
 
 ##
 # Create directory structure
@@ -506,31 +542,10 @@ case "$1" in
 	cat README
 	;;
   --help)
-	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-cpput|mbed-none-sim|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
-	echo ""
-	echo "   mbed-none ................. creates a bare-metal project with mbed SDK"
-	echo "   mbed-none-BB .............. creates a bare-metal project with mbed SDK, cpputest support and redirected STDIO tailored to STM32F4-BB expansion board"
-	echo "   mbed-none-sh[|cpput] ...... creates a bare-metal project with mbed SDK, cpputest and ARM semihosting support"
-	echo "   mbed-none-shgtest ......... creates a bare-metal project with mbed SDK, googletest and ARM semihosting support"
-	echo "   mbed-none-shsim[|cpput] ... creates a bare-metal project with mbed SDK and cpputest support suitable for (ARM semihosted) QEMU simulation"
-	echo "   mbed-none-shsimgtest ...... creates a bare-metal project with mbed SDK and googletest support suitable for (ARM semihosted) QEMU simulation"
-	echo "   mbed-none-lib ............. creates a bare-metal project with mbed SDK"
-	echo "   mbed-freertos ............. creates a FreeRTOS project with mbed SDK (/w libraries)"
-	echo "   mbed-freertos-lib ......... creates a FreeRTOS project with mbed SDK (/w libraries)"
-	echo "   mbed-mbedrtos ............. creates a mbedRTOS project with mbed SDK"
-	echo "   mbed-mbedrtos-lib ......... creates a mbedRTOS project with mbed SDK (/w libraries)"
-	echo "   none-safertos ............. creates a SafeRTOS project"
-	echo " "
-	echo "   link ...................... symlink files instead of copy"
-	echo " "
+	do_print_usage
 	;;
   *)
-	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-BB|mbed-none-lib|"
-	echo "                    mbed-none-sh|mbed-none-shcpput|mbed-none-shgtest|"
-	echo "                    mbed-none-shsim|mbed-none-shsimcpput|mbed-none-shsimgtest"
-	echo "                    mbed-freertos|mbed-freertos-lib|"
-	echo "                    mbed-mbedrtos|mbed-mbedrtos-lib|"
-	echo "                    none-safertos} {|link}"
+	do_print_usage
 	exit 3
 	;;
 esac
