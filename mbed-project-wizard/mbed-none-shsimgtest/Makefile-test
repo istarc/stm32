@@ -1,0 +1,238 @@
+###
+# Purpose: to create a bare-metal with mbed SDK and cpputest suitable for (ARM semihosting) QEMU simulation
+#
+# Basic usage: make test-clean && make test-deps && make test && make check
+
+#########################
+# Configuration Options #
+#########################
+
+###
+# GNU ARM Embedded Toolchain
+CC=arm-none-eabi-gcc
+CXX=arm-none-eabi-g++
+LD=arm-none-eabi-ld
+AR=arm-none-eabi-ar
+AS=arm-none-eabi-as
+CP=arm-none-eabi-objcopy
+OD=arm-none-eabi-objdump
+NM=arm-none-eabi-nm
+SIZE=arm-none-eabi-size
+A2L=arm-none-eabi-addr2line
+GCOV=arm-none-eabi-gcov
+GPROF=arm-none-eabi-gprof
+
+###
+# Directory Structure
+BINDIR=bin
+INCDIR=inc
+SRCDIR=src
+LIBDIR=lib
+
+TBINDIR=test-bin
+TSRCDIR=test-src
+TGTEST=test-googletest
+
+###
+# Find source files
+ASOURCES=$(shell find -L $(SRCDIR) -name '*.s')
+# Exclude startup_stm32f407xx.s (if exists). QEMU simulation uses different startup routine.
+ASOURCES+=$(shell find -L $(LIBDIR) -name '*.s' -not -name 'startup_stm32f407xx.s')
+# Exclude main.c (if exists), because test-main.cpp is used for unit testing.
+CSOURCES=$(shell find -L $(SRCDIR) -name '*.c' -not -name 'main.c')
+CSOURCES+=$(shell find -L $(LIBDIR) -name '*.c')
+CSOURCES+=$(shell find -L $(TSRCDIR) -name '*.c')
+# Exclude main.cpp (if exists), because test-main.cpp is used for unit testing.
+CXXSOURCES=$(shell find -L $(SRCDIR) -name '*.cpp' -not -name 'main.cpp')
+# Filter retarget.cpp from mbed library, because it is already defined in librdimon,
+# which is used to provide semihosted environment.
+CXXSOURCES+=$(filter-out %retarget.cpp, $(shell find -L $(LIBDIR) -name '*.cpp'))
+CXXSOURCES+=$(shell find -L $(TSRCDIR) -name '*.cpp')
+# Find header directories
+INC=$(shell find -L $(INCDIR) -type f -name '*.h' -exec dirname {} \; | uniq)
+INC+=$(shell find -L $(LIBDIR) -type f -name '*.h' -exec dirname {} \; | uniq)
+INC+=$(shell find -L $(LIBDIR) -type d -name '*include' | uniq)
+INC+=$(shell find -L $(TSRCDIR) -type f -name '*.h' -exec dirname {} \; | uniq)
+# CPPUTEST_INCLUDES are used to build CppUTest framework.
+CPPUTEST_INCLUDES=$(INC:%=-I%)
+# INCLUDES are used at building unit tests.
+INCLUDES=$(CPPUTEST_INCLUDES)
+INCLUDES+=-I$(TGTEST)/include
+# Find libraries
+LIBFILES=$(shell find $(LIBDIR) -type f -name '*.a')
+CPPUTEST_INCLUDES_LIBS=$(patsubst %,-L%, $(dir $(LIBFILES)))
+INCLUDES_LIBS=$(CPPUTEST_INCLUDES_LIBS)
+INCLUDES_LIBS+=-L$(TGTEST)/lib
+# CPPUTEST_LINK_LIBS are used at building CppUTest framework.
+CPPUTEST_LINK_LIBS=$(patsubst lib%, -l%, $(basename $(notdir $(LIBFILES))))
+CPPUTEST_LINK_LIBS+=
+# LINK_LIBS are used at building unit tests.
+# librdimon enables semihosting environment (retargets STDIO)
+# libgcov enables test coverage
+LINK_LIBS=$(CPPUTEST_LINK_LIBS)
+LINK_LIBS+=-lgtest -lrdimon -lgcov
+# Create object list
+AOBJECTS=$(ASOURCES:%.s=%.o)
+COBJECTS=$(CSOURCES:%.c=%.o)
+CXXOBJECTS=$(CXXSOURCES:%.cpp=%.o)
+# Define output files ELF & IHEX
+BINELF=outp.elf
+BINHEX=outp.hex
+
+###
+# MCU FLAGS
+# QEMU currently supports only cortex-m3 CPU and soft FPU (but not cortex-m4 with hard FPU)
+MCFLAGS=-mcpu=cortex-m3 -mthumb -mlittle-endian -mfloat-abi=soft -mthumb-interwork
+# COMPILE FLAGS
+DEFS=-DTARGET_STM32F407 -D__CORTEX_M4 -D__FPU_PRESENT
+# Flags -fprofile-arcs and -ftest-coverage are used on a per file basis due to high memory consumption.
+CFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c99 #-fprofile-arcs -ftest-coverage
+CXXFLAGS=-c $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11 #-fprofile-arcs -ftest-coverage
+# A dirty hack to build Stream.cpp according to C+11.
+CXXFLAGS+=-U__STRICT_ANSI__
+# LINKER FLAGS
+# Use rdimon and nosys specs. The former is used to enable semihosted environment.
+# The latter is used for bare bones target (without OS).
+LDFLAGS=$(MCFLAGS) $(INCLUDES_LIBS) $(LINK_LIBS) --specs=rdimon.specs --specs=nosys.specs
+
+###############
+# Build Rules #
+###############
+
+##
+# Build flavors
+.PHONY: all
+all: test-release-memopt
+
+.PHONY: test
+test: test-release-memopt
+
+.PHONY: test-release-memopt
+# Redefined functions malloc, free, new, delete should not be used with CppUTest. It also requires exeception handling to work properly, so the line below should be disabled.
+#test-release-memopt: DEFS+=-DCUSTOM_NEW -DNO_EXCEPTIONS 
+test-release-memopt: CFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin # -flto
+test-release-memopt: CXXFLAGS+=-Os -ffunction-sections -fdata-sections -fno-builtin #-fno-exceptions -fno-rtti # -flto
+test-release-memopt: LDFLAGS+=-Os -Wl,-gc-sections --specs=nano.specs # -flto
+test-release-memopt: test-release
+
+.PHONY: test-debug
+test-debug: CFLAGS+=-g
+test-debug: CXXFLAGS+=-g
+test-debug: LDFLAGS+=-g
+test-debug: test-release
+
+.PHONY: test-release
+test-release: $(TBINDIR)/$(BINHEX)
+
+##
+# General build rules
+$(TBINDIR)/$(BINHEX): $(TBINDIR)/$(BINELF)
+	$(CP) -O ihex $< $@
+	@echo "Objcopy from ELF to IHEX complete!\n"
+
+$(TBINDIR)/$(BINELF): $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS)
+	$(CXX) $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(LDFLAGS) -o $@
+	@echo "Linking complete!\n"
+	$(SIZE) $(TBINDIR)/$(BINELF)
+
+# Due to high memory consumption -fprofile-arcs and -ftest-coverage are used on a per file basis
+$(SRCDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -fprofile-arcs -ftest-coverage $< -o $@
+	@echo "Compiled "$<"!\n"
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $< -o $@
+	@echo "Compiled "$<"!\n"
+
+# Due to high memory consumption -fprofile-arcs and -ftest-coverage are used on a per file basis
+$(SRCDIR)/%.o: $(SRCDIR)/%.c
+	$(CC) $(CFLAGS) -fprofile-arcs -ftest-coverage $< -o $@
+	@echo "Compiled "$<"!\n"
+
+%.o: %.c
+	$(CC) $(CFLAGS) $< -o $@
+	@echo "Compiled "$<"!\n"
+
+%.o: %.s
+	$(CC) $(CFLAGS) $< -o $@
+	@echo "Assambled "$<"!\n"
+
+##
+# Build dependencies
+# TODO CXXFLAGS+=-std=c++11 works only with -Wno-error (Dirty Hack!)
+.PHONY: test-deps
+test-deps: 
+	cd $(TGTEST) && make clean || true && autoreconf -fvi && ./configure --disable-shared --without-pthreads --disable-libtool-lock --prefix=$(shell pwd)/$(TGTEST) --exec-prefix=$(shell pwd)/$(TGTEST) --host=arm-none-eabi LDFLAGS="$(MCFLAGS) --specs=nosys.specs --specs=nano.specs $(CPPUTEST_INCLUDES_LIBS) $(CPPUTEST_LINK_LIBS)" CFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) -std=c99 -Os -DGTEST_HAS_POSIX_RE=0 -DGTEST_HAS_PTHREAD=0 -DGTEST_HAS_COMBINE=0 -DGTEST_HAS_DEATH_TEST=0 -DGTEST_HAS_TR1_TUPLE=0 -DGTEST_HAS_STREAM_REDIRECTION=0 -DGTEST_OS_NONE" CXXFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) -std=gnu++11 -Os -DGTEST_HAS_POSIX_RE=0 -DGTEST_HAS_PTHREAD=0 -DGTEST_HAS_COMBINE=0 -DGTEST_HAS_DEATH_TEST=0 -DGTEST_HAS_TR1_TUPLE=0 -DGTEST_HAS_STREAM_REDIRECTION=0 -DGTEST_OS_NONE" && make && make install-libLTLIBRARIES
+
+##
+# Clean rules
+.PHONY: test-clean
+test-clean:
+	rm -f $(AOBJECTS) $(COBJECTS) $(CXXOBJECTS) $(TBINDIR)/$(BINELF) $(TBINDIR)/$(BINHEX) $(TBINDIR)/output.map
+	find . -type f -name '*.gcno' -exec rm -f {} \;
+	find . -type f -name '*.gcda' -exec rm -f {} \;
+	find . -type f -name '*.gcov' -exec rm -f {} \;
+	rm -f check.log sim.err
+
+.PHONY: test-deps-clean
+test-deps-clean:
+	cd $(TGTEST) && make clean && rm -f lib/*.a
+
+################
+# Check Rules #
+################
+
+##
+# Unit test
+# Usage: make test-clean && make test-deps && make test && make check
+.PHONY: check
+check:
+	test -e $(TBINDIR)/$(BINELF)
+	find . -type f -name '*.gcda' -exec rm -f {} \;
+	find . -type f -name '*.gcov' -exec rm -f {} \;
+	expect check.exp
+
+##
+# Profile execution coverage
+#
+# Disable coverage testing by removing 
+# (i)   "-lgcov" (Makefile-test, line 70);
+# (ii)  "-fprofile-arcs -ftest-coverage" (Makefile-test, line 143, 152);
+# (iii) "extern "C" void __gcov_flush();" (src-test/test-main.cpp, line 5);
+# (iv)  "__gcov_flush();" (src-test/test-main.cpp, line 14).
+#
+# Usage: make test-clean && make test-deps && make test && make check && make check-exec-coverage
+.PHONY: check-exec-coverage
+check-exec-coverage:
+	@echo "\nEvaluating Test Coverage\n"
+	find src -name '*.cpp' -not -name 'main.cpp' -not -name 'main.c' -exec $(GCOV) --relative-only {} \;
+	@echo "\nDisplaying Test Coverage Details\n"
+	find . -name '*.gcov' -exec sed -e 1s/^/---\\n/g {} \;
+
+##
+# Profile code size
+# Usage: make test-clean && make test-deps && make check-code-size
+.PHONY: check-code-size
+check-code-size: CFLAGS+=-g
+check-code-size: CXXFLAGS+=-g
+check-code-size: LDFLAGS+=-g -Wl,-Map=$(TBINDIR)/output.map
+check-code-size: test-release-memopt
+check-code-size:
+	@echo "Top 10 space consuming symbols from the object code ...\n"
+	$(NM) -A -l -C -td --reverse-sort --size-sort $(TBINDIR)/$(BINELF) | head -n10 | cat -n # Output legend: man nm
+	@echo "\n... and corresponging source files to blame.\n"
+	$(NM) --reverse-sort --size-sort -S -tx $(TBINDIR)/$(BINELF) | head -10 | cut -d':' -f2 | cut -d' ' -f1 | $(A2L) -e $(TBINDIR)/$(BINELF) | cat -n # Output legend: man addr2line
+
+##
+# Profile execution time
+# Usage: make test-clean && make test-deps && make check-exec-time
+.PHONY: check-exec-time
+check-exec-time:
+	test -e $(TBINDIR)/$(BINELF)
+	find . -type f -name '*.gmon' -exec rm -f {} \;
+ifeq ($(wildcard /opt/openocd/bin/openocd),)
+	/usr/bin/openocd -f /usr/share/openocd/scripts/board/stm32f4discovery.cfg -f test-gprof.cfg
+else
+	/opt/openocd/bin/openocd -f /opt/openocd/share/openocd/scripts/board/stm32f4discovery.cfg -f test-gprof.cfg
+endif
+	$(GPROF) $(TBINDIR)/$(BINELF) gmon.out

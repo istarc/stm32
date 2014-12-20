@@ -22,17 +22,6 @@
 # 3. Install via wine (use default installation)
 #	wine STM32F4xx_atollic_SafeRTOS_Library_Demo.exe
 
-##
-# Depends on:
-# freertos/*, mbed/*, mbed-freertos/*, mbed-none/*, mbed-mbedrtos/*, none-safertos/*
-
-##
-# Options:
-# - mbed-none[-lib] - Bare-metal project /w mbed SDK [with library].
-# - mbed-freertos[-lib] - FreeRTOS project /w mbed SDK [with library].
-# - mbed-mbedrtos[-lib] - mbedRTOS project /w mbed SDK [with library].
-# - none-safertos - SafeRTOS project
-
 set -e
 #set -x
 
@@ -256,7 +245,7 @@ case "$1" in
 	;;
   mbed-none-sh)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
-	echo "   mbed-none-sh ... creates a bare-metal project with mbed SDK, cpputest and ARM semihosting support." >> $(pwd)/README
+	echo "   mbed-none-sh[|cpput] ... creates a bare-metal project with mbed SDK, cpputest and ARM semihosting support." >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Usage [app]:  make clean && make && sudo make deploy" >> $(pwd)/README
 	echo "Usage [test]: make test-clean && make test-deps && make test && sudo make check"  >> $(pwd)/README
@@ -291,9 +280,51 @@ case "$1" in
 	# Print usage instructions
 	cat README
 	;;
+	mbed-none-shcpput)
+	mbed-none-sh
+	;;
+	mbed-none-shgtest)
+	echo "Project template created by ${0##*/} $1" > $(pwd)/README
+	echo "   mbed-none-shgtest ... creates a bare-metal project with mbed SDK, googletest and ARM semihosting support." >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Usage [app]:  make clean && make && sudo make deploy" >> $(pwd)/README
+	echo "Usage [test]: make test-clean && make test-deps && make test && sudo make check"  >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Git info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/mbed && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   gtest:    "$(cd $BASEDIR/googletest && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/googletest && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	do_create_tdir $2
+	do_deploy_mbed $2
+	# Deploy project files
+	cp $SCRIPTDIR/mbed-none-shgtest/main.cpp $(pwd)/src/main.cpp
+	cp $SCRIPTDIR/mbed-none-shgtest/add.cpp $(pwd)/src/add.cpp
+	cp $SCRIPTDIR/mbed-none-shgtest/dadd.cpp $(pwd)/src/dadd.cpp
+	cp $SCRIPTDIR/mbed-none-shgtest/add.h $(pwd)/inc/add.h
+	cp $SCRIPTDIR/mbed-none-shgtest/dadd.h $(pwd)/inc/dadd.h
+	# Deploy test files
+	cp $SCRIPTDIR/mbed-none-shgtest/test-main.cpp $(pwd)/test-src/test-main.cpp
+	cp $SCRIPTDIR/mbed-none-shgtest/test-fail.cpp $(pwd)/test-src/test-fail.cpp
+	cp $SCRIPTDIR/mbed-none-shgtest/test-add.cpp $(pwd)/test-src/test-dadd.cpp
+	cp $SCRIPTDIR/mbed-none-shgtest/test-dadd.cpp $(pwd)/test-src/test-add.cpp
+	# Deploy Makefiles, automated unit test check script (with the corresponding OpenOCD script)
+	cp $SCRIPTDIR/mbed-none-shgtest/Makefile $(pwd)/Makefile
+	cp $SCRIPTDIR/mbed-none-shgtest/Makefile-test $(pwd)/Makefile-test
+	cp $SCRIPTDIR/mbed-none-shgtest/check.exp $(pwd)/check.exp
+	cp $SCRIPTDIR/mbed-none-shgtest/check.cfg $(pwd)/check.cfg
+	cp $SCRIPTDIR/mbed-none-shgtest/deploy.cfg $(pwd)/deploy.cfg
+	cp $SCRIPTDIR/mbed-none-shgtest/gprof.cfg $(pwd)/gprof.cfg
+	cp $SCRIPTDIR/mbed-none-shgtest/test-gprof.cfg $(pwd)/test-gprof.cfg
+	# Copy cpputest src (exluding .git)
+	rsync -a --exclude .git $BASEDIR/googletest/ $(pwd)/test-googletest
+	# Add GTEST_OS_NONE Profile, which disables POSIX calls getcwd and mkdir.
+	patch $(pwd)/test-googletest/src/gtest-filepath.cc < $SCRIPTDIR/mbed-none-shgtest/gtest-filepath.cc.patch
+	# Print usage instructions
+	cat README
+	;;
   mbed-none-shsim)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
-	echo "   mbed-none-sim-cpput ... creates a bare-metal project with mbed SDK and cpputest support suitable for (ARM semihosted) QEMU simulation" >> $(pwd)/README
+	echo "   mbed-none-shsim[|cpput] ... creates a bare-metal project with mbed SDK and cpputest support suitable for (ARM semihosted) QEMU simulation" >> $(pwd)/README
 	echo "" >> $(pwd)/README
 	echo "Usage [app]:  make clean && make && sudo make deploy" >> $(pwd)/README
 	echo "Usage [test]: make test-clean && make test-deps && make test && make check"  >> $(pwd)/README
@@ -321,6 +352,46 @@ case "$1" in
 	cp $SCRIPTDIR/mbed-none-shsim/check.exp $(pwd)/check.exp
 	# Copy cpputest src (exluding .git)
 	rsync -a --exclude .git $BASEDIR/cpputest/ $(pwd)/test-cpputest
+	# Delete the linker script
+	rm *.ld
+	# Print usage instructions
+	cat README
+	;;
+	mbed-none-shsimcpput)
+	mbed-none-shsim
+	;;
+	mbed-none-shsimgtest)
+	echo "Project template created by ${0##*/} $1" > $(pwd)/README
+	echo "   mbed-none-shsimgtest ... creates a bare-metal project with mbed SDK and googletest support suitable for (ARM semihosted) QEMU simulation" >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Usage [app]:  make clean && make && sudo make deploy" >> $(pwd)/README
+	echo "Usage [test]: make test-clean && make test-deps && make test && make check"  >> $(pwd)/README
+	echo "" >> $(pwd)/README
+	echo "Git info:" >> $(pwd)/README
+	echo "   stm32:    "$(cd $BASEDIR && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   mbed:     "$(cd $BASEDIR/mbed && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/mbed && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	echo "   gtest:    "$(cd $BASEDIR/googletest && git rev-parse --short=10 HEAD)" ("$(cd $BASEDIR/googletest && git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")" >> $(pwd)/README
+	do_create_tdir $2
+	do_deploy_mbed $2
+	# Deploy project files
+	cp $SCRIPTDIR/mbed-none-shsimgtest/main.cpp $(pwd)/src/main.cpp
+	cp $SCRIPTDIR/mbed-none-shsimgtest/add.cpp $(pwd)/src/add.cpp
+	cp $SCRIPTDIR/mbed-none-shsimgtest/dadd.cpp $(pwd)/src/dadd.cpp
+	cp $SCRIPTDIR/mbed-none-shsimgtest/add.h $(pwd)/inc/add.h
+	cp $SCRIPTDIR/mbed-none-shsimgtest/dadd.h $(pwd)/inc/dadd.h
+	# Deploy test files
+	cp $SCRIPTDIR/mbed-none-shsimgtest/test-main.cpp $(pwd)/test-src/test-main.cpp
+	cp $SCRIPTDIR/mbed-none-shsimgtest/test-fail.cpp $(pwd)/test-src/test-fail.cpp
+	cp $SCRIPTDIR/mbed-none-shsimgtest/test-add.cpp $(pwd)/test-src/test-add.cpp
+	cp $SCRIPTDIR/mbed-none-shsimgtest/test-dadd.cpp $(pwd)/test-src/test-dadd.cpp
+	# Deploy Makefiles, automated unit test check script
+	cp $SCRIPTDIR/mbed-none-shsimgtest/Makefile $(pwd)/Makefile
+	cp $SCRIPTDIR/mbed-none-shsimgtest/Makefile-test $(pwd)/Makefile-test
+	cp $SCRIPTDIR/mbed-none-shsimgtest/check.exp $(pwd)/check.exp
+	# Copy cpputest src (exluding .git)
+	rsync -a --exclude .git $BASEDIR/googletest/ $(pwd)/test-googletest
+	# Add GTEST_OS_NONE Profile, which disables POSIX calls getcwd and mkdir.
+	patch $(pwd)/test-googletest/src/gtest-filepath.cc < $SCRIPTDIR/mbed-none-shsimgtest/gtest-filepath.cc.patch
 	# Delete the linker script
 	rm *.ld
 	# Print usage instructions
@@ -437,22 +508,29 @@ case "$1" in
   --help)
 	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-cpput|mbed-none-sim|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
 	echo ""
-	echo "   mbed-none ........... creates a bare-metal project with mbed SDK"
-	echo "   mbed-none-BB ........ creates a bare-metal project with mbed SDK, cpputest support and redirected STDIO tailored to STM32F4-BB expansion board"
-	echo "   mbed-none-sh ........ creates a bare-metal project with mbed SDK, cpputest and ARM semihosting support"
-	echo "   mbed-none-shsim ..... creates a bare-metal project with mbed SDK and cpputest support suitable for (ARM semihosted) QEMU simulation"
-	echo "   mbed-none-lib ....... creates a bare-metal project with mbed SDK"
-	echo "   mbed-freertos ....... creates a FreeRTOS project with mbed SDK (/w libraries)"
-	echo "   mbed-freertos-lib ... creates a FreeRTOS project with mbed SDK (/w libraries)"
-	echo "   mbed-mbedrtos ....... creates a mbedRTOS project with mbed SDK"
-	echo "   mbed-mbedrtos-lib ... creates a mbedRTOS project with mbed SDK (/w libraries)"
-	echo "   none-safertos ....... creates a SafeRTOS project"
+	echo "   mbed-none ................. creates a bare-metal project with mbed SDK"
+	echo "   mbed-none-BB .............. creates a bare-metal project with mbed SDK, cpputest support and redirected STDIO tailored to STM32F4-BB expansion board"
+	echo "   mbed-none-sh[|cpput] ...... creates a bare-metal project with mbed SDK, cpputest and ARM semihosting support"
+	echo "   mbed-none-shgtest ......... creates a bare-metal project with mbed SDK, googletest and ARM semihosting support"
+	echo "   mbed-none-shsim[|cpput] ... creates a bare-metal project with mbed SDK and cpputest support suitable for (ARM semihosted) QEMU simulation"
+	echo "   mbed-none-shsimgtest ...... creates a bare-metal project with mbed SDK and googletest support suitable for (ARM semihosted) QEMU simulation"
+	echo "   mbed-none-lib ............. creates a bare-metal project with mbed SDK"
+	echo "   mbed-freertos ............. creates a FreeRTOS project with mbed SDK (/w libraries)"
+	echo "   mbed-freertos-lib ......... creates a FreeRTOS project with mbed SDK (/w libraries)"
+	echo "   mbed-mbedrtos ............. creates a mbedRTOS project with mbed SDK"
+	echo "   mbed-mbedrtos-lib ......... creates a mbedRTOS project with mbed SDK (/w libraries)"
+	echo "   none-safertos ............. creates a SafeRTOS project"
 	echo " "
-	echo "   link ................ symlink files instead of copy"
+	echo "   link ...................... symlink files instead of copy"
 	echo " "
 	;;
   *)
-	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-BB|mbed-none-sh|mbed-none-shsim|mbed-none-lib|mbed-freertos|mbed-freertos-lib|mbed-mbedrtos|mbed-mbedrtos-lib|none-safertos} {|link}"
+	echo "Usage: $SCRIPTNAME {mbed-none|mbed-none-BB|mbed-none-lib|"
+	echo "                    mbed-none-sh|mbed-none-shcpput|mbed-none-shgtest|"
+	echo "                    mbed-none-shsim|mbed-none-shsimcpput|mbed-none-shsimgtest"
+	echo "                    mbed-freertos|mbed-freertos-lib|"
+	echo "                    mbed-mbedrtos|mbed-mbedrtos-lib|"
+	echo "                    none-safertos} {|link}"
 	exit 3
 	;;
 esac
