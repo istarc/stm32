@@ -158,11 +158,26 @@ $(SRCDIR)/%.o: $(SRCDIR)/%.c
 	@echo "Assambled "$<"!\n"
 
 ##
-# Build dependencies
-# TODO CXXFLAGS+=-std=c++11 works only with -Wno-error (Dirty Hack!)
+# Build dependencies (googletest)
+# 
+# Google test build for bare metal without OS. 
+# This means the following infrastructre is not available.
+# - POSIX reg. exp. (GTEST_HAS_POSIX_RE=0), 
+# - POSIX threads (GTEST_HAS_PTHREAD=0), 
+# - POSIX OS with the memory management (GTEST_HAS_DEATH_TEST=0),
+# - POSIX IPC (GTEST_HAS_STREAM_REDIRECTION=0),
+# - POSIX OS with the file system (GTEST_OS_NONE should be selected
+#    after gtest is patched with gtest-filepath.cc.patch).
+#
+GTEST_DEFS=-DGTEST_HAS_POSIX_RE=0 -DGTEST_HAS_PTHREAD=0 -DGTEST_HAS_DEATH_TEST=0 -DGTEST_HAS_STREAM_REDIRECTION=0 -DGTEST_OS_NONE # -DGTEST_HAS_COMBINE=1 -DGTEST_HAS_TR1_TUPLE=1
+
 .PHONY: test-deps
 test-deps: 
-	cd $(TGTEST) && make clean || true && autoreconf -fvi && ./configure --disable-shared --without-pthreads --disable-libtool-lock --prefix=$(shell pwd)/$(TGTEST) --exec-prefix=$(shell pwd)/$(TGTEST) --host=arm-none-eabi LDFLAGS="$(MCFLAGS) --specs=nosys.specs --specs=nano.specs $(CPPUTEST_INCLUDES_LIBS) $(CPPUTEST_LINK_LIBS)" CFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) -std=c99 -Os -DGTEST_HAS_POSIX_RE=0 -DGTEST_HAS_PTHREAD=0 -DGTEST_HAS_COMBINE=0 -DGTEST_HAS_DEATH_TEST=0 -DGTEST_HAS_TR1_TUPLE=0 -DGTEST_HAS_STREAM_REDIRECTION=0 -DGTEST_OS_NONE" CXXFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) -std=gnu++11 -Os -DGTEST_HAS_POSIX_RE=0 -DGTEST_HAS_PTHREAD=0 -DGTEST_HAS_COMBINE=0 -DGTEST_HAS_DEATH_TEST=0 -DGTEST_HAS_TR1_TUPLE=0 -DGTEST_HAS_STREAM_REDIRECTION=0 -DGTEST_OS_NONE" && make && make install-libLTLIBRARIES
+	cd $(TGTEST) && \
+	make clean || true && \
+	autoreconf -fvi && \
+	./configure --disable-shared --without-pthreads --disable-libtool-lock --prefix=$(shell pwd)/$(TGTEST) --exec-prefix=$(shell pwd)/$(TGTEST) --host=arm-none-eabi LDFLAGS="$(MCFLAGS) --specs=nosys.specs --specs=nano.specs $(CPPUTEST_INCLUDES_LIBS) $(CPPUTEST_LINK_LIBS)" CFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) $(GTEST_DEFS) -std=c99 -Os" CXXFLAGS="$(MCFLAGS) $(CPPUTEST_INCLUDES) $(GTEST_DEFS) -std=gnu++11 -Os" && \
+	make && make install-libLTLIBRARIES
 
 ##
 # Clean rules

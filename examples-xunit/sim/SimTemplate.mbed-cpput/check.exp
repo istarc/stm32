@@ -29,8 +29,8 @@ expect {
 
 # Checkpoint 3 - Wait for coverage statistic and exit
 expect {
-	-re "\^.* Test End .*\$" {}
-	timeout { puts "Test Results: Failure.\nTest execution failed \[3] due to timeout (see check.exp; current timeout = $timeout s).\n"; exit 1 }
+		-re "\^.* Test End .*\$" {}
+		timeout { puts "Test Results: Failure.\nTest execution failed \[3] due to timeout (see check.exp; current timeout = $timeout s).\n"; exit 1 }
 }
 
 if { $exitcode == 0 } { 

@@ -1,6 +1,10 @@
 Project template created by gen-stm32f407-GCC-project.sh mbed-none-sh
-   mbed-none-sh ... creates a bare-metal project with mbed SDK, cpputest and ARM semihosting support.
+   mbed-none-sh[|cpput] ... creates a bare-metal project with mbed SDK, cpputest and ARM semihosting support.
 
 Usage [app]:  make clean && make && sudo make deploy
-Usage [test]: make test-clean && make test-deps && make test && sudo make check && make check-coverage
+Usage [test]: make test-clean && make test-deps && make test && sudo make check
 
+Git info:
+   stm32:    184857d697 (master)
+   mbed:     a94eb663dc (mbed_lib_rev91)
+   cpputest: 2139e96793 (v3.6)

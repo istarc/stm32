@@ -5,6 +5,6 @@ Usage [app]:  make clean && make && sudo make deploy
 Usage [test]: make test-clean && make test-deps && make test && sudo make check
 
 Git info:
-   stm32:    c9598bb6ec (master)
+   stm32:    184857d697 (master)
    mbed:     a94eb663dc (mbed_lib_rev91)
    gtest:    2ad076167a (release-1.7.0)
