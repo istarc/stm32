@@ -9,7 +9,9 @@ before_script:
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none && cd $TRAVIS_BUILD_DIR/examples/mbed-none && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-BB && cd $TRAVIS_BUILD_DIR/examples/mbed-none-BB && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-BB
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-sh && cd $TRAVIS_BUILD_DIR/examples/mbed-none-sh && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-sh
+  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-shgtest && cd $TRAVIS_BUILD_DIR/examples/mbed-none-shgtest && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-shgtest
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-shsim && cd $TRAVIS_BUILD_DIR/examples/mbed-none-shsim && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-shsim
+  - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-shsimgtest && cd $TRAVIS_BUILD_DIR/examples/mbed-none-shsimgtest && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-shsimgtest
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-none-lib && cd $TRAVIS_BUILD_DIR/examples/mbed-none-lib && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-none-lib
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-freertos && cd $TRAVIS_BUILD_DIR/examples/mbed-freertos && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-freertos
   - mkdir -p $TRAVIS_BUILD_DIR/examples/mbed-freertos-lib && cd $TRAVIS_BUILD_DIR/examples/mbed-freertos-lib && $TRAVIS_BUILD_DIR/mbed-project-wizard/gen-stm32f407-GCC-project.sh mbed-freertos-lib
