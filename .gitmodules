@@ -10,3 +10,6 @@
 [submodule "googletest"]
 	path = googletest
 	url = https://github.com/istarc/googletest.git
+[submodule "lwip"]
+	path = lwip
+	url = https://github.com/istarc/lwip.git
