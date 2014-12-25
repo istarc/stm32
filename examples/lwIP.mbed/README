@@ -1,0 +1,15 @@
+Project template created by gen-stm32f407-GCC-project.sh mbed-none
+   mbed-none ... creates a bare-metal project with mbed SDK
+
+Usage: make && sudo make deploy
+
+Git info:
+   stm32:    e472cd5cea (lwip)
+   mbed:     a94eb663dc (mbed_lib_rev91)
+
+# Additional info
+# Add lwip
+rsync -a --exclude .git ../../lwip/ lib/lwip # Copy the repo
+rm -r lib/lwip/test # Remove Unit Test
+rm -r lib/lwip/src/core/ipv6 # Remove IPv6 Stack
+rm -r lib/lwip/src/include/ipv6 # Remove IPv6 Headers	
