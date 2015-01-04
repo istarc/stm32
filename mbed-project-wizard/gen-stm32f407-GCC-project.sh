@@ -279,7 +279,7 @@ case "$1" in
 	# Print usage instructions
 	cat README
 	;;
-  mbed-none-sh)
+  mbed-none-sh | mbed-none-shcpput)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
 	echo "   mbed-none-sh[|cpput] ... creates a bare-metal project with mbed SDK, cpputest and ARM semihosting support." >> $(pwd)/README
 	echo "" >> $(pwd)/README
@@ -315,9 +315,6 @@ case "$1" in
 	rsync -a --exclude .git $BASEDIR/cpputest/ $(pwd)/test-cpputest
 	# Print usage instructions
 	cat README
-	;;
-	mbed-none-shcpput)
-	mbed-none-sh
 	;;
 	mbed-none-shgtest)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
@@ -358,7 +355,7 @@ case "$1" in
 	# Print usage instructions
 	cat README
 	;;
-  mbed-none-shsim)
+  mbed-none-shsim | mbed-none-shsimcpput)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
 	echo "   mbed-none-shsim[|cpput] ... creates a bare-metal project with mbed SDK and cpputest support suitable for (ARM semihosted) QEMU simulation" >> $(pwd)/README
 	echo "" >> $(pwd)/README
@@ -392,9 +389,6 @@ case "$1" in
 	rm *.ld
 	# Print usage instructions
 	cat README
-	;;
-	mbed-none-shsimcpput)
-	mbed-none-shsim
 	;;
 	mbed-none-shsimgtest)
 	echo "Project template created by ${0##*/} $1" > $(pwd)/README
