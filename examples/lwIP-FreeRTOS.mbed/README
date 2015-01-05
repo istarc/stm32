@@ -1,0 +1,149 @@
+Project template created by gen-stm32f407-GCC-project.sh mbed-freertos
+   mbed-freertos ... creates a FreeRTOS project with mbed SDK (/w libraries)
+
+Usage: make && sudo make deploy
+
+Git info:
+   stm32:    57dd308d4d (lwip)
+   mbed:     a94eb663dc (mbed_lib_rev91)
+   freertos: 2139e96793 (v3.6)
+
+# Additional info
+# Add lwip without OS
+# Limitations: currently works only with raw sockets
+#              netconn and socket API disabled => 
+#              networking IPC disalbed =>
+#              Only networking thread should be used to handle network communications
+#
+rsync -a --exclude .git ../../lwip/ lib/lwip # Copy the repo
+rm -r lib/lwip/test # Remove Unit Test
+rm -r lib/lwip/src/core/ipv6 # Remove IPv6 Stack
+rm -r lib/lwip/src/include/ipv6 # Remove IPv6 Headers	
+
+# Change ./Makefile
+35a36
+> INCLUDES+=-Ilib/lwip/src/include -Ilib/lwip/src/include/ipv4 -Ilib/lwip/port/STM32F4x7
+79c80
+< release-memopt: LDFLAGS+=-Os -Wl,-gc-sections #--specs=nano.specs # -flto
+---
+> release-memopt: LDFLAGS+=-Os -Wl,-gc-sections --specs=nano.specs # -flto
+
+# Copy STM32F4x7 lwIP port files (thx, STM32Cube) to ./lib/lwip/port
+# http://lwip.wikia.com/wiki/LwIP_Platform_Developers_Manual
+
+# Copy lwip.h, lwipopts.h to ./inc
+# Copy lwip.c to ./src
+
+# Change ./src/main.cpp
+2a3,4
+> /* Include lwIP */
+> #include "lwip.h"
+9c11,12
+< #define BLOCK_
+---
+> void SystemClock_Config(void);
+> static void MX_GPIO_Init(void);
+13a17
+> void Networking(void*);
+24a29,34
+>   /* Configure the system clock */
+>   SystemClock_Config();
+>   /* Initialize all configured peripherals */
+>   MX_GPIO_Init();
+>   MX_LWIP_Init();
+> 
+55a66,75
+> 
+>   /* Create tasks */
+>   xTaskCreate(
+>       Networking,                       /* Function pointer */
+>       "Task4",                          /* Task name - for debugging only*/
+>       configMINIMAL_STACK_SIZE,         /* Stack depth in words */
+>       (void*) NULL,                     /* Pointer to tasks arguments (parameter) */
+>       tskIDLE_PRIORITY + 2UL,           /* Task priority*/
+>       NULL                              /* Task handle */
+>   );
+124,125c144,145
+< /*
+<  * Override C++ new/delete operators to reduce memory footprint
+---
+> /**
+>  * TASK 4: Networking
+127,130c147,150
+< #ifdef CUSTOM_NEW
+< 
+< void *operator new(size_t size) {
+<         return malloc(size);
+---
+> void Networking(void *pvParameters){
+>   while (1) {
+>     MX_LWIP_Process();
+>   }
+133,135c153,154
+< void *operator new[](size_t size) {
+<         return malloc(size);
+< }
+---
+> void MX_GPIO_Init(void)
+> {
+137,139c156,170
+< void operator delete(void *p) {
+<         free(p);
+< }
+---
+>   GPIO_InitTypeDef GPIO_InitStruct;
+> 
+>   /* GPIO Ports Clock Enable */
+>   __GPIOH_CLK_ENABLE();
+>   __GPIOC_CLK_ENABLE();
+>   __GPIOA_CLK_ENABLE();
+>   __GPIOB_CLK_ENABLE();
+> 
+>   /*Configure GPIO pin : PA8 */
+>   GPIO_InitStruct.Pin = GPIO_PIN_8;
+>   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+>   GPIO_InitStruct.Pull = GPIO_NOPULL;
+>   GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+>   GPIO_InitStruct.Alternate = GPIO_AF0_MCO;
+>   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+141,142d171
+< void operator delete[](void *p) {
+<         free(p);
+144d172
+< #endif
+145a174,208
+> /** System Clock Configuration
+> */
+> void SystemClock_Config(void)
+> {
+> 
+>   RCC_OscInitTypeDef RCC_OscInitStruct;
+>   RCC_ClkInitTypeDef RCC_ClkInitStruct;
+> 
+>   __PWR_CLK_ENABLE();
+> 
+>   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+> 
+>   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_HSE;
+>   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+>   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+>   RCC_OscInitStruct.HSICalibrationValue = 6;
+>   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+>   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+>   RCC_OscInitStruct.PLL.PLLM = 8;
+>   RCC_OscInitStruct.PLL.PLLN = 336;
+>   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+>   RCC_OscInitStruct.PLL.PLLQ = 4;
+>   HAL_RCC_OscConfig(&RCC_OscInitStruct);
+> 
+>   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_SYSCLK|RCC_CLOCKTYPE_PCLK1
+>                               |RCC_CLOCKTYPE_PCLK2;
+>   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+>   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+>   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+>   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
+>   HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5);
+> 
+>   HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_HSI, RCC_MCODIV_1);
+> 
+> }
