@@ -2,6 +2,8 @@ Project template created by gen-stm32f407-GCC-project.sh mbed-freertos
    mbed-freertos ... creates a FreeRTOS project with mbed SDK (/w libraries)
 
 Usage: make && sudo make deploy
+       ifconfig eth0:0 192.168.255.99 netmask 255.255.255.0 up
+       ping 192.168.34.100 # The IP of the embedded device
 
 Git info:
    stm32:    57dd308d4d (lwip)
