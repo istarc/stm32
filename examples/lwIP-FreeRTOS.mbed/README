@@ -30,7 +30,8 @@ rm -r lib/lwip/src/include/ipv6 # Remove IPv6 Headers
 ---
 > release-memopt: LDFLAGS+=-Os -Wl,-gc-sections --specs=nano.specs # -flto
 
-# Copy STM32F4x7 lwIP port files (thx, STM32Cube) to ./lib/lwip/port
+# Copy STM32F4x7 lwIP port files to ./lib/lwip/port
+# https://github.com/withrobot/myCortex-STM32F4/tree/master/Libraries/lwip-1.4.1
 # http://lwip.wikia.com/wiki/LwIP_Platform_Developers_Manual
 
 # Copy lwip.h, lwipopts.h to ./inc

@@ -16,8 +16,8 @@ rm -r lib/lwip/test # Remove Unit Test
 rm -r lib/lwip/src/core/ipv6 # Remove IPv6 Stack
 rm -r lib/lwip/src/include/ipv6 # Remove IPv6 Headers	
 
-# Copy STM32F4x7 lwIP port files (thx, STM32Cube) to ./lib/lwip/port
-# http://lwip.wikia.com/wiki/LwIP_Platform_Developers_Manual
+# Copy STM32F4x7 lwIP port files to ./lib/lwip/port
+# https://github.com/withrobot/myCortex-STM32F4/tree/master/Libraries/lwip-1.4.1
 
 # Copy lwip.h, lwipopts.h to ./inc
 # Copy lwip.c to ./src
