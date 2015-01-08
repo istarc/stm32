@@ -59,8 +59,8 @@ sudo apt-get install -y build-essential git libgmp-dev libmpfr-dev libmpc-dev zl
 ###
 # 1. Define Variables
 # 1.1 GNU Toolchain
-export BINUTILS=binutils-2.24
-export GCC=gcc-4.9.1
+export BINUTILS=binutils-2.25
+export GCC=gcc-4.9.2
 export NEWLIB=newlib-2.1.0
 export NEWLIB_NANO=newlib-nano-2.1.0
 export GDB=gdb-7.8
@@ -74,7 +74,7 @@ export SCRIPTDIR=$(pwd)
 # 1.4 Stop on first error
 set -e
 # 1.5 Be verbose
-set -x
+# set -x
 # 1.6 Check if clean
 if [ -d "$PREFIX" ]; then
         echo ""
@@ -314,3 +314,29 @@ make install
 echo ""
 echo "### END ###"
 echo ""
+cat << EOF | tee $PREFIX/README
+Created by ${0##*/}
+
+Includes:
+	$BINUTILS
+	$GCC
+	$NEWLIB
+	$NEWLIB_NANO
+	$GDB
+
+Usage:
+	export PATH=~/arm/bin:\$PATH
+	arm-none-eabi-gcc -v
+	arm-none-eabi-g++ -v
+
+Build an Example:
+	export PATH=~/arm/bin:\$PATH
+	cd ~
+	git clone https://github.com/istarc/stm32.git
+	cd ~/stm32
+	git submodule update --init
+	make
+
+Git info:
+	stm32: "$(git rev-parse --short=10 HEAD)" ("$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match 2>/dev/null)")
+EOF
