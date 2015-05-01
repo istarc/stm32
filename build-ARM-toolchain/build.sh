@@ -60,10 +60,10 @@ sudo apt-get install -y build-essential git libgmp-dev libmpfr-dev libmpc-dev zl
 # 1. Define Variables
 # 1.1 GNU Toolchain
 export BINUTILS=binutils-2.25
-export GCC=gcc-4.9.2
+export GCC=gcc-5.1.0
 export NEWLIB=newlib-2.1.0
 export NEWLIB_NANO=newlib-nano-2.1.0
-export GDB=gdb-7.8
+export GDB=gdb-7.9
 # 1.2 Target system
 export TARGET=arm-none-eabi
 # 1.3 Build directory
